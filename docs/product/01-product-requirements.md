@@ -430,11 +430,13 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 **Purpose:** Full list of all Fuel Logs for a vehicle.
 
 **Rules:**
-- Default sort: newest first
+- Default sort: newest first (by date, descending)
+- Sortable by: **Date** (newest/oldest first) or **Efficiency** (best/worst L/100km first)
 - Filterable by: date range (presets: This Month, Last Month, Last 3 Months, All Time; custom range)
 - Each row: Date, Total Cost, Volume, Efficiency (if available)
 - Tapping a row opens the Full Detail screen
 - Partial-fill logs display a visual indicator (e.g., half-filled icon)
+- Sort state persists while on the History screen; resets on navigation away
 
 ### 6.5 Multi-Vehicle Support
 

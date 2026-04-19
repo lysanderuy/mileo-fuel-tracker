@@ -48,6 +48,11 @@ Track multiple vehicles in one account. Switch between cars and see each one's s
 ### ✓ Data Export
 Download all your fuel logs as CSV. Your data is yours—take it with you anytime.
 
+### ✓ Sort & Organize
+View your logs in the way that matters most:
+- **Sort by Date** – See your most recent fill-ups first, or browse chronologically
+- **Sort by Efficiency** – Find your best and worst fuel efficiency runs instantly
+
 ---
 
 ## Who Should Use Mileo?
@@ -139,7 +144,9 @@ Mileo is a complete fuel tracking application with all essential functionality:
 ✓ Update logs  
 ✓ Delete logs  
 ✓ Multi-vehicle support  
-✓ Data export
+✓ Data export  
+✓ Sort logs by date (newest to oldest / oldest to newest)  
+✓ Sort logs by fuel efficiency (L/100km)
 
 ---
 
@@ -157,10 +164,15 @@ Mileo is a complete fuel tracking application with all essential functionality:
    cd mileo-fuel-tracker
    ```
 
-2. **Move to XAMPP htdocs:**
-   - Copy the project folder to your XAMPP `htdocs` directory
-   - On Windows: `C:\xampp\htdocs\mileo-fuel-tracker`
-   - On Mac/Linux: `/Applications/XAMPP/xamppfiles/htdocs/mileo-fuel-tracker`
+2. **Set up XAMPP with public folder:**
+   - **Option A (Recommended):** Configure XAMPP to point to the `public/` folder
+     - Edit `C:\xampp\apache\conf\extra\httpd-vhosts.conf` (Windows)
+     - Or edit `/Applications/XAMPP/xamppfiles/etc/httpd/conf/extra/httpd-vhosts.conf` (Mac)
+     - Point the virtual host DocumentRoot to your `mileo-fuel-tracker/public` folder
+   
+   - **Option B (Simple):** Copy only the `public/` folder to htdocs
+     - Copy `mileo-fuel-tracker/public` → `C:\xampp\htdocs\mileo-fuel-tracker-public`
+     - Keep the rest of the project (app/, config/, database/) locally outside htdocs for security
 
 3. **Start XAMPP:**
    - Open XAMPP Control Panel
@@ -169,15 +181,16 @@ Mileo is a complete fuel tracking application with all essential functionality:
 4. **Import the database:**
    - Open phpMyAdmin: `http://localhost/phpmyadmin`
    - Create a new database named `mileo_db`
-   - Import the SQL file from `/db/mileo_db.sql`
+   - Import the SQL file from `/database/schema.sql`
 
 ### Running Locally
 Open your browser and navigate to:
 ```
-http://localhost/mileo-fuel-tracker
+http://localhost/mileo-fuel-tracker-public
 ```
+(or whatever you configured your DocumentRoot to point to)
 
-That's it! The app should load.
+The `public/index.php` entry point will route all requests to your application.
 
 ### Database Configuration
 Edit `config/db.php` if you need to change database credentials:
@@ -194,37 +207,68 @@ $password = ''; // XAMPP default is empty
 
 ```
 mileo-fuel-tracker/
-├── index.php                # Home / Dashboard page
-├── css/
-│   ├── styles.css          # Main stylesheet
-│   ├── responsive.css      # Responsive styles for all device sizes
-│   └── design-tokens.css   # Color, spacing, typography variables
-├── js/
-│   ├── app.js              # Main application logic
-│   ├── fuel-log.js         # Fuel logging functionality
-│   ├── dashboard.js        # Dashboard stats and display
-│   ├── utils.js            # Helper functions
-│   └── api-client.js       # AJAX calls to backend
-├── api/
-│   ├── create-log.php      # Create fuel log (POST)
-│   ├── get-logs.php        # Fetch fuel logs (GET)
-│   ├── update-log.php      # Update fuel log (PUT)
-│   ├── delete-log.php      # Delete fuel log (DELETE)
-│   ├── get-stats.php       # Get dashboard stats
-│   └── export-csv.php      # Export data to CSV
+
+## PUBLIC (Only folder exposed to browser / htdocs)
+├── public/
+│   ├── index.php           # Entry point / router
+│   ├── css/
+│   │   ├── styles.css      # Main stylesheet
+│   │   ├── responsive.css  # Responsive styles for all device sizes
+│   │   └── design-tokens.css # Color, spacing, typography variables
+│   ├── js/
+│   │   ├── app.js          # Main application logic
+│   │   ├── fuel-log.js     # Fuel logging functionality
+│   │   ├── dashboard.js    # Dashboard stats and display
+│   │   ├── utils.js        # Helper functions
+│   │   └── api-client.js   # AJAX calls to backend
+│   └── assets/
+│       ├── icons/          # SVG and PNG icons
+│       ├── images/         # Images
+│       └── fonts/          # Custom fonts if needed
+
+## APPLICATION LOGIC
+├── app/
+│   │
+│   ├── pages/              # UI pages (views)
+│   │   ├── dashboard.php   # Dashboard / home
+│   │   ├── quick-log.php   # Quick log form page
+│   │   ├── history.php     # View all fuel logs
+│   │   ├── vehicles.php    # Multi-vehicle management
+│   │   └── settings.php    # User settings
+│   │
+│   ├── api/                # Backend API endpoints (controllers)
+│   │   └── logs/
+│   │       ├── create.php  # Create fuel log (POST)
+│   │       ├── read.php    # Fetch fuel logs (GET) with sorting support
+│   │       │               # Params: sort_by (date|efficiency), order (ASC|DESC)
+│   │       ├── update.php  # Update fuel log (PUT)
+│   │       ├── delete.php  # Delete fuel log (DELETE)
+│   │       ├── stats.php   # Get dashboard stats
+│   │       └── export.php  # Export data to CSV
+│   │
+│   ├── includes/           # Reusable UI components
+│   │   ├── header.php      # Header component
+│   │   ├── footer.php      # Footer component
+│   │   └── navbar.php      # Navigation bar
+│   │
+│   ├── models/             # Database logic
+│   │   ├── Log.php         # Fuel log model
+│   │   └── Vehicle.php     # Vehicle model
+│   │
+│   └── helpers/            # Utility functions
+│       ├── response.php    # API response formatting
+│       ├── validation.php  # Input validation
+│       └── utils.php       # General utilities
+
+## CONFIGURATION
 ├── config/
 │   └── db.php              # Database connection config
-├── db/
-│   └── mileo_db.sql        # Database schema and initial data
-├── assets/
-│   ├── icons/              # SVG and PNG icons
-│   ├── images/             # Images
-│   └── fonts/              # Custom fonts if needed
-├── pages/
-│   ├── quick-log.php       # Quick log form page
-│   ├── history.php         # View all fuel logs
-│   ├── vehicles.php        # Multi-vehicle management
-│   └── settings.php        # User settings
+
+## DATABASE
+├── database/
+│   └── schema.sql          # Database schema and initial data
+
+## PROJECT
 ├── .gitignore              # Git ignore rules
 ├── README.md               # This file
 └── package.json            # (Optional) For build tools if needed later
@@ -257,6 +301,17 @@ Mileo talks like a coach—direct, honest, practical, and supportive:
 - Over-explain or patronize
 - Hide the numbers
 - Make false promises
+
+---
+
+## Documentation
+
+- **[Implementation Guide](docs/technical/01-implementation-guide.md)** – Complete step-by-step guide to building Mileo with the new structure
+- **[Database Schema](docs/technical/02-database-schema.md)** – Database structure, tables, and sorting column implementation
+- **[API Documentation](docs/technical/03-api-documentation.md)** – Complete guide to all API endpoints, including sorting and filtering parameters
+- **[Product Requirements](docs/product/02-product-requirements.md)** – Feature specifications, flows, and business rules
+- **[User Stories](docs/product/03-user-stories.md)** – Detailed user stories and acceptance criteria (source for dev tickets)
+- **[Design & Brand](docs/design)** – Brand guidelines and design tokens
 
 ---
 

@@ -352,6 +352,39 @@
 
 ---
 
+### US-041a — Sort History by Date
+
+**Role:** Driver
+**Priority:** Must Have
+
+> As a Driver, I want to sort my fill-up history by date so that I can view logs in chronological order (newest or oldest first).
+
+**Acceptance Criteria:**
+- [ ] A sort control is visible at the top of the History screen
+- [ ] A dropdown or button selector allows choosing between "Date" and "Efficiency" sort fields
+- [ ] For Date sort: two order options are available: "Newest First" (DESC) and "Oldest First" (ASC)
+- [ ] The default sort is "Date, Newest First"
+- [ ] Sort order is reflected immediately in the list view
+- [ ] Sort state persists while on the History screen; resets on navigation away
+
+---
+
+### US-041b — Sort History by Efficiency
+
+**Role:** Driver
+**Priority:** Must Have
+
+> As a Driver, I want to sort my fill-up history by fuel efficiency so that I can spot my best and worst fuel economy runs at a glance.
+
+**Acceptance Criteria:**
+- [ ] The sort control allows selecting "Efficiency" as a sort field
+- [ ] For Efficiency sort: two order options are available: "Best First" (highest L/100km, DESC) and "Worst First" (lowest L/100km, ASC)
+- [ ] Partial-fill logs (where `is_full_tank = false`) are still included but sorted with a visual caveat
+- [ ] Sort order is reflected immediately in the list view
+- [ ] Sort state persists while on the History screen; resets on navigation away
+
+---
+
 ### US-042 — View Full Fill-Up Detail
 
 **Role:** Driver
