@@ -1,0 +1,572 @@
+# ============================================================
+# MILEO — Design System Tokens
+# Version: 1.0
+# Brand Personality: The Coach — direct, honest, practical,
+#   responsive web app, no-nonsense.
+# ============================================================
+#
+# COLOR RATIONALE
+# ---------------
+# Primary (Fuel Amber): Warm amber-orange anchors the brand in the
+#   act of fueling — combustion, energy, motion. Amber reads
+#   as action-oriented without the aggression of red. High contrast
+#   against both light and dark surfaces.
+#
+# Secondary (Slate Ink): Deep desaturated blue-gray for text, structure,
+#   and secondary actions. Authoritative but not corporate. The Coach's
+#   direct voice rendered in color.
+#
+# Neutral (Fog): A warm white-to-charcoal scale with a slight warm tint
+#   (not cold gray). Keeps the UI grounded and human, not clinical.
+#
+# Semantic:
+#   Success uses a muted sage — clear without the "eco-lecture" green.
+#   Warning uses a soft gold — distinct from primary amber.
+#   Error uses a firm brick red — clear, never alarming.
+# ============================================================
+
+meta:
+  name: Mileo Design System
+  version: "1.0"
+  description: >
+    Design tokens for Mileo, a frictionless fuel tracking app.
+    Brand personality: The Coach — direct, honest, practical.
+    All color decisions prioritize clarity and legibility.
+
+# ─────────────────────────────────────────────
+# COLOR PALETTE
+# ─────────────────────────────────────────────
+color:
+
+  # PRIMARY — Fuel Amber
+  # Warm, energetic amber-orange. The action color.
+  # Evokes combustion and motion without aggression.
+  primary:
+    50:  "#FFF8ED"   # Barely amber — backgrounds, hover tints
+    100: "#FFEFD0"   # Soft highlight
+    200: "#FFD999"   # Light accent
+    300: "#FFC055"   # Mid accent
+    400: "#FFAb1F"   # Active/hover state
+    500: "#F59500"   # Core brand color — CTAs, FAB, key stats
+    600: "#CC7A00"   # Pressed state
+    700: "#A36100"   # Dark accent
+    800: "#7A4900"   # Deep usage (dark mode text on amber)
+    900: "#3D2500"   # Near-black amber for high-contrast needs
+
+  # SECONDARY — Slate Ink
+  # Deep, desaturated blue-gray. Structural, typographic authority.
+  secondary:
+    50:  "#F4F5F7"   # Near-white with slate tint
+    100: "#E5E7EC"   # Dividers, subtle borders
+    200: "#C8CDD8"   # Placeholder text, disabled
+    300: "#9AA1B3"   # Muted text, captions
+    400: "#6B738A"   # Secondary text
+    500: "#454E66"   # Body text (dark)
+    600: "#323A52"   # Heading text
+    700: "#232B42"   # Strong headings
+    800: "#161D30"   # Near-black slate
+    900: "#0C1221"   # Deepest — dark mode surfaces
+
+  # NEUTRAL — Fog
+  # Warm white-to-charcoal. Slight warm cast keeps UI human.
+  neutral:
+    0:   "#FFFFFF"   # Pure white — card surfaces
+    50:  "#FAFAF8"   # App background (warm off-white)
+    100: "#F2F1EE"   # Subtle section fills
+    200: "#E5E3DE"   # Borders, dividers
+    300: "#CCC9C2"   # Disabled borders
+    400: "#AAA79E"   # Disabled text
+    500: "#7A776E"   # Placeholder text
+    600: "#57544C"   # Secondary body text
+    700: "#38362F"   # Primary body text
+    800: "#211F1A"   # Strong text, icons
+    900: "#0F0E0C"   # Maximum contrast
+
+  # SEMANTIC — Success (Sage)
+  # Clear but never preachy. Muted green with warm undertone.
+  success:
+    50:  "#F0F7F3"
+    100: "#D4EDE0"
+    200: "#A8D9BE"
+    300: "#6DBF96"
+    400: "#3DA571"   # Icon fills
+    500: "#228A55"   # Primary success state
+    600: "#1A6D43"   # Pressed / deep
+    700: "#135030"
+    foreground: "#FFFFFF"
+
+  # SEMANTIC — Warning (Harvest Gold)
+  # Distinct from primary amber — softer, yellower.
+  warning:
+    50:  "#FFFBEA"
+    100: "#FFF3C0"
+    200: "#FFE566"
+    300: "#FFDA00"
+    400: "#E6C200"
+    500: "#C9A900"   # Primary warning state
+    600: "#A38900"
+    700: "#7A6700"
+    foreground: "#3D2500"
+
+  # SEMANTIC — Error (Brick)
+  # Firm, readable. Not alarming; not dismissible.
+  error:
+    50:  "#FEF2F0"
+    100: "#FDDDD9"
+    200: "#F9B5AC"
+    300: "#F4836F"
+    400: "#EC5237"   # Icon fills
+    500: "#D93520"   # Primary error state
+    600: "#AE2A19"
+    700: "#7F1E12"
+    foreground: "#FFFFFF"
+
+  # SEMANTIC — Info (Clear Sky)
+  # Neutral informational state — not the brand color.
+  info:
+    50:  "#EEF4FF"
+    100: "#D6E6FF"
+    400: "#4A90D9"
+    500: "#2B72C0"
+    600: "#1F5799"
+    foreground: "#FFFFFF"
+
+  # SURFACE tokens (semantic aliases)
+  surface:
+    background:      "#FAFAF8"   # neutral.50 — App background
+    card:            "#FFFFFF"   # neutral.0 — Card/sheet surfaces
+    overlay:         "#0C1221CC" # secondary.900 @ 80% — Modal overlays
+    sunken:          "#F2F1EE"   # neutral.100 — Recessed wells
+    border:          "#E5E3DE"   # neutral.200 — Default borders
+    border_strong:   "#CCC9C2"   # neutral.300 — Prominent dividers
+
+  # TEXT tokens (semantic aliases)
+  text:
+    primary:         "#38362F"   # neutral.700 — Main body text
+    secondary:       "#57544C"   # neutral.600 — Supporting text
+    placeholder:     "#7A776E"   # neutral.500 — Input placeholders
+    disabled:        "#AAA79E"   # neutral.400 — Disabled states
+    inverse:         "#FAFAF8"   # On dark backgrounds
+    on_primary:      "#FFFFFF"   # Text on amber CTA buttons
+    link:            "#CC7A00"   # primary.600 — Tappable text links
+
+  # INTERACTIVE tokens
+  interactive:
+    cta_bg:          "#F59500"   # primary.500
+    cta_bg_hover:    "#FFAb1F"   # primary.400
+    cta_bg_pressed:  "#CC7A00"   # primary.600
+    cta_bg_disabled: "#E5E3DE"   # neutral.200
+    cta_fg:          "#FFFFFF"
+    cta_fg_disabled: "#AAA79E"   # neutral.400
+
+    secondary_bg:         "#F4F5F7"   # secondary.50
+    secondary_bg_hover:   "#E5E7EC"   # secondary.100
+    secondary_bg_pressed: "#C8CDD8"   # secondary.200
+    secondary_fg:         "#323A52"   # secondary.600
+
+    ghost_bg:        "transparent"
+    ghost_fg:        "#323A52"   # secondary.600
+    ghost_border:    "#E5E3DE"   # neutral.200
+
+    destructive_bg:  "#D93520"   # error.500
+    destructive_fg:  "#FFFFFF"
+
+
+# ─────────────────────────────────────────────
+# TYPOGRAPHY
+# ─────────────────────────────────────────────
+# Font choice rationale:
+#   Display / Headings — "DM Sans" (or fallback: "Sora")
+#     Geometric but human. Confident letterforms that read as
+#     "coach voice" — not academic, not corporate. Excellent at
+#     large sizes on OLED screens.
+#   Body / UI — "Plus Jakarta Sans"
+#     Workhorse with personality. Highly legible.
+#     Distinguished from the usual Inter/Roboto defaults.
+#   Monospace (stats/numbers) — "JetBrains Mono"
+#     Numbers are Mileo's content. Tabular, trustworthy, scannable.
+#     Stats feel precise, not decorative.
+typography:
+
+  font_family:
+    display:   "'DM Sans', 'Sora', sans-serif"
+    body:      "'Plus Jakarta Sans', 'DM Sans', sans-serif"
+    mono:      "'JetBrains Mono', 'Fira Code', monospace"
+
+  font_size:
+    "2xs":  "10px"   # Micro labels, legal
+    xs:     "12px"   # Captions, timestamps, unit labels
+    sm:     "14px"   # Secondary body, list item detail
+    md:     "16px"   # Primary body — base size
+    lg:     "18px"   # Large body, card titles
+    xl:     "20px"   # Section headings
+    "2xl":  "24px"   # Screen headings
+    "3xl":  "30px"   # Stat values (secondary)
+    "4xl":  "36px"   # Hero stat (e.g., Total Cost on Instant Stats)
+    "5xl":  "48px"   # Splash / onboarding hero
+    "6xl":  "60px"   # (reserved — future marketing)
+
+  font_weight:
+    regular:   400
+    medium:    500
+    semibold:  600
+    bold:      700
+    extrabold: 800
+
+  line_height:
+    tight:    1.15   # Display headings, hero numbers
+    snug:     1.25   # Card headings, stat labels
+    normal:   1.5    # Body text, descriptions
+    relaxed:  1.625  # Long-form onboarding copy
+    loose:    2.0    # Spacious list items
+
+  letter_spacing:
+    tighter:  "-0.03em"  # Large display numerals
+    tight:    "-0.015em" # Headings
+    normal:   "0em"      # Body
+    wide:     "0.04em"   # CAPS labels, unit badges
+    wider:    "0.08em"   # Small uppercase metadata
+
+  # Named type roles (semantic pairings)
+  roles:
+    display_hero:
+      family:   display
+      size:     "5xl"
+      weight:   bold
+      line_height: tight
+      letter_spacing: tighter
+
+    heading_screen:
+      family:   display
+      size:     "2xl"
+      weight:   bold
+      line_height: snug
+      letter_spacing: tight
+
+    heading_section:
+      family:   display
+      size:     xl
+      weight:   semibold
+      line_height: snug
+      letter_spacing: tight
+
+    heading_card:
+      family:   body
+      size:     lg
+      weight:   semibold
+      line_height: snug
+
+    stat_hero:
+      family:   mono
+      size:     "4xl"
+      weight:   bold
+      line_height: tight
+      letter_spacing: tighter
+
+    stat_secondary:
+      family:   mono
+      size:     "3xl"
+      weight:   semibold
+      line_height: tight
+
+    stat_inline:
+      family:   mono
+      size:     xl
+      weight:   medium
+      line_height: snug
+
+    body_primary:
+      family:   body
+      size:     md
+      weight:   regular
+      line_height: normal
+
+    body_secondary:
+      family:   body
+      size:     sm
+      weight:   regular
+      line_height: normal
+
+    label_default:
+      family:   body
+      size:     sm
+      weight:   medium
+      line_height: snug
+
+    label_caps:
+      family:   body
+      size:     xs
+      weight:   semibold
+      line_height: snug
+      letter_spacing: wide
+
+    caption:
+      family:   body
+      size:     xs
+      weight:   regular
+      line_height: normal
+
+    button_primary:
+      family:   body
+      size:     md
+      weight:   semibold
+      line_height: tight
+
+    button_small:
+      family:   body
+      size:     sm
+      weight:   semibold
+      line_height: tight
+
+    input_value:
+      family:   mono
+      size:     "2xl"
+      weight:   medium
+      line_height: tight
+
+    input_label:
+      family:   body
+      size:     sm
+      weight:   medium
+      line_height: snug
+
+
+# ─────────────────────────────────────────────
+# SPACING SCALE
+# ─────────────────────────────────────────────
+# Base unit: 4px. Generous spacing for clear touch targets.
+# Scale follows a relaxed 4pt grid with larger jumps at the top
+# for section separation.
+spacing:
+  "0":    "0px"
+  px:     "1px"
+  "0.5":  "2px"
+  "1":    "4px"
+  "1.5":  "6px"
+  "2":    "8px"
+  "2.5":  "10px"
+  "3":    "12px"
+  "3.5":  "14px"
+  "4":    "16px"
+  "5":    "20px"
+  "6":    "24px"
+  "7":    "28px"
+  "8":    "32px"
+  "9":    "36px"
+  "10":   "40px"
+  "11":   "44px"   # Minimum tap target height (WCAG 2.5.8)
+  "12":   "48px"   # Standard tap target
+  "14":   "56px"   # Large tap target / FAB minimum
+  "16":   "64px"   # Section padding
+  "18":   "72px"
+  "20":   "80px"
+  "24":   "96px"
+  "28":   "112px"
+  "32":   "128px"
+  "40":   "160px"
+  "48":   "192px"
+  "56":   "224px"
+  "64":   "256px"
+
+  # Semantic spacing aliases
+  semantic:
+    screen_padding_x:     "20px"   # Horizontal safe zone
+    screen_padding_y:     "24px"   # Top/bottom screen padding
+    card_padding:         "16px"   # Internal card padding
+    card_padding_lg:      "24px"   # Larger card padding (hero cards)
+    section_gap:          "24px"   # Between sections on a screen
+    list_item_gap:        "0px"    # Row lists use borders, not gap
+    list_item_padding_y:  "14px"   # Vertical padding inside rows
+    input_padding_x:      "16px"
+    input_padding_y:      "14px"
+    button_padding_x:     "20px"
+    button_padding_y:     "14px"
+    button_padding_x_sm:  "16px"
+    button_padding_y_sm:  "10px"
+    fab_size:             "56px"
+    icon_size_sm:         "16px"
+    icon_size_md:         "20px"
+    icon_size_lg:         "24px"
+
+
+# ─────────────────────────────────────────────
+# BORDER RADIUS
+# ─────────────────────────────────────────────
+# Approach: Confident radii — not over-rounded (not toy-like),
+# not sharp (not cold). Cards use 16px; inputs 12px; pills 999px.
+border_radius:
+  none:   "0px"
+  xs:     "4px"    # Badges, chips, tight UI
+  sm:     "8px"    # Tags, small chips
+  md:     "12px"   # Inputs, secondary buttons
+  lg:     "16px"   # Cards, sheets, modals
+  xl:     "20px"   # Hero cards (Instant Stats)
+  "2xl":  "24px"   # Bottom sheets
+  "3xl":  "32px"   # Large modal panels
+  full:   "9999px" # Pills, toggle thumb, FAB
+
+
+# ─────────────────────────────────────────────
+# SHADOWS
+# ─────────────────────────────────────────────
+# Warm-tinted shadows (amber-slate undertone) stay on-brand.
+# Elevation model: 0 = flat, 5 = floating. Most UI is flat or
+# level 1. Cards are level 2. FAB and modals are level 4-5.
+shadow:
+  none: "none"
+  xs:   "0px 1px 2px rgba(54, 48, 32, 0.06)"
+  sm:   "0px 2px 4px rgba(54, 48, 32, 0.08), 0px 1px 2px rgba(54, 48, 32, 0.04)"
+  md:   "0px 4px 8px rgba(54, 48, 32, 0.08), 0px 2px 4px rgba(54, 48, 32, 0.06)"
+  lg:   "0px 8px 16px rgba(54, 48, 32, 0.10), 0px 4px 8px rgba(54, 48, 32, 0.06)"
+  xl:   "0px 16px 32px rgba(54, 48, 32, 0.12), 0px 8px 16px rgba(54, 48, 32, 0.06)"
+  "2xl":"0px 24px 48px rgba(54, 48, 32, 0.14), 0px 12px 24px rgba(54, 48, 32, 0.08)"
+
+  # Semantic aliases
+  card:       "0px 2px 4px rgba(54, 48, 32, 0.08), 0px 1px 2px rgba(54, 48, 32, 0.04)"
+  card_hover: "0px 8px 16px rgba(54, 48, 32, 0.10), 0px 4px 8px rgba(54, 48, 32, 0.06)"
+  fab:        "0px 8px 24px rgba(245, 149, 0, 0.35)"   # Amber glow for FAB
+  modal:      "0px 24px 48px rgba(54, 48, 32, 0.14), 0px 12px 24px rgba(54, 48, 32, 0.08)"
+  input_focus:"0px 0px 0px 3px rgba(245, 149, 0, 0.25)" # Amber focus ring
+
+  # Colored shadows for semantic states
+  success:    "0px 4px 12px rgba(34, 138, 85, 0.20)"
+  error:      "0px 4px 12px rgba(217, 53, 32, 0.20)"
+
+
+# ─────────────────────────────────────────────
+# BREAKPOINTS
+# ─────────────────────────────────────────────
+# Mobile-first. Responsive across devices with tablet and desktop support.
+breakpoints:
+  xs:   "320px"   # Minimum supported phone (iPhone SE 1st gen)
+  sm:   "375px"   # Standard phone (iPhone 14 mini, most Androids)
+  md:   "430px"   # Large phone (iPhone 14 Pro Max, Pixel 8 Pro)
+  lg:   "768px"   # Tablet portrait / small web
+  xl:   "1024px"  # Tablet landscape / web
+  "2xl":"1280px"  # Desktop (future web dashboard)
+  "3xl":"1440px"  # Wide desktop
+
+
+# ─────────────────────────────────────────────
+# ANIMATION & MOTION
+# ─────────────────────────────────────────────
+animation:
+  duration:
+    instant:   "80ms"
+    fast:      "150ms"
+    normal:    "250ms"
+    slow:      "400ms"
+    slower:    "600ms"
+    crawl:     "800ms"
+
+  easing:
+    default:   "cubic-bezier(0.2, 0, 0, 1)"       # Snappy — most UI transitions
+    spring:    "cubic-bezier(0.34, 1.56, 0.64, 1)" # Slight overshoot for saves/confirmations
+    ease_in:   "cubic-bezier(0.4, 0, 1, 1)"        # Elements leaving screen
+    ease_out:  "cubic-bezier(0, 0, 0.2, 1)"        # Elements entering screen
+    linear:    "linear"
+
+
+# ─────────────────────────────────────────────
+# BORDER
+# ─────────────────────────────────────────────
+border:
+  width:
+    none:   "0px"
+    thin:   "1px"
+    medium: "1.5px"
+    thick:  "2px"
+
+  style:
+    default: "solid"
+    dashed:  "dashed"
+
+  # Semantic border aliases
+  semantic:
+    default:   "1px solid #E5E3DE"   # neutral.200
+    strong:    "1px solid #CCC9C2"   # neutral.300
+    focus:     "1.5px solid #F59500" # primary.500
+    error:     "1.5px solid #D93520" # error.500
+    success:   "1.5px solid #228A55" # success.500
+    card:      "1px solid #F2F1EE"   # neutral.100
+
+
+# ─────────────────────────────────────────────
+# Z-INDEX SCALE
+# ─────────────────────────────────────────────
+z_index:
+  base:         0
+  raised:       10    # Sticky headers, floating labels
+  dropdown:     100   # Dropdowns, vehicle picker
+  sticky:       200   # Sticky nav bar
+  fab:          300   # Floating action button
+  overlay:      400   # Modal backdrop
+  modal:        500   # Modal / bottom sheet
+  toast:        600   # Toast notifications
+  tooltip:      700   # Tooltips
+
+
+# ─────────────────────────────────────────────
+# COMPONENT TOKENS (quick-reference)
+# ─────────────────────────────────────────────
+components:
+
+  button:
+    height_md:         "48px"
+    height_sm:         "40px"
+    border_radius:     "12px"   # border_radius.md
+    font_size:         "16px"   # font_size.md
+    font_weight:       600      # semibold
+
+  input:
+    height:            "52px"
+    border_radius:     "12px"
+    font_size:         "24px"   # 2xl — large numerics for clarity
+    font_family:       mono
+    padding_x:         "16px"
+    padding_y:         "14px"
+    bg:                "#FFFFFF"
+    bg_filled:         "#FAFAF8"
+    border_default:    "#E5E3DE"
+    border_focus:      "#F59500"
+    label_size:        "12px"
+    label_weight:      600
+    label_spacing:     "0.04em"
+
+  card:
+    border_radius:     "16px"
+    padding:           "16px"
+    shadow:            "sm"
+    border:            "1px solid #F2F1EE"
+
+  fab:
+    size:              "56px"
+    border_radius:     "9999px"
+    bg:                "#F59500"
+    fg:                "#FFFFFF"
+    shadow:            "0px 8px 24px rgba(245, 149, 0, 0.35)"
+
+  stat_hero:
+    font_family:       mono
+    font_size:         "4xl"   # 36px
+    font_weight:       700
+    color:             "#38362F"  # neutral.700
+
+  badge:
+    border_radius:     "4px"
+    font_size:         "10px"
+    font_weight:       700
+    letter_spacing:    "0.08em"
+    padding:           "2px 6px"
+
+  bottom_nav:
+    height:            "64px"
+    icon_size:         "24px"
+    label_size:        "10px"
+    bg:                "#FFFFFF"
+    border_top:        "1px solid #E5E3DE"
+
+  toast:
+    border_radius:     "12px"
+    padding:           "12px 16px"
+    shadow:            "lg"

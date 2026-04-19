@@ -1,0 +1,693 @@
+/**
+ * ============================================================
+ * MILEO — Design System Tokens (CSS Custom Properties)
+ * Version: 1.0
+ * Brand: The Coach — direct, honest, practical, responsive web app
+ *
+ * Usage:
+ *   @import 'mileo_tokens.css';
+ *
+ * All tokens are defined on :root for global access.
+ * Dark mode overrides are provided in a prefers-color-scheme
+ * media query at the bottom of this file.
+ * ============================================================
+ */
+
+/* ─────────────────────────────────────────────
+   FONT IMPORTS
+   ─────────────────────────────────────────────
+   Add to your HTML <head> or main CSS entry:
+
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+*/
+
+:root {
+
+  /* ─────────────────────────────────────────────
+     COLOR — PRIMARY (Fuel Amber)
+     ─────────────────────────────────────────────
+     Action color. Warm amber-orange anchoring the
+     brand in energy, combustion, and motion.
+  */
+  --color-primary-50:   #FFF8ED;
+  --color-primary-100:  #FFEFD0;
+  --color-primary-200:  #FFD999;
+  --color-primary-300:  #FFC055;
+  --color-primary-400:  #FFAb1F;
+  --color-primary-500:  #F59500;  /* Core brand — CTAs, FAB, key stats */
+  --color-primary-600:  #CC7A00;  /* Pressed state */
+  --color-primary-700:  #A36100;
+  --color-primary-800:  #7A4900;
+  --color-primary-900:  #3D2500;
+
+  /* ─────────────────────────────────────────────
+     COLOR — SECONDARY (Slate Ink)
+     ─────────────────────────────────────────────
+     Deep desaturated blue-gray. Structure,
+     typography, authority without corporate cold.
+  */
+  --color-secondary-50:  #F4F5F7;
+  --color-secondary-100: #E5E7EC;
+  --color-secondary-200: #C8CDD8;
+  --color-secondary-300: #9AA1B3;
+  --color-secondary-400: #6B738A;
+  --color-secondary-500: #454E66;
+  --color-secondary-600: #323A52;  /* Heading text */
+  --color-secondary-700: #232B42;  /* Strong headings */
+  --color-secondary-800: #161D30;
+  --color-secondary-900: #0C1221;  /* Dark mode surfaces */
+
+  /* ─────────────────────────────────────────────
+     COLOR — NEUTRAL (Fog)
+     ─────────────────────────────────────────────
+     Warm white-to-charcoal. Slight warm cast
+     keeps UI human, not clinical.
+  */
+  --color-neutral-0:   #FFFFFF;
+  --color-neutral-50:  #FAFAF8;
+  --color-neutral-100: #F2F1EE;
+  --color-neutral-200: #E5E3DE;
+  --color-neutral-300: #CCC9C2;
+  --color-neutral-400: #AAA79E;
+  --color-neutral-500: #7A776E;
+  --color-neutral-600: #57544C;
+  --color-neutral-700: #38362F;
+  --color-neutral-800: #211F1A;
+  --color-neutral-900: #0F0E0C;
+
+  /* ─────────────────────────────────────────────
+     COLOR — SEMANTIC: SUCCESS (Sage)
+     ─────────────────────────────────────────────
+  */
+  --color-success-50:         #F0F7F3;
+  --color-success-100:        #D4EDE0;
+  --color-success-200:        #A8D9BE;
+  --color-success-300:        #6DBF96;
+  --color-success-400:        #3DA571;
+  --color-success-500:        #228A55;
+  --color-success-600:        #1A6D43;
+  --color-success-700:        #135030;
+  --color-success-foreground: #FFFFFF;
+
+  /* ─────────────────────────────────────────────
+     COLOR — SEMANTIC: WARNING (Harvest Gold)
+     ─────────────────────────────────────────────
+  */
+  --color-warning-50:         #FFFBEA;
+  --color-warning-100:        #FFF3C0;
+  --color-warning-200:        #FFE566;
+  --color-warning-300:        #FFDA00;
+  --color-warning-400:        #E6C200;
+  --color-warning-500:        #C9A900;
+  --color-warning-600:        #A38900;
+  --color-warning-700:        #7A6700;
+  --color-warning-foreground: #3D2500;
+
+  /* ─────────────────────────────────────────────
+     COLOR — SEMANTIC: ERROR (Brick)
+     ─────────────────────────────────────────────
+  */
+  --color-error-50:         #FEF2F0;
+  --color-error-100:        #FDDDD9;
+  --color-error-200:        #F9B5AC;
+  --color-error-300:        #F4836F;
+  --color-error-400:        #EC5237;
+  --color-error-500:        #D93520;
+  --color-error-600:        #AE2A19;
+  --color-error-700:        #7F1E12;
+  --color-error-foreground: #FFFFFF;
+
+  /* ─────────────────────────────────────────────
+     COLOR — SEMANTIC: INFO (Clear Sky)
+     ─────────────────────────────────────────────
+  */
+  --color-info-50:         #EEF4FF;
+  --color-info-100:        #D6E6FF;
+  --color-info-400:        #4A90D9;
+  --color-info-500:        #2B72C0;
+  --color-info-600:        #1F5799;
+  --color-info-foreground: #FFFFFF;
+
+  /* ─────────────────────────────────────────────
+     SURFACE TOKENS (semantic color aliases)
+     ─────────────────────────────────────────────
+  */
+  --surface-background:   #FAFAF8;  /* App background */
+  --surface-card:         #FFFFFF;  /* Card / sheet surfaces */
+  --surface-overlay:      rgba(12, 18, 33, 0.80); /* Modal backdrop */
+  --surface-sunken:       #F2F1EE;  /* Recessed wells */
+  --surface-border:       #E5E3DE;  /* Default borders */
+  --surface-border-strong:#CCC9C2;  /* Prominent dividers */
+
+  /* ─────────────────────────────────────────────
+     TEXT TOKENS (semantic color aliases)
+     ─────────────────────────────────────────────
+  */
+  --text-primary:     #38362F;  /* Main body text */
+  --text-secondary:   #57544C;  /* Supporting text */
+  --text-placeholder: #7A776E;  /* Input placeholders */
+  --text-disabled:    #AAA79E;  /* Disabled states */
+  --text-inverse:     #FAFAF8;  /* On dark backgrounds */
+  --text-on-primary:  #FFFFFF;  /* On amber CTA buttons */
+  --text-link:        #CC7A00;  /* Tappable text links */
+
+  /* ─────────────────────────────────────────────
+     INTERACTIVE TOKENS
+     ─────────────────────────────────────────────
+  */
+  --interactive-cta-bg:          #F59500;
+  --interactive-cta-bg-hover:    #FFAb1F;
+  --interactive-cta-bg-pressed:  #CC7A00;
+  --interactive-cta-bg-disabled: #E5E3DE;
+  --interactive-cta-fg:          #FFFFFF;
+  --interactive-cta-fg-disabled: #AAA79E;
+
+  --interactive-secondary-bg:         #F4F5F7;
+  --interactive-secondary-bg-hover:   #E5E7EC;
+  --interactive-secondary-bg-pressed: #C8CDD8;
+  --interactive-secondary-fg:         #323A52;
+
+  --interactive-ghost-bg:     transparent;
+  --interactive-ghost-fg:     #323A52;
+  --interactive-ghost-border: #E5E3DE;
+
+  --interactive-destructive-bg: #D93520;
+  --interactive-destructive-fg: #FFFFFF;
+
+  /* ─────────────────────────────────────────────
+     TYPOGRAPHY — FONT FAMILIES
+     ─────────────────────────────────────────────
+  */
+  --font-display: 'DM Sans', 'Sora', sans-serif;
+  --font-body:    'Plus Jakarta Sans', 'DM Sans', sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+
+  /* ─────────────────────────────────────────────
+     TYPOGRAPHY — FONT SIZES
+     ─────────────────────────────────────────────
+  */
+  --text-2xs: 10px;
+  --text-xs:  12px;
+  --text-sm:  14px;
+  --text-md:  16px;
+  --text-lg:  18px;
+  --text-xl:  20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+  --text-4xl: 36px;
+  --text-5xl: 48px;
+  --text-6xl: 60px;
+
+  /* ─────────────────────────────────────────────
+     TYPOGRAPHY — FONT WEIGHTS
+     ─────────────────────────────────────────────
+  */
+  --weight-regular:   400;
+  --weight-medium:    500;
+  --weight-semibold:  600;
+  --weight-bold:      700;
+  --weight-extrabold: 800;
+
+  /* ─────────────────────────────────────────────
+     TYPOGRAPHY — LINE HEIGHTS
+     ─────────────────────────────────────────────
+  */
+  --leading-tight:   1.15;
+  --leading-snug:    1.25;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose:   2.0;
+
+  /* ─────────────────────────────────────────────
+     TYPOGRAPHY — LETTER SPACING
+     ─────────────────────────────────────────────
+  */
+  --tracking-tighter: -0.03em;
+  --tracking-tight:   -0.015em;
+  --tracking-normal:   0em;
+  --tracking-wide:     0.04em;
+  --tracking-wider:    0.08em;
+
+  /* ─────────────────────────────────────────────
+     SPACING SCALE (4px base unit)
+     ─────────────────────────────────────────────
+  */
+  --space-0:    0px;
+  --space-px:   1px;
+  --space-0-5:  2px;
+  --space-1:    4px;
+  --space-1-5:  6px;
+  --space-2:    8px;
+  --space-2-5:  10px;
+  --space-3:    12px;
+  --space-3-5:  14px;
+  --space-4:    16px;
+  --space-5:    20px;
+  --space-6:    24px;
+  --space-7:    28px;
+  --space-8:    32px;
+  --space-9:    36px;
+  --space-10:   40px;
+  --space-11:   44px;  /* Minimum tap target (WCAG 2.5.8) */
+  --space-12:   48px;  /* Standard tap target */
+  --space-14:   56px;  /* Large tap target / FAB minimum */
+  --space-16:   64px;
+  --space-18:   72px;
+  --space-20:   80px;
+  --space-24:   96px;
+  --space-28:   112px;
+  --space-32:   128px;
+  --space-40:   160px;
+  --space-48:   192px;
+  --space-56:   224px;
+  --space-64:   256px;
+
+  /* ─────────────────────────────────────────────
+     SPACING — SEMANTIC ALIASES
+     ─────────────────────────────────────────────
+  */
+  --spacing-screen-x:          20px;   /* Horizontal safe zone */
+  --spacing-screen-y:          24px;   /* Top/bottom screen padding */
+  --spacing-card:              16px;   /* Card internal padding */
+  --spacing-card-lg:           24px;   /* Hero card padding */
+  --spacing-section-gap:       24px;   /* Between screen sections */
+  --spacing-list-item-y:       14px;   /* Row vertical padding */
+  --spacing-input-x:           16px;
+  --spacing-input-y:           14px;
+  --spacing-button-x:          20px;
+  --spacing-button-y:          14px;
+  --spacing-button-x-sm:       16px;
+  --spacing-button-y-sm:       10px;
+  --spacing-fab-size:          56px;
+  --spacing-icon-sm:           16px;
+  --spacing-icon-md:           20px;
+  --spacing-icon-lg:           24px;
+
+  /* ─────────────────────────────────────────────
+     BORDER RADIUS
+     ─────────────────────────────────────────────
+  */
+  --radius-none:  0px;
+  --radius-xs:    4px;
+  --radius-sm:    8px;
+  --radius-md:    12px;  /* Inputs, secondary buttons */
+  --radius-lg:    16px;  /* Cards, sheets, modals */
+  --radius-xl:    20px;  /* Hero cards */
+  --radius-2xl:   24px;  /* Bottom sheets */
+  --radius-3xl:   32px;  /* Large modals */
+  --radius-full:  9999px;/* Pills, FAB, toggle */
+
+  /* ─────────────────────────────────────────────
+     SHADOWS
+     ─────────────────────────────────────────────
+     Warm-tinted (amber-slate) for on-brand depth.
+  */
+  --shadow-none: none;
+  --shadow-xs:   0px 1px 2px rgba(54, 48, 32, 0.06);
+  --shadow-sm:   0px 2px 4px rgba(54, 48, 32, 0.08),
+                 0px 1px 2px rgba(54, 48, 32, 0.04);
+  --shadow-md:   0px 4px 8px rgba(54, 48, 32, 0.08),
+                 0px 2px 4px rgba(54, 48, 32, 0.06);
+  --shadow-lg:   0px 8px 16px rgba(54, 48, 32, 0.10),
+                 0px 4px 8px rgba(54, 48, 32, 0.06);
+  --shadow-xl:   0px 16px 32px rgba(54, 48, 32, 0.12),
+                 0px 8px 16px rgba(54, 48, 32, 0.06);
+  --shadow-2xl:  0px 24px 48px rgba(54, 48, 32, 0.14),
+                 0px 12px 24px rgba(54, 48, 32, 0.08);
+
+  /* Semantic shadow aliases */
+  --shadow-card:        var(--shadow-sm);
+  --shadow-card-hover:  var(--shadow-lg);
+  --shadow-fab:         0px 8px 24px rgba(245, 149, 0, 0.35); /* Amber glow */
+  --shadow-modal:       var(--shadow-2xl);
+  --shadow-input-focus: 0px 0px 0px 3px rgba(245, 149, 0, 0.25);
+  --shadow-success:     0px 4px 12px rgba(34, 138, 85, 0.20);
+  --shadow-error:       0px 4px 12px rgba(217, 53, 32, 0.20);
+
+  /* ─────────────────────────────────────────────
+     BORDERS
+     ─────────────────────────────────────────────
+  */
+  --border-thin:   1px;
+  --border-medium: 1.5px;
+  --border-thick:  2px;
+
+  /* Semantic border aliases */
+  --border-default:  1px solid #E5E3DE;
+  --border-strong:   1px solid #CCC9C2;
+  --border-focus:    1.5px solid #F59500;
+  --border-error:    1.5px solid #D93520;
+  --border-success:  1.5px solid #228A55;
+  --border-card:     1px solid #F2F1EE;
+
+  /* ─────────────────────────────────────────────
+     ANIMATION & MOTION
+     ─────────────────────────────────────────────
+  */
+  --duration-instant:  80ms;
+  --duration-fast:     150ms;
+  --duration-normal:   250ms;
+  --duration-slow:     400ms;
+  --duration-slower:   600ms;
+  --duration-crawl:    800ms;
+
+  --ease-default: cubic-bezier(0.2, 0, 0, 1);       /* Snappy — most UI */
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1); /* Slight bounce for saves */
+  --ease-in:      cubic-bezier(0.4, 0, 1, 1);        /* Leaving screen */
+  --ease-out:     cubic-bezier(0, 0, 0.2, 1);        /* Entering screen */
+  --ease-linear:  linear;
+
+  /* Semantic animation shorthands */
+  --transition-default: var(--duration-normal) var(--ease-default);
+  --transition-fast:    var(--duration-fast)   var(--ease-default);
+  --transition-spring:  var(--duration-slow)   var(--ease-spring);
+
+  /* ─────────────────────────────────────────────
+     Z-INDEX SCALE
+     ─────────────────────────────────────────────
+  */
+  --z-base:     0;
+  --z-raised:   10;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-fab:      300;
+  --z-overlay:  400;
+  --z-modal:    500;
+  --z-toast:    600;
+  --z-tooltip:  700;
+
+  /* ─────────────────────────────────────────────
+     BREAKPOINTS (for use in JS / container queries)
+     ─────────────────────────────────────────────
+     Note: CSS media queries use these values directly.
+     For JS: getComputedStyle(document.documentElement)
+             .getPropertyValue('--bp-sm')
+  */
+  --bp-xs:  320px;
+  --bp-sm:  375px;
+  --bp-md:  430px;
+  --bp-lg:  768px;
+  --bp-xl:  1024px;
+  --bp-2xl: 1280px;
+  --bp-3xl: 1440px;
+
+  /* ─────────────────────────────────────────────
+     COMPONENT TOKENS
+     ─────────────────────────────────────────────
+  */
+
+  /* Button */
+  --btn-height-md:     48px;
+  --btn-height-sm:     40px;
+  --btn-radius:        var(--radius-md);
+  --btn-font-size:     var(--text-md);
+  --btn-font-weight:   var(--weight-semibold);
+
+  /* Input */
+  --input-height:       52px;
+  --input-radius:       var(--radius-md);
+  --input-font-size:    var(--text-2xl);  /* Large for pump readability */
+  --input-font-family:  var(--font-mono);
+  --input-padding-x:    var(--spacing-input-x);
+  --input-padding-y:    var(--spacing-input-y);
+  --input-bg:           var(--color-neutral-0);
+  --input-bg-filled:    var(--color-neutral-50);
+  --input-border:       var(--border-default);
+  --input-border-focus: var(--border-focus);
+  --input-label-size:   var(--text-xs);
+  --input-label-weight: var(--weight-semibold);
+  --input-label-track:  var(--tracking-wide);
+
+  /* Card */
+  --card-radius:   var(--radius-lg);
+  --card-padding:  var(--spacing-card);
+  --card-shadow:   var(--shadow-card);
+  --card-border:   var(--border-card);
+
+  /* FAB (Floating Action Button) */
+  --fab-size:     56px;
+  --fab-radius:   var(--radius-full);
+  --fab-bg:       var(--color-primary-500);
+  --fab-fg:       #FFFFFF;
+  --fab-shadow:   var(--shadow-fab);
+
+  /* Stat hero */
+  --stat-hero-font:   var(--font-mono);
+  --stat-hero-size:   var(--text-4xl);
+  --stat-hero-weight: var(--weight-bold);
+  --stat-hero-color:  var(--text-primary);
+
+  /* Badge */
+  --badge-radius:  var(--radius-xs);
+  --badge-size:    var(--text-2xs);
+  --badge-weight:  var(--weight-bold);
+  --badge-track:   var(--tracking-wider);
+
+  /* Bottom Nav */
+  --bottom-nav-height:    64px;
+  --bottom-nav-icon-size: 24px;
+  --bottom-nav-label-size:var(--text-2xs);
+  --bottom-nav-bg:        var(--color-neutral-0);
+  --bottom-nav-border:    var(--border-default);
+
+  /* Toast */
+  --toast-radius:  var(--radius-md);
+  --toast-shadow:  var(--shadow-lg);
+  --toast-padding: var(--space-3) var(--space-4);
+
+}
+
+
+/* ─────────────────────────────────────────────
+   DARK MODE OVERRIDES
+   ─────────────────────────────────────────────
+   Surfaces invert to slate. Primary amber stays
+   warm and visible. Text inverts to fog tones.
+*/
+@media (prefers-color-scheme: dark) {
+  :root {
+
+    /* Surfaces */
+    --surface-background:    #0C1221;  /* secondary.900 */
+    --surface-card:          #161D30;  /* secondary.800 */
+    --surface-sunken:        #0C1221;
+    --surface-border:        #232B42;  /* secondary.700 */
+    --surface-border-strong: #323A52;  /* secondary.600 */
+
+    /* Text */
+    --text-primary:     #F2F1EE;  /* neutral.100 — primary readable */
+    --text-secondary:   #CCC9C2;  /* neutral.300 */
+    --text-placeholder: #6B738A;  /* secondary.400 */
+    --text-disabled:    #454E66;  /* secondary.500 */
+    --text-inverse:     #38362F;  /* neutral.700 — on light surfaces */
+    --text-link:        #FFAb1F;  /* primary.400 — brighter on dark */
+
+    /* Primary CTA — amber remains, slightly adjusted for dark */
+    --interactive-cta-bg:         #F59500;
+    --interactive-cta-bg-hover:   #FFAb1F;
+    --interactive-cta-bg-pressed: #CC7A00;
+
+    /* Secondary buttons */
+    --interactive-secondary-bg:         #232B42;
+    --interactive-secondary-bg-hover:   #323A52;
+    --interactive-secondary-bg-pressed: #454E66;
+    --interactive-secondary-fg:         #E5E7EC;
+
+    /* Ghost */
+    --interactive-ghost-fg:     #C8CDD8;
+    --interactive-ghost-border: #323A52;
+
+    /* Borders */
+    --border-default: 1px solid #232B42;
+    --border-strong:  1px solid #323A52;
+    --border-card:    1px solid #161D30;
+
+    /* Shadows (lighter on dark backgrounds) */
+    --shadow-sm:  0px 2px 4px rgba(0, 0, 0, 0.30),
+                  0px 1px 2px rgba(0, 0, 0, 0.20);
+    --shadow-md:  0px 4px 8px rgba(0, 0, 0, 0.35),
+                  0px 2px 4px rgba(0, 0, 0, 0.20);
+    --shadow-lg:  0px 8px 16px rgba(0, 0, 0, 0.40),
+                  0px 4px 8px rgba(0, 0, 0, 0.25);
+    --shadow-2xl: 0px 24px 48px rgba(0, 0, 0, 0.50),
+                  0px 12px 24px rgba(0, 0, 0, 0.30);
+
+    /* FAB glow is punchier on dark */
+    --shadow-fab: 0px 8px 28px rgba(245, 149, 0, 0.45);
+
+    /* Input on dark */
+    --input-bg:       #161D30;
+    --input-bg-filled:#0C1221;
+
+    /* Card on dark */
+    --card-border: 1px solid #232B42;
+
+    /* Bottom nav */
+    --bottom-nav-bg:     #161D30;
+    --bottom-nav-border: 1px solid #232B42;
+
+  }
+}
+
+
+/* ─────────────────────────────────────────────
+   DATA-THEME ATTRIBUTE OVERRIDES
+   ─────────────────────────────────────────────
+   Alternative: use data-theme="dark" on <html>
+   to force dark mode regardless of system pref.
+*/
+[data-theme="dark"] {
+  --surface-background:    #0C1221;
+  --surface-card:          #161D30;
+  --surface-sunken:        #0C1221;
+  --surface-border:        #232B42;
+  --surface-border-strong: #323A52;
+  --text-primary:     #F2F1EE;
+  --text-secondary:   #CCC9C2;
+  --text-placeholder: #6B738A;
+  --text-disabled:    #454E66;
+  --text-inverse:     #38362F;
+  --text-link:        #FFAb1F;
+  --interactive-secondary-bg:         #232B42;
+  --interactive-secondary-bg-hover:   #323A52;
+  --interactive-secondary-bg-pressed: #454E66;
+  --interactive-secondary-fg:         #E5E7EC;
+  --interactive-ghost-fg:     #C8CDD8;
+  --interactive-ghost-border: #323A52;
+  --border-default: 1px solid #232B42;
+  --border-strong:  1px solid #323A52;
+  --border-card:    1px solid #161D30;
+  --shadow-sm:  0px 2px 4px rgba(0, 0, 0, 0.30), 0px 1px 2px rgba(0, 0, 0, 0.20);
+  --shadow-md:  0px 4px 8px rgba(0, 0, 0, 0.35), 0px 2px 4px rgba(0, 0, 0, 0.20);
+  --shadow-lg:  0px 8px 16px rgba(0, 0, 0, 0.40), 0px 4px 8px rgba(0, 0, 0, 0.25);
+  --shadow-2xl: 0px 24px 48px rgba(0, 0, 0, 0.50), 0px 12px 24px rgba(0, 0, 0, 0.30);
+  --shadow-fab: 0px 8px 28px rgba(245, 149, 0, 0.45);
+  --input-bg:       #161D30;
+  --input-bg-filled:#0C1221;
+  --card-border: 1px solid #232B42;
+  --bottom-nav-bg:     #161D30;
+  --bottom-nav-border: 1px solid #232B42;
+}
+
+[data-theme="light"] {
+  /* Force light mode — mirrors :root defaults */
+  --surface-background:    #FAFAF8;
+  --surface-card:          #FFFFFF;
+  --text-primary:     #38362F;
+  --text-secondary:   #57544C;
+  --text-link:        #CC7A00;
+  --border-default:   1px solid #E5E3DE;
+  --border-card:      1px solid #F2F1EE;
+  --input-bg:         #FFFFFF;
+  --input-bg-filled:  #FAFAF8;
+  --bottom-nav-bg:    #FFFFFF;
+  --bottom-nav-border:1px solid #E5E3DE;
+}
+
+
+/* ─────────────────────────────────────────────
+   UTILITY CLASSES (optional light helpers)
+   ─────────────────────────────────────────────
+   These are convenience classes. Use tokens
+   directly in component styles when possible.
+*/
+
+/* Typography roles */
+.type-display-hero {
+  font-family: var(--font-display);
+  font-size: var(--text-5xl);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tighter);
+}
+
+.type-heading-screen {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-tight);
+}
+
+.type-heading-section {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-tight);
+}
+
+.type-heading-card {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+}
+
+.type-stat-hero {
+  font-family: var(--font-mono);
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tighter);
+}
+
+.type-stat-secondary {
+  font-family: var(--font-mono);
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+.type-stat-inline {
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+}
+
+.type-body {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+}
+
+.type-body-sm {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+}
+
+.type-label {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+}
+
+.type-label-caps {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.type-caption {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+}
+
+.type-input-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-tight);
+}
