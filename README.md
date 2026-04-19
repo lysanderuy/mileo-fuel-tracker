@@ -1,14 +1,14 @@
 # Mileo — Frictionless Fuel Tracking
 
-**Mileo** is a fuel tracking web app that turns every fill-up into clear spending and efficiency insights. Log your fuel in 15 seconds, see your stats instantly, and move on.
+**Mileo** is a fuel tracking web app that turns every fill-up into clear spending and efficiency insights. Log your fuel. Done fast. See your stats instantly, and move on.
 
 ## What is Mileo?
 
 Mileo helps regular drivers understand their fuel spending without friction. It's built for one job: make logging a fill-up so fast and easy that you'll actually do it every time—then show you what your fuel costs really are.
 
-### The Mileo Philosophy
+### Core Principles
 
-- **Speed above all.** Log a fill-up in ≤15 seconds. No complex forms. No unnecessary fields.
+- **Speed above all.** Log a fill-up fast. No complex forms. No unnecessary fields.
 - **Instant insights.** See your fuel cost, efficiency, and spending trends immediately after logging.
 - **One job, done well.** Mileo tracks fuel. Nothing else. No maintenance logs, no fleet management, no social features.
 - **The Coach.** Our tone is direct, honest, and supportive—like a coach, not a judge. We tell you what's happening with your fuel, clearly and practically.
@@ -100,7 +100,7 @@ Open Mileo at the pump:
 - Enter liters filled
 - Tap "Log Fill-Up"
 
-Time elapsed: ~15 seconds.
+Done fast.
 
 ### 3. See Your Stats
 Instant stats appear:

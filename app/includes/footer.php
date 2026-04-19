@@ -1,0 +1,26 @@
+<!-- FOOTER -->
+<footer class="mm-footer">
+  <div class="mm-footer-inner">
+    <div class="mm-footer-top">
+      <div>
+        <div class="mm-footer-brand">mileo</div>
+        <div class="mm-footer-tagline">Frictionless fuel tracking for drivers.</div>
+      </div>
+      <div class="mm-footer-links">
+        <a class="mm-footer-link" href="#docs">Documentation</a>
+        <a class="mm-footer-link" href="#privacy">Privacy</a>
+        <a class="mm-footer-link" href="#terms">Terms</a>
+        <a class="mm-footer-link" href="#contact">Contact</a>
+      </div>
+    </div>
+    <div class="mm-footer-bottom">© 2026 Mileo. Built for drivers.</div>
+  </div>
+</footer>
+
+<!-- MODAL + TOAST MOUNTS -->
+<div id="mm-modal-root"></div>
+<div id="mm-toast-root"></div>
+
+<script src="../../public/js/landing.js"></script>
+</body>
+</html>
