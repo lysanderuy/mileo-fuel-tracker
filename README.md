@@ -197,7 +197,7 @@ mileo-fuel-tracker/
 ├── index.php                # Home / Dashboard page
 ├── css/
 │   ├── styles.css          # Main stylesheet
-│   ├── responsive.css      # Mobile-first responsive styles
+│   ├── responsive.css      # Responsive styles for all device sizes
 │   └── design-tokens.css   # Color, spacing, typography variables
 ├── js/
 │   ├── app.js              # Main application logic
