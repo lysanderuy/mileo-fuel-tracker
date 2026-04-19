@@ -43,15 +43,19 @@ Overview your fuel data at a glance:
 - Quick access to your full log history
 
 ### ✓ Multi-Vehicle Support
-Track multiple vehicles in one account. Switch between cars and see each one's stats independently.
+Track multiple vehicles in one account. Switch between cars and see each one's stats independently. Add, archive, or set a default vehicle.
+
+### ✓ Full History with Sort & Filter
+View all your past fill-ups with flexible sorting:
+- **Sort by Date** – See your most recent fill-ups first, or browse chronologically
+- **Sort by Efficiency** – Find your best and worst fuel economy runs instantly
+- **Filter by Date Range** – View This Month, Last Month, Last 3 Months, or custom ranges
 
 ### ✓ Data Export
 Download all your fuel logs as CSV. Your data is yours—take it with you anytime.
 
-### ✓ Sort & Organize
-View your logs in the way that matters most:
-- **Sort by Date** – See your most recent fill-ups first, or browse chronologically
-- **Sort by Efficiency** – Find your best and worst fuel efficiency runs instantly
+### ✓ Edit & Delete Logs
+Correct mistakes or remove incorrect entries. Editing an odometer automatically recalculates affected logs.
 
 ---
 
@@ -75,6 +79,9 @@ View your logs in the way that matters most:
 | A vehicle maintenance tracker | Oil changes, tire rotations, and service logs are out of scope. |
 | A fleet management tool | Mileo is for individuals, not businesses. |
 | A GPS or route tracker | No location tracking. No passive data collection. |
+| A tax compliance or mileage deduction tool | No tax reports or mileage deductions. Fuel cost awareness is the job. |
+| A community or social platform | No user comparisons, leaderboards, or social feeds. |
+| A gas price aggregator | Users enter the price they paid. Mileo does not crowdsource pump prices. |
 | A multi-expense tracker | Tolls, insurance, parking, and carwash logs are out of scope. |
 | A subscription-bait app | The free tier is the full product. No paywalls or upgrade prompts. |
 
@@ -139,14 +146,40 @@ Every feature decision in Mileo is governed by these principles:
 
 Mileo is a complete fuel tracking application with all essential functionality:
 
-✓ Create fuel logs  
-✓ Read logs and stats  
-✓ Update logs  
-✓ Delete logs  
-✓ Multi-vehicle support  
-✓ Data export  
-✓ Sort logs by date (newest to oldest / oldest to newest)  
-✓ Sort logs by fuel efficiency (L/100km)
+**Fuel Log Management**
+✓ Create fuel logs (Quick Log — 4 required fields)  
+✓ Read logs with instant stats (cost per liter, cost per km, efficiency)  
+✓ Update logs (with downstream recalculation)  
+✓ Delete logs (with confirmation)  
+
+**Dashboard & Analytics**
+✓ Current month vs. previous month comparison  
+✓ Monthly spending trends and efficiency trends  
+✓ Recent fill-ups overview  
+
+**History & Organization**
+✓ Full fill-up history (newest first by default)  
+✓ Sort by date (newest/oldest)  
+✓ Sort by efficiency (best/worst L/100km)  
+✓ Filter by date range (This Month, Last Month, Last 3 Months, All Time, custom)  
+
+**Vehicle Management**
+✓ Multi-vehicle support (up to 10 vehicles per account)  
+✓ Add, edit, and archive vehicles  
+✓ Set default vehicle for Quick Log  
+✓ View stats per vehicle independently  
+
+**Data & Account**
+✓ Export logs as CSV (all fields, respects unit preferences)  
+✓ User account signup and login  
+✓ Session persistence  
+✓ Password reset  
+✓ Account deletion  
+
+**User Settings**
+✓ Change display name  
+✓ Configure units (distance, volume, currency)  
+✓ Set default vehicle
 
 ---
 
