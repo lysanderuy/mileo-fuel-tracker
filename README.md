@@ -147,29 +147,34 @@ Every feature decision in Mileo is governed by these principles:
 Mileo is a complete fuel tracking application with all essential functionality:
 
 **Fuel Log Management**
+
 ✓ Create fuel logs (Quick Log — 4 required fields)  
 ✓ Read logs with instant stats (cost per liter, cost per km, efficiency)  
 ✓ Update logs (with downstream recalculation)  
 ✓ Delete logs (with confirmation)  
 
 **Dashboard & Analytics**
+
 ✓ Current month vs. previous month comparison  
 ✓ Monthly spending trends and efficiency trends  
 ✓ Recent fill-ups overview  
 
 **History & Organization**
+
 ✓ Full fill-up history (newest first by default)  
 ✓ Sort by date (newest/oldest)  
 ✓ Sort by efficiency (best/worst L/100km)  
 ✓ Filter by date range (This Month, Last Month, Last 3 Months, All Time, custom)  
 
 **Vehicle Management**
+
 ✓ Multi-vehicle support (up to 10 vehicles per account)  
 ✓ Add, edit, and archive vehicles  
 ✓ Set default vehicle for Quick Log  
 ✓ View stats per vehicle independently  
 
 **Data & Account**
+
 ✓ Export logs as CSV (all fields, respects unit preferences)  
 ✓ User account signup and login  
 ✓ Session persistence  
@@ -177,6 +182,7 @@ Mileo is a complete fuel tracking application with all essential functionality:
 ✓ Account deletion  
 
 **User Settings**
+
 ✓ Change display name  
 ✓ Configure units (distance, volume, currency)  
 ✓ Set default vehicle
