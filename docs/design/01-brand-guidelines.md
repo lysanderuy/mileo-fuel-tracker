@@ -538,7 +538,7 @@ Micro-copy is the small text that lives in the margins of the UI: placeholders, 
 | Component | Personality Note |
 |---|---|
 | **FAB** | The loudest element on the screen. Amber with amber glow. Always reachable. Never hidden. |
-| **Primary Button** | Full-width on mobile where the primary action is clear. Amber. One per screen. |
+| **Primary Button** | Full-width where the primary action is clear. Amber. One per screen. |
 | **Secondary Button** | Slate background, slate text. Low-key. Supports the primary action — never competes. |
 | **Ghost Button** | Text-only with border. Used for destructive-adjacent or low-priority actions (e.g., "Cancel"). |
 | **Input fields** | Large numerics (24px mono). Wide tap targets. Amber focus ring. |

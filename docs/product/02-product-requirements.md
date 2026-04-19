@@ -62,7 +62,7 @@ These principles govern every feature decision, UX choice, and trade-off in Mile
 
 4. **Coach tone throughout.** All copy, empty states, confirmations, and nudges use The Coach voice: direct, honest, supportive. Never preachy, never guilt-inducing.
 
-5. **Responsive web app.** Designed to work across devices. Mobile is the primary target.
+5. **Responsive web app.** Designed to work seamlessly across all device sizes and browsers.
 
 6. **No dark patterns.** No ads in the free tier. No surprise paywalls after onboarding. No nagging to upgrade. What's free stays free.
 
