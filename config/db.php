@@ -9,9 +9,9 @@
 
 // Database connection parameters
 $db_host = 'localhost';
-$db_name = 'mileo_db';
+$db_name = 'mileo';
 $db_user = 'root';
-$db_pass = ''; // XAMPP default is empty
+$db_pass = '';
 
 // Create connection
 try {
@@ -29,6 +29,5 @@ try {
   $db_connected = true;
 } catch (Exception $e) {
   $db_connected = false;
-  // In production, log this error instead of displaying it
-  error_log('Database connection error: ' . $e->getMessage());
+  die('Database error: ' . $e->getMessage());
 }

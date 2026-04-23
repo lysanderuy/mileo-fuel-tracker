@@ -1,4 +1,4 @@
-<?php include_once '../includes/header.php'; ?>
+<?php include_once __DIR__ . '/../includes/header.php'; ?>
 
 <!-- HERO -->
 <section class="mm-hero">
@@ -110,4 +110,4 @@
   </div>
 </section>
 
-<?php include_once '../includes/footer.php'; ?>
+<?php include_once __DIR__ . '/../includes/footer.php'; ?>

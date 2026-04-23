@@ -21,6 +21,6 @@
 <div id="mm-modal-root"></div>
 <div id="mm-toast-root"></div>
 
-<script src="../../public/js/landing.js"></script>
+<script src="js/landing.js"></script>
 </body>
 </html>

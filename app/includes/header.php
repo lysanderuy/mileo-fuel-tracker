@@ -7,8 +7,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../public/css/design-tokens.css">
-<link rel="stylesheet" href="../../public/css/landing.css">
+<link rel="stylesheet" href="css/design-tokens.css">
+<link rel="stylesheet" href="css/landing.css">
+<?php if (($page ?? '') === 'dashboard'): ?>
+<link rel="stylesheet" href="css/dashboard.css">
+<?php endif; ?>
+<?php if (in_array($page ?? '', ['login', 'signup'])): ?>
+<link rel="stylesheet" href="css/auth.css">
+<?php endif; ?>
 <style>html,body{margin:0;padding:0;background:#FAFAF8}</style>
 </head>
 <body class="mileo-marketing" data-theme="light">
@@ -21,8 +27,12 @@
       <span class="mm-brand-name">mileo</span>
     </div>
     <div style="display:flex;gap:12px;align-items:center">
-      <button class="mm-btn mm-btn-secondary mm-btn-sm" data-nav="login">Sign In</button>
-      <button class="mm-btn mm-btn-primary mm-btn-sm" data-nav="signup">Get Started</button>
+      <?php if (isset($_SESSION['user_id'])): ?>
+        <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="location.href='?page=logout'">Logout</button>
+      <?php else: ?>
+        <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="location.href='?page=login'">Sign In</button>
+        <button class="mm-btn mm-btn-primary mm-btn-sm" onclick="location.href='?page=signup'">Get Started</button>
+      <?php endif; ?>
     </div>
   </div>
 </nav>
