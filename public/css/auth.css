@@ -1,0 +1,99 @@
+.auth-wrap {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.auth-card {
+  background: #fff;
+  border: 1px solid #E5E3DE;
+  border-radius: 20px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-brand {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1A1815;
+  margin-bottom: 28px;
+}
+
+.auth-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1A1815;
+  margin: 0 0 8px;
+}
+
+.auth-sub {
+  font-size: 15px;
+  color: #8B8880;
+  margin: 0 0 28px;
+}
+
+.auth-error {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #DC2626;
+  margin-bottom: 20px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #57544C;
+}
+
+.auth-input {
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid #E5E3DE;
+  border-radius: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  color: #38362F;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.auth-input:focus {
+  border-color: #CC7A00;
+}
+
+.auth-switch {
+  margin: 20px 0 0;
+  text-align: center;
+  font-size: 14px;
+  color: #8B8880;
+}
+
+.auth-switch a {
+  color: #CC7A00;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
