@@ -1,0 +1,29 @@
+.db-wrap { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+.db-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+.db-title { font-family: 'Sora', sans-serif; font-size: 1.5rem; font-weight: 700; color: #111; }
+.db-subtitle { font-size: 0.875rem; color: #666; margin-top: 2px; }
+
+.db-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+@media (max-width: 768px) { .db-stats { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .db-stats { grid-template-columns: 1fr; } }
+
+.db-card { background: #fff; border: 1px solid #E8E8E4; border-radius: 12px; padding: 20px 24px; }
+.db-card-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #888; margin-bottom: 8px; }
+.db-card-value { font-family: 'JetBrains Mono', monospace; font-size: 1.75rem; font-weight: 700; color: #111; line-height: 1; }
+.db-card-sub { font-size: 0.8rem; color: #888; margin-top: 6px; }
+.db-card-sub .up { color: #228A55; font-weight: 600; }
+.db-card-sub .down { color: #C0392B; font-weight: 600; }
+
+.db-section { background: #fff; border: 1px solid #E8E8E4; border-radius: 12px; overflow: hidden; }
+.db-section-head { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid #F0F0EB; }
+.db-section-title { font-family: 'Sora', sans-serif; font-size: 1rem; font-weight: 600; color: #111; }
+
+.db-table { width: 100%; border-collapse: collapse; }
+.db-table th { padding: 10px 24px; text-align: left; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #999; background: #FAFAF8; border-bottom: 1px solid #F0F0EB; }
+.db-table td { padding: 14px 24px; font-size: 0.875rem; color: #333; border-bottom: 1px solid #F7F7F5; }
+.db-table tr:last-child td { border-bottom: none; }
+.db-table tr:hover td { background: #FAFAF8; }
+
+.db-badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 0.72rem; font-weight: 600; }
+.db-badge-green { background: #E6F4EC; color: #228A55; }
+.db-badge-yellow { background: #FEF6E4; color: #B07D00; }
