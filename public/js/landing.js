@@ -305,7 +305,9 @@
       const scroll = e.target.closest('[data-scroll]');
       if (nav) {
         const k = nav.getAttribute('data-nav');
-        if (k === 'signup' || k === 'login') openModal(k);
+        if (k === 'signup') window.location.href = '?page=signup';
+        else if (k === 'login') window.location.href = '?page=login';
+        else if (k === 'home') window.location.href = '?page=landing';
       }
       if (scroll) {
         const sel = scroll.getAttribute('data-scroll');
@@ -313,82 +315,6 @@
         if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 60, behavior: 'smooth' });
       }
     });
-  }
-
-  function openModal(mode) {
-    const root = $('#mm-modal-root');
-    closeModal();
-
-    const inputStyle = 'height:48px;padding:0 16px;border:1px solid #E5E3DE;border-radius:12px;font-family:JetBrains Mono,monospace;font-size:16px;color:#38362F;background:#fff;outline:none;';
-    const labelStyle = 'display:flex;flex-direction:column;gap:6px;';
-    const spanStyle  = 'font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:#57544C;';
-
-    const overlay = h('div', {
-      style: 'position:fixed;inset:0;z-index:500;background:rgba(12,18,33,0.60);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;animation:mm-fadeUp 250ms ease-out;',
-      onClick: (e) => { if (e.target === overlay) closeModal(); },
-    });
-
-    const switchLink = h('a', {
-      style: 'color:#CC7A00;font-weight:600;cursor:pointer;',
-      onClick: () => openModal(mode === 'signup' ? 'login' : 'signup'),
-    }, mode === 'signup' ? 'Sign in' : 'Create account');
-
-    const modal = h('div', {
-      style: 'background:#fff;border-radius:20px;padding:32px;width:100%;max-width:420px;box-shadow:0 24px 48px rgba(54,48,32,0.18);display:flex;flex-direction:column;gap:16px;',
-      onClick: (e) => e.stopPropagation(),
-    },
-      h('div', { style: 'display:flex;align-items:center;gap:10px' },
-        h('span', { style: 'font-size:22px' }, '⚡'),
-        h('h3', { style: 'font-family:Space Grotesk,sans-serif;font-size:22px;font-weight:700;color:#38362F;margin:0;letter-spacing:-0.02em;' },
-          mode === 'signup' ? 'Create your account' : 'Welcome back')
-      ),
-      h('p', { style: 'color:#57544C;font-size:14px;margin:0' },
-        mode === 'signup' ? 'Free forever. No credit card.' : 'Sign in to log your next fill-up.'),
-      h('label', { style: labelStyle },
-        h('span', { style: spanStyle }, 'Email'),
-        (() => {
-          const inp = h('input', { type: 'email', value: 'driver@mileo.app', style: inputStyle });
-          inp.addEventListener('focus', () => { inp.style.border = '1.5px solid #F59500'; inp.style.padding = '0 15.5px'; inp.style.boxShadow = '0 0 0 3px rgba(245,149,0,0.25)'; });
-          inp.addEventListener('blur',  () => { inp.style.border = '1px solid #E5E3DE'; inp.style.padding = '0 16px'; inp.style.boxShadow = 'none'; });
-          return inp;
-        })(),
-      ),
-      h('label', { style: labelStyle },
-        h('span', { style: spanStyle }, 'Password'),
-        h('input', { type: 'password', value: '••••••••', style: inputStyle }),
-      ),
-      h('button', {
-        class: 'mm-btn mm-btn-primary mm-btn-md',
-        style: 'margin-top:4px',
-        onClick: () => { closeModal(); showToast(mode === 'signup' ? 'Welcome to Mileo 👋' : 'Signed in'); },
-      }, mode === 'signup' ? 'Create account' : 'Sign in'),
-      h('div', { style: 'text-align:center;font-size:13px;color:#57544C' },
-        mode === 'signup' ? 'Already have one? ' : 'New here? ',
-        switchLink,
-      ),
-    );
-
-    overlay.appendChild(modal);
-    root.appendChild(overlay);
-
-    document.addEventListener('keydown', onEsc);
-  }
-  function onEsc(e) { if (e.key === 'Escape') closeModal(); }
-  function closeModal() {
-    $('#mm-modal-root').innerHTML = '';
-    document.removeEventListener('keydown', onEsc);
-  }
-
-  function showToast(msg) {
-    const root = $('#mm-toast-root');
-    const el = h('div', {
-      style: 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:600;background:#fff;border:1px solid #F2F1EE;border-radius:12px;padding:12px 20px;box-shadow:0 8px 16px rgba(54,48,32,0.10);font-family:Plus Jakarta Sans,sans-serif;font-size:14px;font-weight:500;color:#38362F;display:flex;align-items:center;gap:10px;animation:mm-fadeUp 300ms ease-out;',
-    },
-      h('span', { style: 'width:8px;height:8px;background:#228A55;border-radius:9999px' }),
-      msg,
-    );
-    root.appendChild(el);
-    setTimeout(() => { el.remove(); }, 2400);
   }
 
   // Boot
