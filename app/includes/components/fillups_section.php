@@ -15,7 +15,7 @@
     <div class="db-empty">
       <div class="db-empty-icon">&#128663;</div>
       <div class="db-empty-title">Start by adding your vehicle</div>
-      <div class="db-empty-sub">Before you can track fuel, you'll need to <a href="#" class="db-empty-link">add a vehicle</a> first.</div>
+      <div class="db-empty-sub">Before you can track fuel, you'll need to <a href="?page=vehicles" class="db-empty-link">open the Vehicles page</a> first.</div>
     </div>
 
   <?php elseif (empty($fillups)): ?>

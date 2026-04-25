@@ -4,9 +4,18 @@ session_start();
 $api = $_GET['api'] ?? null;
 
 if ($api !== null) {
-    $allowed_api = ['auth/signup', 'auth/login', 'auth/logout'];
+    $allowed_api = [
+        'auth/signup',
+        'auth/login',
+        'auth/logout',
+        'vehicles/list',
+        'vehicles/create',
+        'vehicles/update',
+        'vehicles/archive',
+        'vehicles/delete',
+    ];
 
-    if (!in_array($api, $allowed_api)) {
+    if (!in_array($api, $allowed_api, true)) {
         http_response_code(404);
         echo "404 Not Found";
         exit;
@@ -18,7 +27,7 @@ if ($api !== null) {
 
 $page = $_GET['page'] ?? 'landing';
 
-$allowed_pages = ['landing', 'login', 'signup', 'logout', 'dashboard'];
+$allowed_pages = ['landing', 'login', 'signup', 'logout', 'dashboard', 'vehicles'];
 
 if (!in_array($page, $allowed_pages)) {
     http_response_code(404);
@@ -26,7 +35,7 @@ if (!in_array($page, $allowed_pages)) {
     exit;
 }
 
-if ($page === 'dashboard' && !isset($_SESSION['user_id'])) {
+if (in_array($page, ['dashboard', 'vehicles'], true) && !isset($_SESSION['user_id'])) {
     header('Location: ?page=login');
     exit;
 }

@@ -23,6 +23,9 @@
 <div id="mm-modal-root"></div>
 <div id="mm-toast-root"></div>
 
+<?php if (($page ?? '') === 'vehicles'): ?>
+<script src="js/vehicles.js"></script>
+<?php endif; ?>
 <script src="js/landing.js"></script>
 </body>
 </html>

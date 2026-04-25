@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../../config/db.php';
 
 $user_id = (int)$_SESSION['user_id'];
+$dashboard_title = 'Dashboard';
+$dashboard_subtitle = 'Your fuel tracking overview';
 
 // Aggregate stats
 $stmt = $conn->prepare("
@@ -30,11 +32,17 @@ $avg_kml       = ($agg['avg_kml']     !== null) ? (float)$agg['avg_kml']     : n
 $avg_cost_km   = ($agg['avg_cost_km'] !== null) ? (float)$agg['avg_cost_km'] : null;
 
 // Vehicle check
-$stmt = $conn->prepare("SELECT COUNT(*) FROM vehicles WHERE user_id = ?");
+$stmt = $conn->prepare("
+    SELECT COUNT(*) AS total_vehicles
+    FROM vehicles
+    WHERE user_id = ?
+");
 $stmt->bind_param('i', $user_id);
 $stmt->execute();
-$has_vehicles = (bool)$stmt->get_result()->fetch_row()[0];
+$vehicle_totals = $stmt->get_result()->fetch_assoc();
 $stmt->close();
+$total_vehicles = (int)($vehicle_totals['total_vehicles'] ?? 0);
+$has_vehicles = $total_vehicles > 0;
 
 // Recent fill-ups (last 5)
 $fillups = [];
@@ -115,25 +123,23 @@ include_once __DIR__ . '/../includes/header.php';
 
   <div class="db-topbar">
     <div>
-      <div class="db-title">Dashboard</div>
-      <div class="db-subtitle">Your fuel tracking overview</div>
+      <div class="db-title"><?= htmlspecialchars($dashboard_title) ?></div>
+      <div class="db-subtitle"><?= htmlspecialchars($dashboard_subtitle) ?></div>
     </div>
-    <?php if ($has_vehicles): ?>
-      <button class="mm-btn mm-btn-primary mm-btn-sm">+ Log Fill-up</button>
-    <?php else: ?>
-      <button class="mm-btn mm-btn-primary mm-btn-sm">+ Add Vehicle</button>
-    <?php endif; ?>
+    <div class="db-topbar-actions">
+      <button class="mm-btn mm-btn-primary mm-btn-sm" type="button" title="Fuel log creation UI coming soon">+ Add Fuel Log</button>
+    </div>
   </div>
 
-  <!-- STAT CARDS -->
-  <div class="db-stats">
-    <?php foreach ($stats as $stat): ?>
-      <?php include __DIR__ . '/../includes/components/stat_card.php'; ?>
-    <?php endforeach; ?>
-  </div>
+  <section class="db-overview-stack">
+    <div class="db-stats">
+      <?php foreach ($stats as $stat): ?>
+        <?php include __DIR__ . '/../includes/components/stat_card.php'; ?>
+      <?php endforeach; ?>
+    </div>
 
-  <!-- RECENT FILL-UPS -->
-  <?php include __DIR__ . '/../includes/components/fillups_section.php'; ?>
+    <?php include __DIR__ . '/../includes/components/fillups_section.php'; ?>
+  </section>
 
 </div>
 

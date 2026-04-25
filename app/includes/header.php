@@ -12,6 +12,9 @@
 <?php if (($page ?? '') === 'dashboard'): ?>
 <link rel="stylesheet" href="css/dashboard.css">
 <?php endif; ?>
+<?php if (($page ?? '') === 'vehicles'): ?>
+<link rel="stylesheet" href="css/vehicles.css">
+<?php endif; ?>
 <?php if (in_array($page ?? '', ['login', 'signup'])): ?>
 <link rel="stylesheet" href="css/auth.css">
 <?php endif; ?>
@@ -26,8 +29,12 @@
       <span class="mm-brand-icon">⚡</span>
       <span class="mm-brand-name">mileo</span>
     </div>
-    <div style="display:flex;gap:12px;align-items:center">
+    <div class="mm-navbar-actions">
       <?php if (isset($_SESSION['user_id'])): ?>
+        <div class="mm-nav-tabs" aria-label="Primary sections">
+          <button class="mm-nav-tab<?= ($page ?? '') === 'dashboard' ? ' is-active' : '' ?>" onclick="location.href='?page=dashboard'">Dashboard</button>
+          <button class="mm-nav-tab<?= ($page ?? '') === 'vehicles' ? ' is-active' : '' ?>" onclick="location.href='?page=vehicles'">Vehicles</button>
+        </div>
         <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="location.href='?page=logout'">Logout</button>
       <?php else: ?>
         <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="location.href='?page=login'">Sign In</button>

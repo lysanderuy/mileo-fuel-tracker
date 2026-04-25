@@ -20,6 +20,7 @@ CREATE TABLE vehicles (
   fuel_type    VARCHAR(20),
   color        VARCHAR(50),
   plate_number VARCHAR(20),
+  is_archived  TINYINT(1)   NOT NULL DEFAULT 0,
   created_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
   updated_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
