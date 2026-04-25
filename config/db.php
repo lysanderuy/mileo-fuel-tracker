@@ -1,11 +1,4 @@
 <?php
-/**
- * ============================================================
- * MILEO — Database Configuration
- * ============================================================
- * Configure your database connection here.
- * These are the default XAMPP credentials.
- */
 
 // Database connection parameters
 $db_host = 'localhost';
@@ -17,7 +10,7 @@ $db_pass = '';
 try {
   $conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
 
-  // Check connection
+  // Check database connection
   if ($conn->connect_error) {
     die('Database connection failed: ' . $conn->connect_error);
   }
