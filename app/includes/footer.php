@@ -1,3 +1,5 @@
+</main>
+
 <!-- FOOTER -->
 <footer class="mm-footer">
   <div class="mm-footer-inner">

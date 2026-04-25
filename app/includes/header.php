@@ -15,7 +15,7 @@
 <?php if (in_array($page ?? '', ['login', 'signup'])): ?>
 <link rel="stylesheet" href="css/auth.css">
 <?php endif; ?>
-<style>html,body{margin:0;padding:0;background:#FAFAF8}</style>
+<style>html,body{margin:0;padding:0;background:#FAFAF8}body{display:flex;flex-direction:column;min-height:100vh}</style>
 </head>
 <body class="mileo-marketing" data-theme="light">
 
@@ -36,3 +36,4 @@
     </div>
   </div>
 </nav>
+<main style="flex:1">

@@ -27,3 +27,11 @@
 .db-badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 0.72rem; font-weight: 600; }
 .db-badge-green { background: #E6F4EC; color: #228A55; }
 .db-badge-yellow { background: #FEF6E4; color: #B07D00; }
+.db-badge-red    { background: #FDECEA; color: #C0392B; }
+
+.db-empty { padding: 56px 24px; text-align: center; width: 100%; box-sizing: border-box; }
+.db-empty-icon { font-size: 1.75rem; line-height: 1; margin-bottom: 12px; opacity: 0.25; display: block; }
+.db-empty-title { font-family: 'Sora', sans-serif; font-size: 0.9375rem; font-weight: 600; color: #555; }
+.db-empty-sub { font-size: 0.8125rem; color: #AAA; max-width: 300px; margin: 6px auto 0; line-height: 1.65; }
+.db-empty-link { color: #F59500; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.db-empty-link:hover { color: #CC7A00; }
