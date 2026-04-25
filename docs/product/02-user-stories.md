@@ -35,7 +35,7 @@
 ### US-001 — Welcome and Sign Up
 
 **Role:** New Driver
-**Priority:** Must Have
+**Priority:** Urgent
 
 > As a New Driver, I want to create an account quickly so that I can start tracking fuel without a long setup process.
 
@@ -50,7 +50,7 @@
 ### US-010 — Open Quick Log
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** Urgent
 
 > As a Driver, I want to open the Quick Log screen from the Dashboard so that I can start logging my fill-up.
 
@@ -65,7 +65,7 @@
 ### US-011 — Log a Fill-Up (Required Fields)
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** Urgent
 
 > As a Driver, I want to enter my odometer reading, fuel price, volume filled, and trip distance on the Quick Log screen.
 
@@ -79,7 +79,7 @@
 ### US-012 — Auto-Computed Trip Distance
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** Urgent
 
 > As a Driver, I want the app to automatically calculate my trip distance from my odometer reading so that I don't have to do the math myself.
 
@@ -94,7 +94,7 @@
 ### US-013 — Live Total Cost Display
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** Urgent
 
 > As a Driver, I want to see my total cost update in real time as I enter price and volume so that I can confirm the cost before saving.
 
@@ -109,7 +109,7 @@
 ### US-014 — Full Tank Toggle
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** Urgent
 
 > As a Driver, I want to indicate whether I filled the tank completely so that the app can accurately calculate my fuel efficiency.
 
@@ -123,7 +123,7 @@
 ### US-015 — Optional Notes on a Fill-Up
 
 **Role:** Driver
-**Priority:** Should Have
+**Priority:** Normal
 
 > As a Driver, I want to optionally add a note to a fill-up so that I can record context (e.g., "highway trip," "car felt sluggish") without it cluttering the default screen.
 
@@ -139,7 +139,7 @@
 ### US-016 — Adjust Fill-Up Date and Time
 
 **Role:** Driver
-**Priority:** Should Have
+**Priority:** Normal
 
 > As a Driver, I want to change the date and time of a fill-up so that I can correct a log I forgot to record at the pump.
 
@@ -155,7 +155,7 @@
 ### US-017 — Switch Vehicle on Quick Log
 
 **Role:** Driver
-**Priority:** Should Have
+**Priority:** Normal
 
 > As a Driver with multiple vehicles, I want to switch the active vehicle on the Quick Log screen so that I can log for the right car without going back to the Dashboard.
 
@@ -170,7 +170,7 @@
 ### US-018 — Validation Errors on Quick Log
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** Urgent
 
 > As a Driver, I want to see inline validation errors on the Quick Log screen so that I know exactly which field needs fixing without losing my entered data.
 
@@ -187,7 +187,7 @@
 ### US-020 — View Instant Stats After Logging
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** Urgent
 
 > As a Driver, I want to see my fuel stats after saving a fill-up so that I can see the results of my log.
 
@@ -201,7 +201,7 @@
 ### US-021 — Comparison to Previous Fill-Up
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** High
 
 > As a Driver, I want to see how my latest fill-up compares to my previous one so that I can immediately notice if my efficiency has changed.
 
@@ -215,7 +215,7 @@
 ### US-022 — Dismiss Instant Stats
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** Urgent
 
 > As a Driver, I want to dismiss Instant Stats and return to the Dashboard easily so that I can close the app and get on with my day.
 
@@ -231,7 +231,7 @@
 ### US-030 — View Monthly Fuel Summary
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** Urgent
 
 > As a Driver, I want to see my current month's fuel spend and related stats on the home screen so that I can track my fuel costs.
 
@@ -245,7 +245,7 @@
 ### US-031 — Compare This Month to Last Month
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** High
 
 > As a Driver, I want to see how my current month's fuel spend and efficiency compare to last month so that I can spot trends without digging into history.
 
@@ -259,7 +259,7 @@
 ### US-032 — View Recent Fill-Ups on Dashboard
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** High
 
 > As a Driver, I want to see my last 5 fill-ups on the Dashboard so that I can quickly review recent activity without navigating away.
 
@@ -274,7 +274,7 @@
 ### US-033 — Dashboard Empty States
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** Urgent
 
 > As a Driver on a fresh account, I want to see a helpful prompt on the Dashboard so that I know exactly what to do next rather than seeing a blank screen.
 
@@ -289,7 +289,7 @@
 ### US-034 — Switch Vehicles on Dashboard
 
 **Role:** Driver
-**Priority:** Should Have
+**Priority:** Normal
 
 > As a Driver with multiple vehicles, I want to switch between vehicles on the Dashboard so that I can see stats for each car without navigating to a separate screen.
 
@@ -306,7 +306,7 @@
 ### US-040 — View Full Fill-Up History
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** High
 
 > As a Driver, I want to browse all my past fill-ups in a scrollable list so that I can review my logging history at any time.
 
@@ -321,7 +321,7 @@
 ### US-041 — Filter History by Date Range
 
 **Role:** Driver
-**Priority:** Should Have
+**Priority:** Normal
 
 > As a Driver, I want to filter my fill-up history by date range so that I can review spending for a specific period (e.g., last month, last 3 months).
 
@@ -336,7 +336,7 @@
 ### US-041a — Sort History by Date
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** High
 
 > As a Driver, I want to sort my fill-up history by date so that I can view logs in chronological order (newest or oldest first).
 
@@ -353,7 +353,7 @@
 ### US-041b — Sort History by Efficiency
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** Normal
 
 > As a Driver, I want to sort my fill-up history by fuel efficiency so that I can spot my best and worst fuel economy runs at a glance.
 
@@ -369,7 +369,7 @@
 ### US-042 — View Full Fill-Up Detail
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** High
 
 > As a Driver, I want to tap a fill-up in the history list to see its full details so that I can review all fields including notes and computed stats.
 
@@ -386,7 +386,7 @@
 ### US-050 — Edit an Existing Fill-Up
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** High
 
 > As a Driver, I want to edit a previously logged fill-up so that I can correct a mistake without deleting and re-entering the record.
 
@@ -405,7 +405,7 @@
 ### US-051 — Downstream Recomputation on Edit
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** High
 
 > As a Driver, I want the app to automatically recompute affected stats in subsequent logs when I edit an odometer reading so that my efficiency history stays accurate.
 
@@ -421,7 +421,7 @@
 ### US-060 — Delete a Fill-Up
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** High
 
 > As a Driver, I want to delete an incorrectly logged fill-up so that it no longer affects my stats or history.
 
@@ -438,7 +438,7 @@
 ### US-061 — Downstream Recomputation on Delete
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** High
 
 > As a Driver, I want the app to automatically recompute affected stats in adjacent logs when I delete a fill-up so that my history remains consistent.
 
@@ -453,7 +453,7 @@
 ### US-070 — Add a Vehicle
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** Urgent
 
 > As a Driver, I want to add a new vehicle to my account so that I can track fuel for more than one car.
 
@@ -470,7 +470,7 @@
 ### US-071 — Set a Default Vehicle
 
 **Role:** Driver
-**Priority:** Should Have
+**Priority:** Normal
 
 > As a Driver with multiple vehicles, I want to set a default vehicle so that the correct car is pre-selected every time I open Quick Log.
 
@@ -485,7 +485,7 @@
 ### US-072 — Archive a Vehicle
 
 **Role:** Driver
-**Priority:** Should Have
+**Priority:** Normal
 
 > As a Driver who no longer uses a vehicle, I want to archive it so that it's hidden from active views without losing my historical data.
 
@@ -500,7 +500,7 @@
 ### US-073 — Delete a Vehicle
 
 **Role:** Driver
-**Priority:** Should Have
+**Priority:** Low
 
 > As a Driver, I want to delete a vehicle I added by mistake so that it doesn't clutter my vehicle list.
 
@@ -516,7 +516,7 @@
 ### US-100 — Log In to Existing Account
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** Urgent
 
 > As a returning Driver, I want to log in with my username and password so that I can access my data.
 
@@ -531,7 +531,7 @@
 ### US-101 — Stay Logged In
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** Urgent
 
 > As a Driver, I want to remain logged in between app sessions so that I don't have to re-authenticate every time I open the app.
 
@@ -545,7 +545,7 @@
 ### US-102 — Log Out
 
 **Role:** Driver
-**Priority:** Must Have
+**Priority:** High
 
 > As a Driver, I want to log out of my account so that I can secure my data if I share a device.
 
