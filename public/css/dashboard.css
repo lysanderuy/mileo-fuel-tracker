@@ -154,6 +154,12 @@
 .db-table td { padding: 14px 24px; font-size: 0.875rem; color: #333; border-bottom: 1px solid #F7F7F5; }
 .db-table tr:last-child td { border-bottom: none; }
 .db-table tr:hover td { background: #FAFAF8; }
+.db-row-note {
+  margin-top: 3px;
+  font-size: 0.76rem;
+  color: #8A857A;
+  line-height: 1.4;
+}
 
 .db-badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 0.72rem; font-weight: 600; }
 .db-badge-green { background: #E6F4EC; color: #228A55; }
