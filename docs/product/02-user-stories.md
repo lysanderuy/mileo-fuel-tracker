@@ -4,10 +4,6 @@
 
 **Status:** Draft
 
-**Based on:** docs/product/02-product-requirements.md v1.0
-
-**Last Updated:** April 2026
-
 ---
 
 ## Roles
@@ -15,7 +11,7 @@
 | Role | Description |
 |---|---|
 | **Driver** | The account owner. The only role. Can be a commuter, gig worker, or any regular driver. |
-| **New Driver** | A Driver who has not yet completed onboarding (no account or no vehicle yet). |
+| **New Driver** | A Driver who has just signed up and has not yet added a vehicle or logged a fill-up. |
 
 ---
 
@@ -29,10 +25,8 @@
 6. [Edit a Fuel Log](#6-edit-a-fuel-log)
 7. [Delete a Fuel Log](#7-delete-a-fuel-log)
 8. [Vehicle Management](#8-vehicle-management)
-9. [Data Export](#9-data-export)
-10. [Settings](#10-settings)
-11. [Account & Auth](#11-account--auth)
-12. [Screen Inventory](#screen-inventory)
+9. [Account & Auth](#9-account--auth)
+10. [Screen Inventory](#screen-inventory)
 
 ---
 
@@ -47,24 +41,7 @@
 
 **Acceptance Criteria:**
 - [ ] A welcome screen is shown on first app launch
-- [ ] The New Driver can sign up using username and password
-
----
-
-### US-002 — Add First Vehicle During Onboarding
-
-**Role:** New Driver
-**Priority:** Must Have
-
-> As a New Driver, I want to add my vehicle during onboarding so that I can log my first fill-up immediately after setup.
-
-**Acceptance Criteria:**
-- [ ] After sign-up, the user is prompted to add their first vehicle before reaching the Dashboard
-- [ ] Vehicle name and fuel type are the only required fields
-- [ ] Make, model, and year are optional fields
-- [ ] The first vehicle created is automatically set as the default vehicle
-- [ ] The user cannot reach the Dashboard without completing vehicle creation
-- [ ] The Dashboard empty state shows a Coach-tone prompt: *"Log your first fill-up to see your numbers."*
+- [ ] The New Driver can sign up using email and password
 
 ---
 
@@ -78,7 +55,8 @@
 > As a Driver, I want to open the Quick Log screen from the Dashboard so that I can start logging my fill-up.
 
 **Acceptance Criteria:**
-- [ ] A prominent **Log Fill-Up** button (FAB or persistent CTA) is visible on the Dashboard
+- [ ] A prominent **Log Fill-Up** button (FAB or persistent CTA) is visible on the Dashboard when at least one vehicle exists
+- [ ] The button is not shown when no vehicles exist
 - [ ] The Quick Log screen opens when the button is tapped
 - [ ] The default vehicle is pre-selected at the top of the screen
 
@@ -293,16 +271,18 @@
 
 ---
 
-### US-033 — Dashboard Empty State
+### US-033 — Dashboard Empty States
 
 **Role:** Driver
 **Priority:** Must Have
 
-> As a Driver with no fill-ups yet, I want to see a helpful prompt on the Dashboard so that I know exactly what to do next rather than seeing a blank screen.
+> As a Driver on a fresh account, I want to see a helpful prompt on the Dashboard so that I know exactly what to do next rather than seeing a blank screen.
 
 **Acceptance Criteria:**
-- [ ] When no Fuel Logs exist for the selected vehicle, the Dashboard displays a Coach-tone empty state (e.g., *"Log your first fill-up to see your numbers."*) with a CTA to Quick Log
-- [ ] The empty state is not shown once at least one log exists
+- [ ] When no vehicles exist, the Dashboard displays a Coach-tone prompt: *"Add your first vehicle to start tracking."* with a CTA to Add Vehicle
+- [ ] When a vehicle exists but no Fuel Logs have been logged, the Dashboard displays: *"Log your first fill-up to see your numbers."* with a CTA to Quick Log
+- [ ] The Log Fill-Up FAB is not shown when no vehicles exist
+- [ ] Empty states are not shown once at least one log exists for the active vehicle
 
 ---
 
@@ -314,7 +294,8 @@
 > As a Driver with multiple vehicles, I want to switch between vehicles on the Dashboard so that I can see stats for each car without navigating to a separate screen.
 
 **Acceptance Criteria:**
-- [ ] A vehicle selector (tabs or dropdown) is visible at the top of the Dashboard whenever more than one active vehicle exists
+- [ ] The active vehicle name is always displayed on the Dashboard
+- [ ] A vehicle switcher is visible only when more than one active vehicle exists
 - [ ] Switching vehicles updates all Dashboard stats and the recent fill-ups list without leaving the screen
 - [ ] The selected vehicle persists as the active view until the user changes it again or logs out
 
@@ -477,7 +458,7 @@
 > As a Driver, I want to add a new vehicle to my account so that I can track fuel for more than one car.
 
 **Acceptance Criteria:**
-- [ ] An **Add Vehicle** option is accessible from the Vehicle management screen (reachable from Settings or Dashboard)
+- [ ] An **Add Vehicle** option is accessible from the Vehicle management screen (reachable from the Dashboard vehicle switcher or account menu)
 - [ ] Vehicle Name and Fuel Type are the only required fields
 - [ ] Make, Model, and Year are optional
 - [ ] A Driver cannot exceed 10 vehicles; an informative message is shown if the limit is reached
@@ -530,72 +511,7 @@
 
 ---
 
-## 9. Data Export
-
-### US-080 — Export Fuel Logs as CSV
-
-**Role:** Driver
-**Priority:** Should Have
-
-> As a Driver, I want to export my fuel log history as a CSV file so that I can keep a personal record or use it in a spreadsheet.
-
-**Acceptance Criteria:**
-- [ ] Export is accessible from Settings and from the History screen
-- [ ] The Driver can select: all vehicles or a specific vehicle; all time or a custom date range
-- [ ] Tapping **Export as CSV** generates the file and opens the system share sheet
-- [ ] The CSV includes all fields: date, vehicle name, odometer, trip distance, price per unit, volume filled, total cost, cost per kilometer, efficiency, notes, is full tank, distance unit, volume unit, currency
-- [ ] Unit values in the CSV reflect the user's configured preferences (not raw SI units)
-- [ ] The file is named: `mileo_export_{vehicle_name}_{date_range}.csv`
-- [ ] An empty selection (no logs in range) shows an informative message rather than generating an empty file
-
----
-
-## 10. Settings
-
-### US-090 — Change Unit Preferences
-
-**Role:** Driver
-**Priority:** Must Have
-
-> As a Driver, I want to change my distance, volume, and currency units in Settings so that the app matches my region or personal preference.
-
-**Acceptance Criteria:**
-- [ ] Settings includes: Distance Unit (km), Volume Unit (Liters), Currency (PHP)
-- [ ] Changing a unit immediately updates all Dashboard stats, History rows, and computed fields without requiring a restart
-- [ ] Stored values remain in SI base units (km, liters); display conversion happens at render time
-
----
-
-### US-091 — Change Display Name
-
-**Role:** Driver
-**Priority:** Nice to Have
-
-> As a Driver, I want to set a display name so that the app feels more personal.
-
-**Acceptance Criteria:**
-- [ ] Display Name is an optional free-text field in Settings
-- [ ] The display name is shown in relevant UI surfaces (e.g., greeting on Dashboard)
-- [ ] Leaving it blank is valid — the app falls back to a default greeting
-
----
-
-### US-092 — Delete Account
-
-**Role:** Driver
-**Priority:** Must Have
-
-> As a Driver, I want to permanently delete my account and all my data so that I have full control over my personal information.
-
-**Acceptance Criteria:**
-- [ ] A **Delete Account** option is available in Settings, visually separated from other settings (destructive action styling)
-- [ ] The user must type a confirmation phrase before deletion proceeds
-- [ ] All user data (account, vehicles, fuel logs) is permanently removed
-- [ ] The user is logged out and returned to the Welcome screen after deletion
-
----
-
-## 11. Account & Auth
+## 9. Account & Auth
 
 ### US-100 — Log In to Existing Account
 
@@ -606,7 +522,7 @@
 
 **Acceptance Criteria:**
 - [ ] A Log In screen is accessible from the Welcome screen
-- [ ] Username and password fields are present
+- [ ] Email and password fields are present
 - [ ] Incorrect credentials show an inline error
 - [ ] Successful login navigates directly to the Dashboard
 
@@ -634,26 +550,9 @@
 > As a Driver, I want to log out of my account so that I can secure my data if I share a device.
 
 **Acceptance Criteria:**
-- [ ] A **Log Out** option is available in Settings
+- [ ] A **Log Out** option is accessible from the account menu
 - [ ] Logging out clears the session and navigates to the Welcome screen
 - [ ] Local cached data is cleared on logout
-
----
-
-### US-103 — Forgot Password
-
-**Role:** Driver
-**Priority:** Should Have
-
-> As a Driver who has forgotten their password, I want to request a password reset so that I can regain access to my account.
-
-**Acceptance Criteria:**
-- [ ] A **Forgot Password** link is visible on the Log In screen
-- [ ] Tapping it opens a screen where the user enters their username
-- [ ] Password reset instructions are provided if the account exists
-- [ ] Successful password reset allows the user to log in with the new password
-
----
 
 ---
 
@@ -664,22 +563,17 @@
 | **S01** | Welcome / Splash | New Driver | First app launch (no active session) |
 | **S02** | Sign Up | New Driver | Tap "Get Started" on S01 |
 | **S03** | Log In | Driver | Tap "Log In" on S01 |
-| **S04** | Forgot Password | Driver | Tap "Forgot Password" on S03 |
-| **S05** | Onboarding — Add First Vehicle | New Driver | Successful sign-up |
-| **S06** | Dashboard | Driver | After onboarding, after login, after completing Quick Log |
+| **S06** | Dashboard | Driver | After sign-up, after login, after completing Quick Log |
 | **S07** | Quick Log | Driver | Tap "Log Fill-Up" CTA from S06 |
 | **S08** | Instant Stats | Driver | Successful save from S07 |
-| **S09** | Fill-Up History | Driver | Tap "View all" on S06, or navigate via bottom nav |
+| **S09** | Fill-Up History | Driver | Tap "View all" on S06, or navigate via main navigation |
 | **S10** | Fuel Log Detail | Driver | Tap any fill-up row on S09 or S06 recent list |
 | **S11** | Edit Fuel Log | Driver | Tap "Edit" on S10 |
 | **S12** | Delete Fuel Log — Confirmation Dialog | Driver | Tap "Delete" on S10 |
-| **S13** | Vehicle Management | Driver | Navigate from Settings or Dashboard vehicle selector |
-| **S14** | Add Vehicle | Driver | Tap "Add Vehicle" on S13, or during onboarding (S05) |
+| **S13** | Vehicle Management | Driver | Navigate from Dashboard vehicle switcher or account menu |
+| **S14** | Add Vehicle | Driver | Tap "Add Vehicle" on S13, or from the Dashboard no-vehicle empty state |
 | **S15** | Vehicle Detail / Edit | Driver | Tap a vehicle on S13 |
-| **S16** | Export — Scope Selection | Driver | Tap "Export" in Settings or History |
-| **S17** | Settings | Driver | Navigate via bottom nav or profile icon |
-| **S18** | Delete Account — Confirmation | Driver | Tap "Delete Account" in S17 |
 
 ---
 
-*This document is derived from docs/product/02-product-requirements.md v1.0. All screen IDs and story IDs should be referenced in design tickets and engineering tasks. When the PRD changes, update this document accordingly.*
+*This document is derived from docs/product/01-product-requirements.md v1.0. All screen IDs and story IDs should be referenced in design tickets and engineering tasks. When the PRD changes, update this document accordingly.*

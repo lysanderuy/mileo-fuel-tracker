@@ -23,11 +23,13 @@ Creates a new fuel log entry for a vehicle.
 ```json
 {
   "vehicle_id": 1,
-  "odometer": 45200,
-  "trip_distance": 150,
-  "fuel_price": 60.50,
-  "liters_filled": 25,
-  "log_date": "2026-04-20"
+  "logged_at": "2026-04-20T14:30:00",
+  "odometer_reading": 45200.00,
+  "trip_distance": 150.50,
+  "fuel_price_per_unit": 60.50,
+  "volume_filled": 25.0,
+  "is_full_tank": true,
+  "notes": "Highway driving"
 }
 ```
 
@@ -76,14 +78,16 @@ GET /logs/read.php?vehicle_id=1&sort_by=efficiency&order=ASC
     {
       "id": 42,
       "vehicle_id": 1,
-      "odometer": 45200,
-      "trip_distance": 150,
-      "fuel_price": 60.50,
-      "liters_filled": 25,
-      "cost_per_liter": 2.42,
-      "cost_per_km": 10.17,
-      "efficiency_l100km": 16.67,
-      "log_date": "2026-04-20"
+      "logged_at": "2026-04-20T14:30:00",
+      "odometer_reading": 45200.00,
+      "trip_distance": 150.50,
+      "fuel_price_per_unit": 60.50,
+      "volume_filled": 25.0,
+      "is_full_tank": true,
+      "total_cost": 1512.50,
+      "cost_per_distance_unit": 10.05,
+      "efficiency_km_l": 6.02,
+      "notes": "Highway driving"
     }
   ],
   "total_records": 24
@@ -101,10 +105,13 @@ Updates an existing fuel log.
 ```json
 {
   "log_id": 42,
-  "odometer": 45200,
-  "trip_distance": 150,
-  "fuel_price": 60.50,
-  "liters_filled": 25
+  "logged_at": "2026-04-20T14:30:00",
+  "odometer_reading": 45200.00,
+  "trip_distance": 150.50,
+  "fuel_price_per_unit": 60.50,
+  "volume_filled": 25.0,
+  "is_full_tank": true,
+  "notes": "Highway driving"
 }
 ```
 
@@ -172,21 +179,6 @@ Fetches aggregated statistics for the dashboard.
 
 ---
 
-### 6. Export Logs to CSV
-**GET** `/logs/export.php`
-
-Downloads all fuel logs as a CSV file.
-
-**Query Parameters:**
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `vehicle_id` | integer | No | Filter by vehicle |
-
-**Response:**
-- File download: `mileo_fuel_logs.csv`
-
----
-
 ## Sorting Guide
 
 ### Sort by Date
@@ -201,12 +193,12 @@ sort_by=date&order=ASC   → Oldest first
 
 ---
 
-### Sort by Efficiency (L/100km)
-Arranges logs by fuel efficiency from worst to best or vice versa.
+### Sort by Efficiency (km/L)
+Arranges logs by fuel efficiency from best to worst or vice versa.
 
 ```
-sort_by=efficiency&order=DESC  → Most efficient first
-sort_by=efficiency&order=ASC   → Least efficient first
+sort_by=efficiency&order=DESC  → Best efficiency first (most km per liter)
+sort_by=efficiency&order=ASC   → Worst efficiency first (least km per liter)
 ```
 
 **Use case:** Identify driving patterns, spot efficiency drops, celebrate improvements.
@@ -264,9 +256,9 @@ fetch('/api/logs/read.php?sort_by=efficiency&order=DESC')
 ## Database Fields Used for Sorting
 
 ### Sorting by Date
-- Column: `log_date` (DATE type)
-- Calculated in query: Ordered by log_date ASC/DESC
+- Column: `logged_at` (TIMESTAMP)
+- Ordered by `logged_at` ASC/DESC
 
 ### Sorting by Efficiency
-- Calculated field: `efficiency_l100km` = `(liters_filled / trip_distance) * 100`
-- Sorted by efficiency_l100km ASC/DESC
+- Column: `efficiency_km_l` = `trip_distance / volume_filled`
+- Sorted by `efficiency_km_l` ASC/DESC

@@ -356,8 +356,8 @@ Action-oriented language is clearer and less anxiety-inducing.
 
 | Context | Do Write | Don't Write |
 |---|---|---|
+| Empty state (no vehicle) | "Add your first vehicle to start tracking." | "It looks like you haven't set up yet!" |
 | Empty state (no logs) | "Log your first fill-up to see your numbers." | "It looks like you haven't added any data yet!" |
-| Onboarding complete | "You're set up. Log your next fill-up to see your numbers." | "Welcome to Mileo! We're so excited to help you track your fuel!" |
 | After saving a log | "Fill-up saved." (toast) | "Great job! Your fill-up has been successfully logged!" |
 | Partial fill flag | "Partial fill — efficiency estimate may vary." | "Warning: This may not be accurate because you didn't fill up completely." |
 | Deleting a log | "Delete this fill-up? This can't be undone." | "Are you absolutely sure you want to delete this? This action is permanent and irreversible." |

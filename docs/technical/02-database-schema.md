@@ -40,6 +40,8 @@ Stores vehicle information for multi-vehicle support.
 | `fuel_type` | VARCHAR(20) | | Fuel type (e.g., "Gasoline", "Diesel") |
 | `color` | VARCHAR(50) | | Vehicle color |
 | `plate_number` | VARCHAR(20) | | License plate |
+| `is_default` | TINYINT(1) | NOT NULL, DEFAULT 0 | Pre-selected vehicle in Quick Log |
+| `status` | ENUM | NOT NULL, DEFAULT 'active' | `active` or `archived` |
 | `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Creation time |
 | `updated_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE | Last update |
 
@@ -55,36 +57,37 @@ Stores individual fuel log entries.
 | `id` | INT | PRIMARY KEY, AUTO_INCREMENT | Log ID |
 | `user_id` | INT | FOREIGN KEY (users.id), NOT NULL | User who logged |
 | `vehicle_id` | INT | FOREIGN KEY (vehicles.id), NOT NULL | Vehicle for this log |
-| `log_date` | DATE | NOT NULL | Date of fill-up |
-| `odometer` | INT | NOT NULL | Odometer reading (km) |
+| `logged_at` | TIMESTAMP | NOT NULL, DEFAULT CURRENT_TIMESTAMP | Date and time of fill-up (user-settable) |
+| `odometer_reading` | DECIMAL(10,2) | NOT NULL | Odometer reading (km) |
 | `trip_distance` | DECIMAL(8,2) | NOT NULL | Distance traveled since last log |
-| `liters_filled` | DECIMAL(8,2) | NOT NULL | Liters of fuel filled |
-| `fuel_price` | DECIMAL(10,2) | NOT NULL | Price paid (₱) |
-| `cost_per_liter` | DECIMAL(10,2) | GENERATED (fuel_price / liters_filled) | Calculated cost per liter |
-| `cost_per_km` | DECIMAL(10,4) | GENERATED (fuel_price / trip_distance) | Calculated cost per kilometer |
-| `efficiency_l100km` | DECIMAL(8,2) | GENERATED ((liters_filled / trip_distance) * 100) | Fuel efficiency |
-| `notes` | TEXT | | Optional user notes |
+| `fuel_price_per_unit` | DECIMAL(10,2) | NOT NULL | Price paid per liter (₱) |
+| `volume_filled` | DECIMAL(8,2) | NOT NULL | Liters of fuel filled |
+| `is_full_tank` | TINYINT(1) | NOT NULL, DEFAULT 1 | Whether the tank was fully filled |
+| `total_cost` | DECIMAL(10,2) | GENERATED (fuel_price_per_unit × volume_filled) | Calculated total cost |
+| `cost_per_distance_unit` | DECIMAL(10,4) | GENERATED (total_cost / trip_distance) | Calculated cost per km |
+| `efficiency_km_l` | DECIMAL(8,4) | GENERATED (trip_distance / volume_filled) | Fuel efficiency (km/L) ⭐ |
+| `notes` | TEXT | | Optional user notes (max 200 chars) |
 | `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Creation time |
 | `updated_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE | Last update |
 
 **Indexes:**
 - `user_id` (for user's logs)
 - `vehicle_id` (for vehicle's logs)
-- `log_date` (for sorting by date)
-- `efficiency_l100km` (for sorting by efficiency) ⭐
+- `logged_at` (for sorting by date)
+- `efficiency_km_l` (for sorting by efficiency) ⭐
 
 ---
 
 ## Sorting Columns
 
 ### 1. Sort by Date
-**Column:** `fuel_logs.log_date` (DATE)
+**Column:** `fuel_logs.logged_at` (TIMESTAMP)
 
 **Query Example:**
 ```sql
 SELECT * FROM fuel_logs 
 WHERE user_id = ? 
-ORDER BY log_date DESC 
+ORDER BY logged_at DESC 
 LIMIT 100;
 ```
 
@@ -94,22 +97,22 @@ LIMIT 100;
 
 ---
 
-### 2. Sort by Efficiency (L/100km)
-**Column:** `fuel_logs.efficiency_l100km` (DECIMAL(8,2))
+### 2. Sort by Efficiency (km/L)
+**Column:** `fuel_logs.efficiency_km_l` (DECIMAL(8,4))
 
-**Calculated as:** `(liters_filled / trip_distance) * 100`
+**Calculated as:** `trip_distance / volume_filled`
 
 **Query Example:**
 ```sql
 SELECT * FROM fuel_logs 
 WHERE user_id = ? 
-ORDER BY efficiency_l100km DESC 
+ORDER BY efficiency_km_l DESC 
 LIMIT 100;
 ```
 
 **Sort Options:**
-- `DESC` (best efficiency first) – Most efficient
-- `ASC` (worst efficiency first) – Least efficient
+- `DESC` (best efficiency first) – Most km per liter
+- `ASC` (worst efficiency first) – Least km per liter
 
 ---
 
@@ -132,7 +135,7 @@ if (!in_array($order, $valid_orders)) {
 }
 
 // Map frontend field names to database columns
-$sort_column = ($sort_by === 'efficiency') ? 'efficiency_l100km' : 'log_date';
+$sort_column = ($sort_by === 'efficiency') ? 'efficiency_km_l' : 'logged_at';
 ```
 
 ### Building Dynamic Queries
@@ -142,7 +145,7 @@ $query = "SELECT * FROM fuel_logs
           ORDER BY $sort_column $order 
           LIMIT ? OFFSET ?";
 
-$stmt = $mysqli->prepare($query);
+$stmt = $pdo->prepare($query);
 $stmt->bind_param('iii', $user_id, $limit, $offset);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -178,6 +181,8 @@ CREATE TABLE vehicles (
   fuel_type VARCHAR(20),
   color VARCHAR(50),
   plate_number VARCHAR(20),
+  is_default TINYINT(1) NOT NULL DEFAULT 0,
+  status ENUM('active', 'archived') NOT NULL DEFAULT 'active',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -189,14 +194,15 @@ CREATE TABLE fuel_logs (
   id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
   vehicle_id INT NOT NULL,
-  log_date DATE NOT NULL,
-  odometer INT NOT NULL,
+  logged_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  odometer_reading DECIMAL(10,2) NOT NULL,
   trip_distance DECIMAL(8,2) NOT NULL,
-  liters_filled DECIMAL(8,2) NOT NULL,
-  fuel_price DECIMAL(10,2) NOT NULL,
-  cost_per_liter DECIMAL(10,2) GENERATED ALWAYS AS (fuel_price / liters_filled) STORED,
-  cost_per_km DECIMAL(10,4) GENERATED ALWAYS AS (fuel_price / trip_distance) STORED,
-  efficiency_l100km DECIMAL(8,2) GENERATED ALWAYS AS ((liters_filled / trip_distance) * 100) STORED,
+  fuel_price_per_unit DECIMAL(10,2) NOT NULL,
+  volume_filled DECIMAL(8,2) NOT NULL,
+  is_full_tank TINYINT(1) NOT NULL DEFAULT 1,
+  total_cost DECIMAL(10,2) GENERATED ALWAYS AS (fuel_price_per_unit * volume_filled) STORED,
+  cost_per_distance_unit DECIMAL(10,4) GENERATED ALWAYS AS ((fuel_price_per_unit * volume_filled) / trip_distance) STORED,
+  efficiency_km_l DECIMAL(8,4) GENERATED ALWAYS AS (trip_distance / volume_filled) STORED,
   notes TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -204,8 +210,8 @@ CREATE TABLE fuel_logs (
   FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
   INDEX idx_user_id (user_id),
   INDEX idx_vehicle_id (vehicle_id),
-  INDEX idx_log_date (log_date),
-  INDEX idx_efficiency (efficiency_l100km)
+  INDEX idx_logged_at (logged_at),
+  INDEX idx_efficiency (efficiency_km_l)
 );
 ```
 
@@ -215,15 +221,15 @@ CREATE TABLE fuel_logs (
 
 ### Indexes
 The schema includes indexes on:
-- `fuel_logs.log_date` – For date sorting
-- `fuel_logs.efficiency_l100km` – For efficiency sorting
+- `fuel_logs.logged_at` – For date sorting
+- `fuel_logs.efficiency_km_l` – For efficiency sorting
 - `fuel_logs.user_id` – For filtering by user
 - `fuel_logs.vehicle_id` – For filtering by vehicle
 
 These indexes significantly speed up sorting and filtering operations.
 
 ### Generated Columns
-Calculated fields (`cost_per_liter`, `cost_per_km`, `efficiency_l100km`) are stored as **generated columns**. This means:
+Calculated fields (`total_cost`, `cost_per_distance_unit`, `efficiency_km_l`) are stored as **generated columns**. This means:
 - ✓ Values are automatically calculated and stored
 - ✓ No need to calculate in PHP/JavaScript
 - ✓ Can be indexed for fast sorting
@@ -237,13 +243,18 @@ Calculated fields (`cost_per_liter`, `cost_per_km`, `efficiency_l100km`) are sto
 INSERT INTO users (email, password, first_name, last_name) VALUES
 ('lysander.uy@gmail.com', 'hashed_password_here', 'Lysander', 'Uy');
 
-INSERT INTO vehicles (user_id, name, make, model, year, fuel_type, plate_number) VALUES
-(1, 'Honda Civic', 'Honda', 'Civic', 2020, 'Gasoline', 'ABC-1234');
+INSERT INTO vehicles (user_id, name, make, model, year, fuel_type, plate_number, is_default, status) VALUES
+(1, 'Honda Civic', 'Honda', 'Civic', 2020, 'Gasoline', 'ABC-1234', 1, 'active');
 
-INSERT INTO fuel_logs (user_id, vehicle_id, log_date, odometer, trip_distance, liters_filled, fuel_price, notes) VALUES
-(1, 1, '2026-04-20', 45200, 150.50, 25.0, 60.50, 'Highway driving'),
-(1, 1, '2026-04-15', 45050, 200.0, 35.0, 59.00, 'Mixed driving'),
-(1, 1, '2026-04-10', 44850, 175.25, 30.0, 61.00, 'City driving');
+INSERT INTO fuel_logs (user_id, vehicle_id, logged_at, odometer_reading, trip_distance, fuel_price_per_unit, volume_filled, is_full_tank, notes) VALUES
+(1, 1, '2026-04-20 14:30:00', 45200.00, 150.50, 60.50, 25.0, 1, 'Highway driving'),
+(1, 1, '2026-04-15 09:15:00', 45049.50, 200.0, 59.00, 35.0, 1, 'Mixed driving'),
+(1, 1, '2026-04-10 17:45:00', 44849.50, 175.25, 61.00, 30.0, 1, 'City driving');
+
+-- After insertion, generated columns auto-populate:
+-- total_cost = 1512.50 (60.50 × 25.0)
+-- cost_per_distance_unit = 10.05 (1512.50 / 150.50)
+-- efficiency_km_l = 6.02 (150.50 / 25.0)
 ```
 
 After insertion, the calculated fields will automatically populate:

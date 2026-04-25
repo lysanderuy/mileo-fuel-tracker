@@ -60,9 +60,6 @@ switch($requested_page) {
   case 'vehicles':
     include '../app/pages/vehicles.php';
     break;
-  case 'settings':
-    include '../app/pages/settings.php';
-    break;
   default:
     include '../app/pages/dashboard.php';
 }
@@ -110,7 +107,6 @@ Create reusable components:
     <li><a href="?page=quick-log">Quick Log</a></li>
     <li><a href="?page=history">History</a></li>
     <li><a href="?page=vehicles">Vehicles</a></li>
-    <li><a href="?page=settings">Settings</a></li>
   </ul>
 </nav>
 ```
@@ -155,7 +151,6 @@ Create similar templates for:
 - `quick-log.php` (fuel logging form)
 - `history.php` (logs list with sorting)
 - `vehicles.php` (vehicle management)
-- `settings.php` (user settings)
 
 ---
 
@@ -177,21 +172,25 @@ class Log {
   }
   
   // Create a fuel log
-  public function create($user_id, $vehicle_id, $log_date, $odometer, 
-                         $trip_distance, $liters_filled, $fuel_price) {
+  public function create($user_id, $vehicle_id, $logged_at, $odometer_reading,
+                         $trip_distance, $fuel_price_per_unit, $volume_filled,
+                         $is_full_tank, $notes = null) {
     $query = "INSERT INTO " . $this->table . " 
-              SET user_id = ?, vehicle_id = ?, log_date = ?, 
-                  odometer = ?, trip_distance = ?, liters_filled = ?, fuel_price = ?";
+              SET user_id = ?, vehicle_id = ?, logged_at = ?,
+                  odometer_reading = ?, trip_distance = ?,
+                  fuel_price_per_unit = ?, volume_filled = ?,
+                  is_full_tank = ?, notes = ?";
     
     $stmt = $this->conn->prepare($query);
-    return $stmt->execute([$user_id, $vehicle_id, $log_date, $odometer, 
-                           $trip_distance, $liters_filled, $fuel_price]);
+    return $stmt->execute([$user_id, $vehicle_id, $logged_at, $odometer_reading,
+                           $trip_distance, $fuel_price_per_unit, $volume_filled,
+                           $is_full_tank, $notes]);
   }
   
   // Read logs with sorting
   public function getByUserId($user_id, $sort_by = 'date', $order = 'DESC', 
                               $limit = 100, $offset = 0) {
-    $sort_column = ($sort_by === 'efficiency') ? 'efficiency_l100km' : 'log_date';
+    $sort_column = ($sort_by === 'efficiency') ? 'efficiency_km_l' : 'logged_at';
     
     $query = "SELECT * FROM " . $this->table . " 
               WHERE user_id = ? 
@@ -204,13 +203,17 @@ class Log {
   }
   
   // Update a fuel log
-  public function update($id, $odometer, $trip_distance, $liters_filled, $fuel_price) {
+  public function update($id, $logged_at, $odometer_reading, $trip_distance,
+                         $fuel_price_per_unit, $volume_filled, $is_full_tank, $notes = null) {
     $query = "UPDATE " . $this->table . " 
-              SET odometer = ?, trip_distance = ?, liters_filled = ?, fuel_price = ? 
+              SET logged_at = ?, odometer_reading = ?, trip_distance = ?,
+                  fuel_price_per_unit = ?, volume_filled = ?,
+                  is_full_tank = ?, notes = ?
               WHERE id = ?";
     
     $stmt = $this->conn->prepare($query);
-    return $stmt->execute([$odometer, $trip_distance, $liters_filled, $fuel_price, $id]);
+    return $stmt->execute([$logged_at, $odometer_reading, $trip_distance,
+                           $fuel_price_per_unit, $volume_filled, $is_full_tank, $notes, $id]);
   }
   
   // Delete a fuel log
@@ -257,21 +260,24 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Validate input
 $user_id = validateInput($_POST['user_id'] ?? null, 'int');
 $vehicle_id = validateInput($_POST['vehicle_id'] ?? null, 'int');
-$log_date = validateInput($_POST['log_date'] ?? null, 'date');
-$odometer = validateInput($_POST['odometer'] ?? null, 'int');
+$logged_at = validateInput($_POST['logged_at'] ?? null, 'datetime');
+$odometer_reading = validateInput($_POST['odometer_reading'] ?? null, 'float');
 $trip_distance = validateInput($_POST['trip_distance'] ?? null, 'float');
-$liters_filled = validateInput($_POST['liters_filled'] ?? null, 'float');
-$fuel_price = validateInput($_POST['fuel_price'] ?? null, 'float');
+$fuel_price_per_unit = validateInput($_POST['fuel_price_per_unit'] ?? null, 'float');
+$volume_filled = validateInput($_POST['volume_filled'] ?? null, 'float');
+$is_full_tank = isset($_POST['is_full_tank']) ? (int)(bool)$_POST['is_full_tank'] : 1;
+$notes = $_POST['notes'] ?? null;
 
-if (!$user_id || !$vehicle_id || !$log_date || !$odometer || !$trip_distance || 
-    !$liters_filled || !$fuel_price) {
+if (!$user_id || !$vehicle_id || !$odometer_reading || !$trip_distance || 
+    !$fuel_price_per_unit || !$volume_filled) {
   sendResponse(false, 'Missing required fields', 400);
 }
 
 // Create log
 $log = new Log($pdo);
-if ($log->create($user_id, $vehicle_id, $log_date, $odometer, 
-                 $trip_distance, $liters_filled, $fuel_price)) {
+if ($log->create($user_id, $vehicle_id, $logged_at ?? date('Y-m-d H:i:s'),
+                 $odometer_reading, $trip_distance, $fuel_price_per_unit,
+                 $volume_filled, $is_full_tank, $notes)) {
   sendResponse(true, 'Fuel log created successfully', 200, ['log_id' => $pdo->lastInsertId()]);
 } else {
   sendResponse(false, 'Failed to create log', 500);
@@ -285,7 +291,6 @@ Create endpoints for:
 - `update.php` (PUT - update log)
 - `delete.php` (DELETE - delete log)
 - `stats.php` (GET - dashboard stats)
-- `export.php` (GET - CSV export)
 
 ---
 
@@ -397,7 +402,6 @@ document.addEventListener('DOMContentLoaded', function() {
 - [ ] Create `/app/api/logs/update.php`
 - [ ] Create `/app/api/logs/delete.php`
 - [ ] Create `/app/api/logs/stats.php`
-- [ ] Create `/app/api/logs/export.php`
 
 ### Frontend
 - [ ] Create `/public/index.php` (router)
@@ -411,7 +415,6 @@ document.addEventListener('DOMContentLoaded', function() {
 - [ ] Create `/app/pages/quick-log.php`
 - [ ] Create `/app/pages/history.php`
 - [ ] Create `/app/pages/vehicles.php`
-- [ ] Create `/app/pages/settings.php`
 - [ ] Create `/public/js/app.js`
 - [ ] Create `/public/js/api-client.js`
 - [ ] Create `/public/js/utils.js`
@@ -423,7 +426,6 @@ document.addEventListener('DOMContentLoaded', function() {
 - [ ] Test Update Log API
 - [ ] Test Delete Log API
 - [ ] Test Stats API
-- [ ] Test Export API
 - [ ] Test Dashboard page
 - [ ] Test Quick Log page
 - [ ] Test History page with sorting
@@ -447,7 +449,7 @@ curl "http://localhost/api/logs/read.php?sort_by=efficiency&order=DESC"
 ### Database Debugging
 Check your queries in phpMyAdmin before implementing in PHP:
 ```sql
-SELECT * FROM fuel_logs WHERE user_id = 1 ORDER BY efficiency_l100km DESC;
+SELECT * FROM fuel_logs WHERE user_id = 1 ORDER BY efficiency_km_l DESC;
 ```
 
 ### Frontend Debugging

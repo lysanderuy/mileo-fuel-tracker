@@ -51,9 +51,6 @@ View all your past fill-ups with flexible sorting:
 - **Sort by Efficiency** – Find your best and worst fuel economy runs instantly
 - **Filter by Date Range** – View This Month, Last Month, Last 3 Months, or custom ranges
 
-### ✓ Data Export
-Download all your fuel logs as CSV. Your data is yours—take it with you anytime.
-
 ### ✓ Edit & Delete Logs
 Correct mistakes or remove incorrect entries. Editing an odometer automatically recalculates affected logs.
 
@@ -90,7 +87,7 @@ Correct mistakes or remove incorrect entries. Editing an odometer automatically 
 ## How It Works
 
 ### 1. Create Account
-Sign up with email. One account can track multiple vehicles.
+Sign up with a username and password. One account can track multiple vehicles.
 
 ### 2. Quick Log
 Open Mileo at the pump:
@@ -114,9 +111,6 @@ Visit the Dashboard to see:
 - Efficiency changes
 - Spending patterns
 
-### 5. Export Your Data
-Download your logs as CSV anytime. No lock-in.
-
 ---
 
 ## Core Principles
@@ -128,7 +122,6 @@ Every feature decision in Mileo is governed by these principles:
 3. **Instant reward.** Stats appear immediately after every log.
 4. **The Coach tone.** Direct, honest, supportive. Never preachy.
 5. **No dark patterns.** No ads, no surprise paywalls, no nagging to upgrade.
-6. **Your data is yours.** Everything is exportable. Leave anytime.
 
 ---
 
@@ -175,17 +168,8 @@ Mileo is a complete fuel tracking application with all essential functionality:
 
 **Data & Account**
 
-✓ Export logs as CSV (all fields, respects unit preferences)  
 ✓ User account signup and login  
 ✓ Session persistence  
-✓ Password reset  
-✓ Account deletion  
-
-**User Settings**
-
-✓ Change display name  
-✓ Configure units (distance, volume, currency)  
-✓ Set default vehicle
 
 ---
 
@@ -272,8 +256,7 @@ mileo-fuel-tracker/
 │   │   ├── dashboard.php   # Dashboard / home
 │   │   ├── quick-log.php   # Quick log form page
 │   │   ├── history.php     # View all fuel logs
-│   │   ├── vehicles.php    # Multi-vehicle management
-│   │   └── settings.php    # User settings
+│   │   └── vehicles.php    # Multi-vehicle management
 │   │
 │   ├── api/                # Backend API endpoints (controllers)
 │   │   └── logs/
@@ -348,8 +331,8 @@ Mileo talks like a coach—direct, honest, practical, and supportive:
 - **[Implementation Guide](docs/technical/01-implementation-guide.md)** – Complete step-by-step guide to building Mileo with the new structure
 - **[Database Schema](docs/technical/02-database-schema.md)** – Database structure, tables, and sorting column implementation
 - **[API Documentation](docs/technical/03-api-documentation.md)** – Complete guide to all API endpoints, including sorting and filtering parameters
-- **[Product Requirements](docs/product/02-product-requirements.md)** – Feature specifications, flows, and business rules
-- **[User Stories](docs/product/03-user-stories.md)** – Detailed user stories and acceptance criteria (source for dev tickets)
+- **[Product Requirements](docs/product/01-product-requirements.md)** – Feature specifications, flows, and business rules
+- **[User Stories](docs/product/02-user-stories.md)** – Detailed user stories and acceptance criteria (source for dev tickets)
 - **[Design & Brand](docs/design)** – Brand guidelines and design tokens
 
 ---

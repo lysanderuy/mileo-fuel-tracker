@@ -100,13 +100,11 @@ The person who owns the Mileo account.
 
 | Field | Type | Notes |
 |---|---|---|
-| `id` | UUID | Primary key |
-| `username` | string | Unique, used for auth |
-| `display_name` | string | Optional, shown in UI |
-| `region` | enum | Auto-detected on signup (PH default) — drives default units |
-| `distance_unit` | enum | `km` — defaults from region |
-| `volume_unit` | enum | `liters` — defaults from region |
-| `currency` | string | `PHP` — defaults from region |
+| `id` | INT | Primary key, auto-increment |
+| `email` | string | Unique, used for auth |
+| `password` | string | Hashed |
+| `first_name` | string | Optional, display only |
+| `last_name` | string | Optional, display only |
 | `created_at` | timestamp | |
 | `updated_at` | timestamp | |
 
@@ -116,20 +114,22 @@ A car or motorized vehicle owned by the user.
 
 | Field | Type | Notes |
 |---|---|---|
-| `id` | UUID | Primary key |
-| `user_id` | UUID | FK → User |
+| `id` | INT | Primary key, auto-increment |
+| `user_id` | INT | FK → User |
 | `name` | string | User-defined label (e.g., "My Civic", "Work Van") |
 | `make` | string | Optional (e.g., Honda) |
 | `model` | string | Optional (e.g., Civic) |
 | `year` | integer | Optional (e.g., 2019) |
 | `fuel_type` | enum | `gasoline`, `diesel`, `lpg`, `electric` |
+| `color` | string | Optional |
+| `plate_number` | string | Optional |
 | `is_default` | boolean | The vehicle pre-selected on Quick Log |
 | `status` | enum | `active`, `archived` |
 | `created_at` | timestamp | |
 | `updated_at` | timestamp | |
 
 **Rules:**
-- A User must have at least one Vehicle.
+- A User needs at least one active Vehicle to log a fill-up.
 - The first Vehicle created is automatically set as `is_default = true`.
 - Archived Vehicles are hidden from the Dashboard and Quick Log but their Fuel Logs remain visible in history.
 - Maximum 10 Vehicles per User.
@@ -140,28 +140,26 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 
 | Field | Type | Notes |
 |---|---|---|
-| `id` | UUID | Primary key |
-| `vehicle_id` | UUID | FK → Vehicle |
-| `user_id` | UUID | FK → User (denormalized for query performance) |
+| `id` | INT | Primary key, auto-increment |
+| `vehicle_id` | INT | FK → Vehicle |
+| `user_id` | INT | FK → User (denormalized for query performance) |
 | `logged_at` | timestamp | When the fill-up occurred (user-set, defaults to now) |
 | `odometer_reading` | decimal | Cumulative vehicle distance at time of fill-up |
 | `trip_distance` | decimal | Distance since last fill-up (A→B). Auto-computed if prior log exists; editable |
-| `fuel_price_per_unit` | decimal | Price paid per liter/gallon at the pump |
-| `volume_filled` | decimal | Amount of fuel added (liters/gallons) |
+| `fuel_price_per_unit` | decimal | Price paid per liter at the pump |
+| `volume_filled` | decimal | Amount of fuel added (liters) |
+| `is_full_tank` | boolean | Whether the tank was filled completely |
 | `total_cost` | decimal | Computed: `fuel_price_per_unit × volume_filled` |
 | `cost_per_distance_unit` | decimal | Computed: `total_cost / trip_distance` |
-| `efficiency` | decimal | Computed: km/L or L/100km depending on user's display preference |
+| `efficiency_km_l` | decimal | Computed: `trip_distance / volume_filled` (km/L) |
 | `notes` | string | Optional free-text field (max 200 chars) |
-| `is_full_tank` | boolean | Whether the tank was filled completely (affects efficiency accuracy) |
 | `created_at` | timestamp | |
 | `updated_at` | timestamp | |
 
 **Computation Rules:**
 - `total_cost` = `fuel_price_per_unit × volume_filled` (always computed, not user-entered)
 - `trip_distance` = `current_odometer - previous_odometer` if a prior log exists for the same vehicle; otherwise user must enter it manually
-- `efficiency` (L/100km) = `(volume_filled / trip_distance) × 100`
-- `efficiency` (km/L) = `trip_distance / volume_filled`
-- Efficiency is only computed when `is_full_tank = true` (partial fills skew the calculation and are flagged)
+- `efficiency_km_l` = `trip_distance / volume_filled` (always computed; partial fills are flagged in the UI but still calculated)
 
 **Validation Rules:**
 - `odometer_reading` must be ≥ the previous log's `odometer_reading` for the same Vehicle
@@ -184,16 +182,15 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 1. App displays welcome screen.
 2. User taps **Get Started**.
 3. App requests username and password for account creation.
-4. App sets default units to: km (distance), liters (volume), PHP (currency).
-5. App prompts: **Add your first vehicle.**
-6. User enters Vehicle name (required). Make, model, year are optional. User selects fuel type.
-7. App creates the Vehicle, sets it as default, navigates to Dashboard.
-8. Dashboard shows empty state with Coach prompt: *"Log your first fill-up to see your numbers."*
+4. App navigates to Dashboard. Default units are set to km, liters, PHP.
+5. Dashboard shows empty state: *"Add your first vehicle to start tracking."* with an Add Vehicle CTA.
+6. User adds a vehicle (name + fuel type required). App sets it as the default.
+7. Dashboard updates to empty state: *"Log your first fill-up to see your numbers."* with a Log Fill-Up CTA.
 
 **Acceptance Criteria:**
-- [ ] Default units are set to km, liters, and PHP (Philippine defaults)
-- [ ] A Vehicle is created before the user reaches the Dashboard
-- [ ] The Dashboard empty state shows a clear CTA to log the first Fill-Up
+- [ ] Successful sign-up navigates directly to the Dashboard — no forced interstitial screens
+- [ ] The Dashboard no-vehicle empty state shows a clear CTA to add a vehicle
+- [ ] The Dashboard no-logs empty state shows a clear CTA to log a fill-up
 - [ ] No payment, credit card, or subscription prompt appears during onboarding
 
 ---
@@ -234,18 +231,19 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 **Steps:**
 
 1. Dashboard displays:
-   - **Active Vehicle selector** (tabs or dropdown if multi-vehicle)
+   - **Active Vehicle** — vehicle name always shown; switcher visible only when more than one active vehicle exists
    - **This Month** panel: total spend, total liters, avg efficiency, number of fill-ups
    - **vs. Last Month** delta line: `+/-X% in spend`, `+/-X% in efficiency`
    - **Recent Fill-Ups** list: last 5 logs, showing date, cost, efficiency per row
 2. User can tap any Fill-Up in the list to view its full detail.
-3. User can tap the vehicle selector to switch to another Vehicle.
+3. User can tap the vehicle switcher (if visible) to change the active vehicle.
 4. **Log Fill-Up** button is always visible (FAB or persistent button).
 
 **Acceptance Criteria:**
 - [ ] "This Month" stats reflect all Fuel Logs for the current calendar month
 - [ ] Switching vehicles updates all stats without navigating away
-- [ ] Empty state (no logs yet) shows Coach-tone prompt and CTA, not a blank screen
+- [ ] No-vehicle empty state shows a CTA to add a vehicle; Log Fill-Up FAB is hidden
+- [ ] No-logs empty state (vehicle exists, no logs) shows a CTA to log a fill-up
 
 ---
 
@@ -331,24 +329,6 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 
 ---
 
-### Flow 8: Export Data
-
-**Trigger:** User taps **Export** from Settings or History screen.
-
-**Steps:**
-
-1. Export options screen: select vehicle (all or specific), select date range.
-2. User taps **Export as CSV**.
-3. App generates CSV with all Fuel Log fields (including computed stats) for the selection.
-4. System share sheet opens — user saves to Files, emails to themselves, or shares as needed.
-
-**Acceptance Criteria:**
-- [ ] CSV includes all Fuel Log fields: date, vehicle, odometer, trip distance, price per unit, volume, total cost, cost per kilometer, efficiency, notes, is_full_tank
-- [ ] CSV respects the user's unit preferences (km/L or L/100km)
-- [ ] Export works offline (generates from local data)
-- [ ] Empty selection (no logs in range) shows a message rather than an empty file
-
----
 
 ## 6. Feature Specifications
 
@@ -405,7 +385,7 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 **Purpose:** The home screen. Gives the user their numbers at a glance.
 
 **Sections:**
-1. **Vehicle Selector** — tabs or dropdown for multi-vehicle users
+1. **Active Vehicle** — vehicle name always shown; switcher visible only when more than one active vehicle exists
 2. **This Month Panel** — Total Spend, Total Volume, Avg Efficiency, Fill-Up Count
 3. **vs. Last Month** — delta line for spend and efficiency
 4. **Recent Fill-Ups** — last 5 logs in a scrollable list
@@ -414,7 +394,8 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 
 | State | Description |
 |---|---|
-| `empty` | No Fuel Logs for this vehicle yet; Coach prompt shown |
+| `no_vehicle` | No vehicles added yet; prompt to add first vehicle; Log Fill-Up FAB hidden |
+| `no_logs` | Vehicle exists but no Fuel Logs yet; prompt to log first fill-up |
 | `one_log` | One log exists; This Month stats shown; no comparison (no prior month) |
 | `normal` | Two or more logs; full Dashboard rendered |
 | `loading` | Data fetching; skeleton screen shown |
@@ -449,31 +430,6 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 - One vehicle is marked `is_default` — this is the vehicle pre-selected in Quick Log
 - User can archive a vehicle (hides it from active views but preserves all data)
 
-### 6.6 Data Export
-
-**Purpose:** Let users take their data with them.
-
-**Format:** CSV  
-**Fields exported:** date, vehicle name, odometer, trip distance, price per unit, volume filled, total cost, cost per kilometer, efficiency, notes, is full tank, distance unit, volume unit, currency
-
-**Rules:**
-- Export is scoped: all vehicles or one vehicle; all time or a date range
-- Export works offline (generated from local app data)
-- File is named: `mileo_export_{vehicle_name}_{date_range}.csv`
-
-### 6.7 Settings
-
-**Accessible settings:**
-
-| Setting | Options | Notes |
-|---|---|---|
-| Display name | Free text | Optional |
-| Distance unit | km | Affects all displays and exports |
-| Volume unit | Liters | Affects all displays and exports |
-| Currency | PHP | Affects all cost displays |
-| Default vehicle | Vehicle selector | Pre-selects in Quick Log |
-| Export data | Button → Export flow | |
-| Delete account | Destructive | Requires typed confirmation |
 
 ---
 
@@ -493,9 +449,6 @@ Mileo has a single user role: **Driver** (the account owner).
 | Delete Fuel Log | ✅ (own logs only) |
 | View Dashboard | ✅ |
 | View History | ✅ |
-| Export Data | ✅ |
-| Change Settings | ✅ |
-| Delete Account | ✅ |
 | Access another user's data | ❌ |
 
 
@@ -550,8 +503,7 @@ Mileo has a single user role: **Driver** (the account owner).
 
 | Metric | Note |
 |---|---|
-| **Onboarding Completion Rate** | Track signups reaching Dashboard with ≥1 Vehicle |
-| **Export Usage Rate** | Tracked — informs data portability trust |
+| **Onboarding Completion Rate** | Track signups who add a vehicle and log their first fill-up |
 | **Crash-Free Session Rate** | Track for stability |
 | **User Satisfaction** | Positive feedback in user interviews and support conversations |
 
@@ -583,13 +535,16 @@ All Fuel Logs belong to exactly one Vehicle. All Vehicles belong to exactly one 
 
 ---
 
-## 11. Unit Defaults by Region
+## 11. Units
 
-| Region | Distance | Volume | Efficiency Display |
-|---|---|---|---|
-| Philippines (PH) | km | Liters | km/L or L/100km |
+All values are fixed — there are no user-configurable unit preferences.
 
-Default unit set is Philippine (km, liters, PHP). All stored values are in SI base units (km, liters); display conversion happens at render time.
+| Dimension | Unit |
+|---|---|
+| Distance | km |
+| Volume | Liters |
+| Currency | PHP |
+| Efficiency | km/L |
 
 ---
 
