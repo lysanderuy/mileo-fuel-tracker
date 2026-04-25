@@ -1,5 +1,7 @@
 # Mileo API Documentation
 
+> Status note: this document describes the older planned fuel-log API surface. The current repository only exposes auth and vehicle endpoints through `public/index.php` (`?api=auth/*` and `?api=vehicles/*`). Use the live code and README for current behavior.
+
 This document outlines all API endpoints for the Mileo fuel tracking application.
 
 ---

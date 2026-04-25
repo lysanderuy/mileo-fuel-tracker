@@ -1,342 +1,104 @@
-# Mileo — Frictionless Fuel Tracking
+# Mileo
 
-**Mileo** is a fuel tracking web app that turns every fill-up into clear spending and efficiency insights. Log your fuel. Done fast. See your stats instantly, and move on.
+Mileo is the coach in your glove box for fuel costs. It helps drivers log fill-ups quickly, understand what fuel is really costing them, and keep track of their vehicles without friction.
 
 ## What is Mileo?
 
-Mileo helps regular drivers understand their fuel spending without friction. It's built for one job: make logging a fill-up so fast and easy that you'll actually do it every time—then show you what your fuel costs really are.
+Mileo helps drivers track fuel without turning it into a chore. It gives you a fast way to log fill-ups, see your spending, and keep your vehicles organized in one place.
 
 ### Core Principles
 
-- **Speed above all.** Log a fill-up fast. No complex forms. No unnecessary fields.
-- **Instant insights.** See your fuel cost, efficiency, and spending trends immediately after logging.
-- **One job, done well.** Mileo tracks fuel. Nothing else. No maintenance logs, no fleet management, no social features.
-- **The Coach.** Our tone is direct, honest, and supportive—like a coach, not a judge. We tell you what's happening with your fuel, clearly and practically.
+- **Speed above all.** Logging should be quick enough to do at the pump.
+- **Instant insight.** Users should see useful numbers without extra screens or waiting.
+- **One job, done well.** Mileo stays focused on fuel tracking, not broad vehicle management.
+- **Coach tone.** Copy and feedback should be direct, practical, and supportive.
+- **No dark patterns.** No surprise paywalls, no pressure, no noise.
 
----
+### Who Should Use Mileo
 
-## Key Features
+- **Regular drivers.** People who want a simple way to understand monthly fuel costs.
+- **Commuters.** Drivers who want a clear record of what each fill-up costs.
+- **Gig workers.** Anyone who needs a quick, repeatable fuel log for daily driving.
+- **Cost-conscious owners.** Users who want cleaner visibility into vehicle spending and efficiency.
 
-### ✓ Quick Fuel Log
-Log a fill-up in seconds. Just enter:
-- Odometer reading
-- Trip distance (A → B)
-- Fuel price paid
-- Liters filled
+### Key Features
 
-One screen. Minimal typing. Done.
+- **Quick fuel logging.** Capture a fill-up with minimal friction.
+- **Dashboard overview.** See stats and recent fill-ups at a glance.
+- **Vehicle management.** Add, edit, archive, restore, and delete vehicles.
+- **Archive support.** Keep inactive vehicles out of the way without losing their data.
+- **Room to grow.** The current structure leaves space for the future fuel-log flow and history views.
 
-### ✓ Instant Stats
-The moment you log a fill-up, you see:
-- Cost per liter
-- Cost per kilometer
-- Fuel efficiency (L/100km)
-- Total monthly spending
+## Project Structure (Working Copy)
 
-No waiting. No second screen. Stats appear immediately.
-
-### ✓ Simple Dashboard
-Overview your fuel data at a glance:
-- Current month vs. previous month
-- Spending trends
-- Efficiency trends
-- Quick access to your full log history
-
-### ✓ Multi-Vehicle Support
-Track multiple vehicles in one account. Switch between cars and see each one's stats independently. Add, archive, or set a default vehicle.
-
-### ✓ Full History with Sort & Filter
-View all your past fill-ups with flexible sorting:
-- **Sort by Date** – See your most recent fill-ups first, or browse chronologically
-- **Sort by Efficiency** – Find your best and worst fuel economy runs instantly
-- **Filter by Date Range** – View This Month, Last Month, Last 3 Months, or custom ranges
-
-### ✓ Edit & Delete Logs
-Correct mistakes or remove incorrect entries. Editing an odometer automatically recalculates affected logs.
-
----
-
-## Who Should Use Mileo?
-
-**Primary Users:**
-- Regular car owners and commuters who drive 5–6 days per week
-- Anyone who wants to know what fuel really costs them per month
-- Cost-conscious drivers tracking expenses
-
-**Secondary Users:**
-- Gig workers and delivery drivers tracking vehicle costs
-- Anyone logging fuel for reimbursement or tax purposes
-
----
-
-## What Mileo Is Not
-
-| Not This | Why |
-|---|---|
-| A vehicle maintenance tracker | Oil changes, tire rotations, and service logs are out of scope. |
-| A fleet management tool | Mileo is for individuals, not businesses. |
-| A GPS or route tracker | No location tracking. No passive data collection. |
-| A tax compliance or mileage deduction tool | No tax reports or mileage deductions. Fuel cost awareness is the job. |
-| A community or social platform | No user comparisons, leaderboards, or social feeds. |
-| A gas price aggregator | Users enter the price they paid. Mileo does not crowdsource pump prices. |
-| A multi-expense tracker | Tolls, insurance, parking, and carwash logs are out of scope. |
-| A subscription-bait app | The free tier is the full product. No paywalls or upgrade prompts. |
-
----
-
-## How It Works
-
-### 1. Create Account
-Sign up with a username and password. One account can track multiple vehicles.
-
-### 2. Quick Log
-Open Mileo at the pump:
-- Enter odometer
-- Enter trip distance
-- Enter price per liter
-- Enter liters filled
-- Tap "Log Fill-Up"
-
-Done fast.
-
-### 3. See Your Stats
-Instant stats appear:
-- "You paid ₱60/liter"
-- "Your efficiency: 8.2 L/100km"
-- "Monthly spend: ₱4,200"
-
-### 4. Track Over Time
-Visit the Dashboard to see:
-- Month-over-month trends
-- Efficiency changes
-- Spending patterns
-
----
-
-## Core Principles
-
-Every feature decision in Mileo is governed by these principles:
-
-1. **Speed is a hard constraint.** If it adds time to logging, it doesn't ship.
-2. **One job, done completely.** Fuel tracking. Nothing else.
-3. **Instant reward.** Stats appear immediately after every log.
-4. **The Coach tone.** Direct, honest, supportive. Never preachy.
-5. **No dark patterns.** No ads, no surprise paywalls, no nagging to upgrade.
-
----
-
-## Tech Stack
-
-- **Frontend:** Vanilla HTML, CSS, JavaScript
-- **Backend:** PHP
-- **Database:** MySQL
-- **Local Development:** XAMPP
-- **Deployment:** [TBD]
-
----
-
-## Core Features (Final)
-
-Mileo is a complete fuel tracking application with all essential functionality:
-
-**Fuel Log Management**
-
-✓ Create fuel logs (Quick Log — 4 required fields)  
-✓ Read logs with instant stats (cost per liter, cost per km, efficiency)  
-✓ Update logs (with downstream recalculation)  
-✓ Delete logs (with confirmation)  
-
-**Dashboard & Analytics**
-
-✓ Current month vs. previous month comparison  
-✓ Monthly spending trends and efficiency trends  
-✓ Recent fill-ups overview  
-
-**History & Organization**
-
-✓ Full fill-up history (newest first by default)  
-✓ Sort by date (newest/oldest)  
-✓ Sort by efficiency (best/worst L/100km)  
-✓ Filter by date range (This Month, Last Month, Last 3 Months, All Time, custom)  
-
-**Vehicle Management**
-
-✓ Multi-vehicle support (up to 10 vehicles per account)  
-✓ Add, edit, and archive vehicles  
-✓ Set default vehicle for Quick Log  
-✓ View stats per vehicle independently  
-
-**Data & Account**
-
-✓ User account signup and login  
-✓ Session persistence  
-
----
-
-## Getting Started
-
-### Prerequisites
-- **XAMPP** installed on your system (Apache, MySQL, PHP)
-- **Git** for version control
-
-### Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/lysanderuy/mileo-fuel-tracker.git
-   cd mileo-fuel-tracker
-   ```
-
-2. **Set up XAMPP with public folder:**
-   - **Option A (Recommended):** Configure XAMPP to point to the `public/` folder
-     - Edit `C:\xampp\apache\conf\extra\httpd-vhosts.conf` (Windows)
-     - Or edit `/Applications/XAMPP/xamppfiles/etc/httpd/conf/extra/httpd-vhosts.conf` (Mac)
-     - Point the virtual host DocumentRoot to your `mileo-fuel-tracker/public` folder
-   
-   - **Option B (Simple):** Copy only the `public/` folder to htdocs
-     - Copy `mileo-fuel-tracker/public` → `C:\xampp\htdocs\mileo-fuel-tracker-public`
-     - Keep the rest of the project (app/, config/, database/) locally outside htdocs for security
-
-3. **Start XAMPP:**
-   - Open XAMPP Control Panel
-   - Start **Apache** and **MySQL** services
-
-4. **Import the database:**
-   - Open phpMyAdmin: `http://localhost/phpmyadmin`
-   - Create a new database named `mileo_db`
-   - Import the SQL file from `/database/schema.sql`
-
-### Running Locally
-Open your browser and navigate to:
-```
-http://localhost/mileo-fuel-tracker-public
-```
-(or whatever you configured your DocumentRoot to point to)
-
-The `public/index.php` entry point will route all requests to your application.
-
-### Database Configuration
-Edit `config/db.php` if you need to change database credentials:
-```php
-$host = 'localhost';
-$db_name = 'mileo_db';
-$user = 'root';
-$password = ''; // XAMPP default is empty
-```
-
----
-
-## Project Structure
-
-```
-mileo-fuel-tracker/
-
-## PUBLIC (Only folder exposed to browser / htdocs)
-├── public/
-│   ├── index.php           # Entry point / router
-│   ├── css/
-│   │   ├── styles.css      # Main stylesheet
-│   │   ├── responsive.css  # Responsive styles for all device sizes
-│   │   └── design-tokens.css # Color, spacing, typography variables
-│   ├── js/
-│   │   ├── app.js          # Main application logic
-│   │   ├── fuel-log.js     # Fuel logging functionality
-│   │   ├── dashboard.js    # Dashboard stats and display
-│   │   ├── utils.js        # Helper functions
-│   │   └── api-client.js   # AJAX calls to backend
-│   └── assets/
-│       ├── icons/          # SVG and PNG icons
-│       ├── images/         # Images
-│       └── fonts/          # Custom fonts if needed
-
-## APPLICATION LOGIC
+```text
+mileo/
 ├── app/
-│   │
-│   ├── pages/              # UI pages (views)
-│   │   ├── dashboard.php   # Dashboard / home
-│   │   ├── quick-log.php   # Quick log form page
-│   │   ├── history.php     # View all fuel logs
-│   │   └── vehicles.php    # Multi-vehicle management
-│   │
-│   ├── api/                # Backend API endpoints (controllers)
-│   │   └── logs/
-│   │       ├── create.php  # Create fuel log (POST)
-│   │       ├── read.php    # Fetch fuel logs (GET) with sorting support
-│   │       │               # Params: sort_by (date|efficiency), order (ASC|DESC)
-│   │       ├── update.php  # Update fuel log (PUT)
-│   │       ├── delete.php  # Delete fuel log (DELETE)
-│   │       ├── stats.php   # Get dashboard stats
-│   │       └── export.php  # Export data to CSV
-│   │
-│   ├── includes/           # Reusable UI components
-│   │   ├── header.php      # Header component
-│   │   ├── footer.php      # Footer component
-│   │   └── navbar.php      # Navigation bar
-│   │
-│   ├── models/             # Database logic
-│   │   ├── Log.php         # Fuel log model
-│   │   └── Vehicle.php     # Vehicle model
-│   │
-│   └── helpers/            # Utility functions
-│       ├── response.php    # API response formatting
-│       ├── validation.php  # Input validation
-│       └── utils.php       # General utilities
-
-## CONFIGURATION
+│   ├── api/
+│   │   ├── auth/
+│   │   │   ├── login.php
+│   │   │   ├── logout.php
+│   │   │   └── signup.php
+│   │   └── vehicles/
+│   │       ├── archive.php
+│   │       ├── create.php
+│   │       ├── delete.php
+│   │       ├── list.php
+│   │       └── update.php
+│   ├── includes/
+│   │   ├── components/
+│   │   │   ├── fillups_section.php
+│   │   │   ├── stat_card.php
+│   │   │   └── vehicles_section.php
+│   │   ├── footer.php
+│   │   └── header.php
+│   └── pages/
+│       ├── dashboard.php
+│       ├── landing.php
+│       ├── login.php
+│       ├── logout.php
+│       ├── signup.php
+│       └── vehicles.php
 ├── config/
-│   └── db.php              # Database connection config
-
-## DATABASE
+│   └── db.php
 ├── database/
-│   └── schema.sql          # Database schema and initial data
-
-## PROJECT
-├── .gitignore              # Git ignore rules
-├── README.md               # This file
-└── package.json            # (Optional) For build tools if needed later
+│   ├── migrations/
+│   │   └── 20260425_add_vehicle_archive.sql
+│   └── schema.sql
+├── docs/
+│   ├── design/
+│   │   ├── 01-brand-guidelines.md
+│   │   ├── 02-design-tokens.yaml
+│   │   └── 03-tokens.css
+│   ├── product/
+│   │   ├── 01-product-requirements.md
+│   │   └── 02-user-stories.md
+│   └── technical/
+│       ├── 01-implementation-guide.md
+│       ├── 02-database-schema.md
+│       └── 03-api-documentation.md
+├── public/
+│   ├── css/
+│   │   ├── auth.css
+│   │   ├── dashboard.css
+│   │   ├── design-tokens.css
+│   │   ├── landing.css
+│   │   └── vehicles.css
+│   ├── index.php
+│   └── js/
+│       ├── landing.js
+│       └── vehicles.js
+└── README.md
 ```
 
----
+## Setup
 
-## Design Philosophy
-
-Mileo's design is guided by:
-- **Minimal UI.** Only what's necessary appears on screen.
-- **Clear labels.** Field names are explicit, no assumptions.
-- **Instant feedback.** Every action gets an immediate response.
-- **Coach tone in copy.** Supportive, direct, no jargon.
-
----
-
-## Brand Voice: The Coach
-
-Mileo talks like a coach—direct, honest, practical, and supportive:
-
-**What The Coach does:**
-- Tells you straight: "You're spending ₱15,000/month on fuel"
-- Motivates without judgment: "Your efficiency improved 12% this month"
-- Stays practical: No fluff, no unnecessary complexity
-- Supports you: Honest feedback to help you understand your driving costs
-
-**What The Coach doesn't do:**
-- Shame or guilt-trip
-- Over-explain or patronize
-- Hide the numbers
-- Make false promises
-
----
-
-## Documentation
-
-- **[Implementation Guide](docs/technical/01-implementation-guide.md)** – Complete step-by-step guide to building Mileo with the new structure
-- **[Database Schema](docs/technical/02-database-schema.md)** – Database structure, tables, and sorting column implementation
-- **[API Documentation](docs/technical/03-api-documentation.md)** – Complete guide to all API endpoints, including sorting and filtering parameters
-- **[Product Requirements](docs/product/01-product-requirements.md)** – Feature specifications, flows, and business rules
-- **[User Stories](docs/product/02-user-stories.md)** – Detailed user stories and acceptance criteria (source for dev tickets)
-- **[Design & Brand](docs/design)** – Brand guidelines and design tokens
-
----
+1. Install XAMPP with Apache, MySQL, and PHP.
+2. Point your document root at `public/`.
+3. Create the `mileo` database.
+4. Import `database/schema.sql`.
+5. Update `config/db.php` if your local credentials differ.
 
 ## Questions?
 
-For support or questions about Mileo, reach out to the development team or check the docs folder for detailed guides.
+For support or questions about Mileo, check the docs folder for detailed guides and implementation notes.

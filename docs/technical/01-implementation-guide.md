@@ -1,5 +1,7 @@
 # Mileo Implementation Guide
 
+> Status note: this document is a legacy implementation plan. The current repository uses a simpler PHP structure with `app/pages`, `app/includes`, `app/api`, and `public/` assets. Treat the current code and README as the source of truth.
+
 This guide explains how to implement the Mileo fuel tracking application with the new professional project structure.
 
 ---
