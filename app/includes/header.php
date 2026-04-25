@@ -15,6 +15,9 @@
 <?php if (($page ?? '') === 'vehicles'): ?>
 <link rel="stylesheet" href="css/vehicles.css">
 <?php endif; ?>
+<?php if (($page ?? '') === 'quick-log'): ?>
+<link rel="stylesheet" href="css/quick-log.css">
+<?php endif; ?>
 <?php if (in_array($page ?? '', ['login', 'signup'])): ?>
 <link rel="stylesheet" href="css/auth.css">
 <?php endif; ?>
@@ -34,6 +37,7 @@
         <div class="mm-nav-tabs" aria-label="Primary sections">
           <button class="mm-nav-tab<?= ($page ?? '') === 'dashboard' ? ' is-active' : '' ?>" onclick="location.href='?page=dashboard'">Dashboard</button>
           <button class="mm-nav-tab<?= ($page ?? '') === 'vehicles' ? ' is-active' : '' ?>" onclick="location.href='?page=vehicles'">Vehicles</button>
+          <button class="mm-nav-tab<?= ($page ?? '') === 'quick-log' ? ' is-active' : '' ?>" onclick="location.href='?page=quick-log'">Quick Log</button>
         </div>
         <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="location.href='?page=logout'">Logout</button>
       <?php else: ?>

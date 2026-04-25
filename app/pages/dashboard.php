@@ -53,6 +53,7 @@ $stmt = $conn->prepare("
         fl.liters_filled,
         fl.cost_per_liter,
         fl.fuel_price,
+        fl.notes,
         CASE WHEN fl.efficiency_l100km > 0 THEN 100.0 / fl.efficiency_l100km END       AS efficiency_kml
     FROM fuel_logs fl
     JOIN vehicles v ON v.id = fl.vehicle_id
@@ -79,6 +80,7 @@ while ($row = $result->fetch_assoc()) {
         'efficiency'  => $kml !== null ? number_format($kml, 1) . ' km/L' : '&mdash;',
         'badge'       => $badge,
         'status'      => $status,
+        'notes'       => $row['notes'] !== null ? trim($row['notes']) : '',
     ];
 }
 $stmt->close();
@@ -127,7 +129,9 @@ include_once __DIR__ . '/../includes/header.php';
       <div class="db-subtitle"><?= htmlspecialchars($dashboard_subtitle) ?></div>
     </div>
     <div class="db-topbar-actions">
-      <button class="mm-btn mm-btn-primary mm-btn-sm" type="button" title="Fuel log creation UI coming soon">+ Add Fuel Log</button>
+      <?php if ($has_vehicles): ?>
+        <a class="mm-btn mm-btn-primary mm-btn-sm" href="?page=quick-log" aria-label="Open Quick Log and start logging a fill-up">Log Fill-Up</a>
+      <?php endif; ?>
     </div>
   </div>
 

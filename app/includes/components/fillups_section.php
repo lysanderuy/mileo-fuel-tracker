@@ -2,7 +2,7 @@
 // Caller sets:
 // $fillups = [] for empty state, or an array of rows where each row has:
 //   'date', 'station', 'liters', 'price_per_l' (raw HTML), 'total' (raw HTML),
-//   'efficiency', 'badge' ('green'|'yellow'), 'status'
+//   'efficiency', 'badge' ('green'|'yellow'), 'status', 'notes'
 ?>
 <div class="db-section">
 
@@ -44,7 +44,12 @@
         <?php foreach ($fillups as $row): ?>
           <tr>
             <td><?= htmlspecialchars($row['date']) ?></td>
-            <td><?= htmlspecialchars($row['station']) ?></td>
+            <td>
+              <div><?= htmlspecialchars($row['station']) ?></div>
+              <?php if (!empty($row['notes'])): ?>
+                <div class="db-row-note"><?= htmlspecialchars($row['notes']) ?></div>
+              <?php endif; ?>
+            </td>
             <td><?= htmlspecialchars($row['liters']) ?></td>
             <td><?= $row['price_per_l'] ?></td>
             <td><?= $row['total'] ?></td>

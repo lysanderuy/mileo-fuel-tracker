@@ -26,6 +26,9 @@
 <?php if (($page ?? '') === 'vehicles'): ?>
 <script src="js/vehicles.js"></script>
 <?php endif; ?>
+<?php if (($page ?? '') === 'quick-log'): ?>
+<script src="js/quick-log.js"></script>
+<?php endif; ?>
 <script src="js/landing.js"></script>
 </body>
 </html>

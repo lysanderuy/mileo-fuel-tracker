@@ -36,6 +36,7 @@ CREATE TABLE fuel_logs (
   trip_distance     DECIMAL(8,2)   NOT NULL,
   liters_filled     DECIMAL(8,2)   NOT NULL,
   fuel_price        DECIMAL(10,2)  NOT NULL,
+  is_full_tank      TINYINT(1)     NOT NULL DEFAULT 1,
   cost_per_liter    DECIMAL(10,2)  GENERATED ALWAYS AS (fuel_price / liters_filled) STORED,
   cost_per_km       DECIMAL(10,4)  GENERATED ALWAYS AS (fuel_price / trip_distance) STORED,
   efficiency_l100km DECIMAL(8,2)   GENERATED ALWAYS AS ((liters_filled / trip_distance) * 100) STORED,
