@@ -1,4 +1,4 @@
-.veh-wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+.veh-wrap { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
 
 .veh-topbar {
   display: flex;
@@ -18,7 +18,7 @@
 .veh-subtitle { font-size: 0.875rem; color: #666; margin-top: 2px; }
 
 /* ── Section card ── */
-.veh-section { background: #fff; border: 1px solid #E8E8E4; border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+.veh-section { background: #fff; border: 1px solid #E8E8E4; border-radius: 12px; overflow: visible; margin-bottom: 20px; }
 .veh-section-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 0; border-bottom: 1px solid #F0F0EB; }
 .veh-tabs { padding-bottom: 0; }
 .veh-tabbar {
@@ -73,6 +73,7 @@
 
 /* ── Vehicle row ── */
 .veh-row {
+  position: relative;
   display: grid;
   grid-template-columns: 56px minmax(0, 1fr) auto;
   gap: 16px;
@@ -82,6 +83,31 @@
   border-radius: 18px;
   background: #FFFFFF;
   transition: border-color 140ms ease, background 140ms ease;
+}
+
+.veh-star-btn {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #CCC4B7;
+  transition: transform 120ms ease, color 120ms ease;
+  z-index: 5;
+  padding: 0;
+}
+.veh-star-btn:hover {
+  color: #CC7A00;
+  transform: scale(1.15);
+}
+.veh-star-btn.is-default {
+  color: #F59500;
 }
 .veh-row:hover {
   border-color: #E4D5B2;
@@ -121,6 +147,21 @@
   font-size: 0.78rem;
   font-weight: 700;
   color: #6B6155;
+}
+
+.veh-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.veh-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #7A6C4F;
+  background: #FFF8E8;
+  border: 1px solid #F0DFB0;
+  border-radius: 6px;
+  padding: 2px 8px;
+  white-space: nowrap;
 }
 
 .veh-side {
@@ -183,6 +224,7 @@
 .veh-field { display: flex; flex-direction: column; gap: 5px; }
 .veh-field label { font-size: 0.8rem; font-weight: 600; color: #57544C; }
 .veh-field label .veh-required { color: #D93520; margin-left: 2px; }
+.veh-field label .veh-field-unit { font-weight: 400; color: #9C9689; font-size: 0.75rem; margin-left: 3px; }
 .veh-input, .veh-select { width: 100%; padding: 9px 12px; border: 1px solid #E5E3DE; border-radius: 10px; font-size: 0.875rem; color: #38362F; background: #fff; outline: none; box-sizing: border-box; transition: border-color 0.15s, box-shadow 0.15s; font-family: inherit; }
 .veh-input:focus, .veh-select:focus { border-color: #F59500; box-shadow: 0 0 0 3px rgba(245,149,0,0.12); }
 .veh-input.error { border-color: #D93520; }

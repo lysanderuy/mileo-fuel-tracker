@@ -13,6 +13,10 @@ if ($api !== null) {
         'vehicles/update',
         'vehicles/archive',
         'vehicles/delete',
+        'vehicles/set-default',
+        'fuel-logs/create',
+        'fuel-logs/list',
+        'dashboard/summary',
     ];
 
     if (!in_array($api, $allowed_api, true)) {
@@ -27,7 +31,7 @@ if ($api !== null) {
 
 $page = $_GET['page'] ?? 'landing';
 
-$allowed_pages = ['landing', 'login', 'signup', 'logout', 'dashboard', 'vehicles'];
+$allowed_pages = ['landing', 'login', 'signup', 'logout', 'dashboard', 'vehicles', 'history'];
 
 if (!in_array($page, $allowed_pages)) {
     http_response_code(404);
@@ -35,7 +39,7 @@ if (!in_array($page, $allowed_pages)) {
     exit;
 }
 
-if (in_array($page, ['dashboard', 'vehicles'], true) && !isset($_SESSION['user_id'])) {
+if (in_array($page, ['dashboard', 'vehicles', 'history'], true) && !isset($_SESSION['user_id'])) {
     header('Location: ?page=login');
     exit;
 }

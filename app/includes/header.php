@@ -9,11 +9,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/design-tokens.css">
 <link rel="stylesheet" href="css/landing.css">
+<link rel="stylesheet" href="css/fillup-modal.css">
 <?php if (($page ?? '') === 'dashboard'): ?>
 <link rel="stylesheet" href="css/dashboard.css">
 <?php endif; ?>
 <?php if (($page ?? '') === 'vehicles'): ?>
 <link rel="stylesheet" href="css/vehicles.css">
+<?php endif; ?>
+<?php if (($page ?? '') === 'fuel-log'): ?>
+<link rel="stylesheet" href="css/fuel-log.css">
+<?php endif; ?>
+<?php if (($page ?? '') === 'history'): ?>
+<link rel="stylesheet" href="css/history.css">
 <?php endif; ?>
 <?php if (in_array($page ?? '', ['login', 'signup'])): ?>
 <link rel="stylesheet" href="css/auth.css">
@@ -34,8 +41,9 @@
         <div class="mm-nav-tabs" aria-label="Primary sections">
           <button class="mm-nav-tab<?= ($page ?? '') === 'dashboard' ? ' is-active' : '' ?>" onclick="location.href='?page=dashboard'">Dashboard</button>
           <button class="mm-nav-tab<?= ($page ?? '') === 'vehicles' ? ' is-active' : '' ?>" onclick="location.href='?page=vehicles'">Vehicles</button>
+          <button class="mm-nav-tab<?= ($page ?? '') === 'history' ? ' is-active' : '' ?>" onclick="location.href='?page=history'">History</button>
         </div>
-        <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="location.href='?page=logout'">Logout</button>
+        <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="localStorage.removeItem('mileo_active_vehicle_id'); location.href='?page=logout'">Logout</button>
       <?php else: ?>
         <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="location.href='?page=login'">Sign In</button>
         <button class="mm-btn mm-btn-primary mm-btn-sm" onclick="location.href='?page=signup'">Get Started</button>

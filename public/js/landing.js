@@ -102,7 +102,7 @@
     {
       key: 'log',
       kicker: 'At the pump',
-      title: 'Quick Log',
+      title: 'Fuel Log',
       desc: 'Enter four fields in seconds. Done.',
       render: () => `
         <div class="mm-mock mm-mock-log">
