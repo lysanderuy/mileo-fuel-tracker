@@ -1,6 +1,15 @@
 <?php
 require_once __DIR__ . '/../../../config/db.php';
 
+set_exception_handler(function (Throwable $e) {
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: application/json');
+    }
+    echo json_encode(['error' => $e->getMessage()]);
+    exit;
+});
+
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
     header('Content-Type: application/json');

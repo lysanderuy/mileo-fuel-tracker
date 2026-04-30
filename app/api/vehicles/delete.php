@@ -39,11 +39,6 @@ if (!$vehicle) {
     exit;
 }
 
-if (!(bool)$vehicle['is_archived']) {
-    http_response_code(422);
-    echo json_encode(['error' => 'Only archived vehicles can be deleted.']);
-    exit;
-}
 
 $stmt = $conn->prepare("DELETE FROM vehicles WHERE id = ? AND user_id = ?");
 $stmt->bind_param('ii', $id, $user_id);

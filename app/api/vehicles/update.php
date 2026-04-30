@@ -18,14 +18,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $body = json_decode(file_get_contents('php://input'), true);
 
-$id           = isset($body['id']) ? (int)$body['id'] : 0;
-$name         = trim($body['name']         ?? '');
-$make         = trim($body['make']         ?? '');
-$model        = trim($body['model']        ?? '');
-$year         = isset($body['year']) && $body['year'] !== '' ? (int)$body['year'] : null;
-$fuel_type    = trim($body['fuel_type']    ?? '');
-$color        = trim($body['color']        ?? '');
-$plate_number = trim($body['plate_number'] ?? '');
+$id            = isset($body['id']) ? (int)$body['id'] : 0;
+$name          = trim($body['name']          ?? '');
+$make          = trim($body['make']          ?? '');
+$model         = trim($body['model']         ?? '');
+$year          = isset($body['year']) && $body['year'] !== '' ? (int)$body['year'] : null;
+$fuel_type     = trim($body['fuel_type']     ?? '');
+$color         = trim($body['color']         ?? '');
+$plate_number  = trim($body['plate_number']  ?? '');
+$tank_capacity = isset($body['tank_capacity']) && $body['tank_capacity'] !== '' ? (float)$body['tank_capacity'] : null;
+$odometer      = isset($body['odometer'])      && $body['odometer']      !== '' ? (int)$body['odometer']      : null;
 
 if ($id <= 0) {
     http_response_code(422);
@@ -52,6 +54,18 @@ if ($year !== null && ($year < 1900 || $year > 2100)) {
     exit;
 }
 
+if ($tank_capacity === null || $tank_capacity <= 0) {
+    http_response_code(422);
+    echo json_encode(['error' => 'Tank capacity is required and must be a positive number.']);
+    exit;
+}
+
+if ($odometer === null || $odometer < 0) {
+    http_response_code(422);
+    echo json_encode(['error' => 'Odometer reading is required and cannot be negative.']);
+    exit;
+}
+
 $user_id = (int)$_SESSION['user_id'];
 
 $check = $conn->prepare("SELECT id FROM vehicles WHERE id = ? AND user_id = ?");
@@ -68,10 +82,10 @@ if (!$found) {
 
 $stmt = $conn->prepare("
     UPDATE vehicles
-    SET name = ?, make = ?, model = ?, year = ?, fuel_type = ?, color = ?, plate_number = ?
+    SET name = ?, make = ?, model = ?, year = ?, fuel_type = ?, color = ?, plate_number = ?, tank_capacity = ?, odometer = ?
     WHERE id = ? AND user_id = ?
 ");
-$stmt->bind_param('sssssssii',
+$stmt->bind_param('sssssssdiii',
     $name,
     $make,
     $model,
@@ -79,6 +93,8 @@ $stmt->bind_param('sssssssii',
     $fuel_type,
     $color,
     $plate_number,
+    $tank_capacity,
+    $odometer,
     $id,
     $user_id
 );
