@@ -5,7 +5,7 @@
     const root = document.getElementById('mm-toast-root');
     if (!root) return;
     const toast = document.createElement('div');
-    toast.className = 'ql-toast' + (type ? ' ' + type : '');
+    toast.className = 'fl-toast' + (type ? ' ' + type : '');
     toast.textContent = message;
     root.appendChild(toast);
     setTimeout(() => toast.remove(), 3200);
@@ -25,7 +25,7 @@
   }
 
   function parseVehiclesData() {
-    const node = document.getElementById('quick-log-vehicles-data');
+    const node = document.getElementById('fuel-log-vehicles-data');
     if (!node || !node.textContent) return [];
     try {
       const data = JSON.parse(node.textContent);
@@ -51,7 +51,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    const form = document.querySelector('.ql-form');
+    const form = document.querySelector('.fl-form');
     if (!form) return;
 
     const vehicles = toVehicleMap(parseVehiclesData());
