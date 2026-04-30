@@ -1,0 +1,258 @@
+/* ── Fuel Fill-Up Modal ── */
+.hist-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1000;
+  animation: hist-modal-fade-in 0.2s ease;
+}
+
+.hist-modal-overlay[hidden],
+[hidden] {
+  display: none !important;
+}
+
+.hist-modal {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 720px;
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+  animation: hist-modal-slide-up 0.3s ease;
+}
+
+@keyframes hist-modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes hist-modal-slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.hist-modal-head {
+  padding: 20px 24px;
+  border-bottom: 1px solid #E8E8E4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hist-modal-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #38362F;
+  margin: 0;
+}
+
+.hist-modal-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #999;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+.hist-modal-close:hover {
+  color: #333;
+}
+
+.hist-modal-body {
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+.hist-fuel-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.hist-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.hist-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hist-form-field label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #57544C;
+}
+
+.hist-form-input,
+.hist-form-select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #E5E3DE;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  color: #38362F;
+  background: #fff;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+}
+
+.hist-form-input:focus,
+.hist-form-select:focus {
+  border-color: #F59500;
+  box-shadow: 0 0 0 3px rgba(245, 149, 0, 0.12);
+}
+
+/* ── Context & Fuel Grids ── */
+.context-section,
+.fuel-inputs-paired {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.odometer-field {
+  grid-column: span 2;
+}
+
+.hist-form-help,
+.hist-form-error {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.hist-form-help {
+  color: #7B756A;
+}
+
+.hist-form-error {
+  color: #D93520;
+  font-weight: 600;
+  min-height: 1.2em;
+}
+
+/* ── Red/Green Switch ── */
+.toggle-field {
+  padding-top: 5px;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toggle-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #57544C;
+}
+
+.mileo-switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+}
+
+.mileo-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.mileo-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #D93520; /* Red indicator for OFF */
+  transition: 0.3s;
+  border-radius: 999px;
+}
+
+.mileo-slider:before {
+  position: absolute;
+  content: '';
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.mileo-switch input:checked + .mileo-slider {
+  background-color: #228A55; /* Green indicator for ON */
+}
+
+.mileo-switch input:checked + .mileo-slider:before {
+  transform: translateX(22px);
+}
+
+/* ── Notes ── */
+.hist-form-textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 60px;
+  padding: 9px 12px;
+  border: 1px solid #E5E3DE;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  color: #38362F;
+  background: #fff;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+}
+
+.hist-form-textarea:focus {
+  border-color: #F59500;
+  box-shadow: 0 0 0 3px rgba(245, 149, 0, 0.12);
+}
+
+.hist-form-notes-count {
+  margin-top: 5px;
+  font-size: 0.75rem;
+  color: #8E887C;
+  text-align: right;
+}
+
+/* ── Actions ── */
+.hist-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 15px;
+  margin-top: 5px;
+  border-top: 1px solid #E8E8E4;
+}
+
+@media (max-width: 768px) {
+  .hist-modal { width: calc(100% - 32px); max-height: 85vh; }
+  .context-section, .fuel-inputs-paired { grid-template-columns: 1fr; }
+  .hist-form-actions { flex-direction: column-reverse; }
+  .hist-form-actions .mm-btn { width: 100%; }
+}
