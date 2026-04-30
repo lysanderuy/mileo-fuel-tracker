@@ -26,8 +26,11 @@
 <?php if (($page ?? '') === 'vehicles'): ?>
 <script src="js/vehicles.js"></script>
 <?php endif; ?>
-<?php if (($page ?? '') === 'quick-log'): ?>
-<script src="js/quick-log.js"></script>
+<?php if (($page ?? '') === 'fuel-log'): ?>
+<script src="js/fuel-log.js"></script>
+<?php endif; ?>
+<?php if (($page ?? '') === 'history'): ?>
+<script src="js/history.js"></script>
 <?php endif; ?>
 <script src="js/landing.js"></script>
 </body>

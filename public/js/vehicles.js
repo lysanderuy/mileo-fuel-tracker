@@ -3,7 +3,7 @@
 
   const FUEL_TYPES = ['Gasoline', 'Diesel', 'Electric', 'Hybrid'];
 
-  /** @type {{ id: number, name: string, make: string|null, model: string|null, year: number|null, fuel_type: string|null, color: string|null, plate_number: string|null, is_archived: boolean }[]} */
+  /** @type {{ id: number, name: string, make: string|null, model: string|null, year: number|null, fuel_type: string|null, color: string|null, plate_number: string|null, tank_capacity: number|null, odometer: number|null, is_archived: boolean }[]} */
   let vehicles = [];
   let activeTab = 'active';
 
@@ -58,10 +58,16 @@
       actions = `
         <button class="veh-btn" data-action="edit">Edit</button>
         <button class="veh-btn" data-action="archive">Archive</button>
+        <button class="veh-btn veh-btn-danger" data-action="delete">Delete</button>
       `;
     }
 
     row.innerHTML = `
+      <button class="veh-star-btn ${v.is_default ? 'is-default' : ''}" data-action="set-default" title="${v.is_default ? 'Default vehicle' : 'Set as default'}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="${v.is_default ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+        </svg>
+      </button>
       <div class="veh-icon ${v.is_archived ? 'veh-icon-archived' : ''}">
         <span class="veh-icon-mark">&#x1F697;</span>
       </div>
@@ -72,6 +78,10 @@
             ${esc(vehicleMeta(v))}
             ${v.plate_number ? `<span class="veh-meta-sep">•</span><span class="veh-plate-inline">${esc(v.plate_number)}</span>` : ''}
           </div>
+        </div>
+        <div class="veh-badges">
+          ${v.tank_capacity != null ? `<span class="veh-badge">&#x26FD; ${v.tank_capacity}L tank</span>` : ''}
+          ${v.odometer     != null ? `<span class="veh-badge">&#x1F6E3; ${v.odometer.toLocaleString()} km</span>` : ''}
         </div>
       </div>
       <div class="veh-side">
@@ -163,10 +173,24 @@
   /* ── Row actions ────────────────────────── */
 
   async function handleRowAction(id, action) {
-    if (action === 'edit')      { openModal(id); return; }
-    if (action === 'archive')   { await doArchive(id, true);  return; }
-    if (action === 'unarchive') { await doArchive(id, false); return; }
-    if (action === 'delete')    { await confirmDelete(id);    return; }
+    if (action === 'edit')        { openModal(id); return; }
+    if (action === 'archive')     { await doArchive(id, true);  return; }
+    if (action === 'unarchive')   { await doArchive(id, false); return; }
+    if (action === 'delete')      { await confirmDelete(id);    return; }
+    if (action === 'set-default') { await doSetDefault(id);     return; }
+  }
+
+  async function doSetDefault(id) {
+    try {
+      await api('set-default', { id });
+      vehicles.forEach(v => {
+        v.is_default = (v.id === id);
+      });
+      renderLists();
+      showToast('Default vehicle updated.', 'success');
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
   }
 
   async function doArchive(id, archived) {
@@ -277,6 +301,16 @@
               <input class="veh-input" id="veh-f-plate" type="text" placeholder="ABC 1234" maxlength="20" value="${esc(v && v.plate_number ? v.plate_number : '')}">
             </div>
           </div>
+          <div class="veh-form-row">
+            <div class="veh-field">
+              <label>Tank Capacity <span class="veh-field-unit">(liters)</span></label>
+              <input class="veh-input" id="veh-f-tank" type="number" placeholder="60" min="1" max="9999" step="0.1" value="${v && v.tank_capacity != null ? v.tank_capacity : ''}">
+            </div>
+            <div class="veh-field">
+              <label>Odometer <span class="veh-field-unit">(km)</span></label>
+              <input class="veh-input" id="veh-f-odometer" type="number" placeholder="12500" min="0" max="9999999" value="${v && v.odometer != null ? v.odometer : ''}">
+            </div>
+          </div>
           <div id="veh-modal-error" style="display:none;color:#D93520;font-size:0.8125rem;font-weight:500;padding:8px 12px;background:#FDECEA;border-radius:8px;"></div>
         </div>
         <div class="veh-modal-footer">
@@ -305,13 +339,15 @@
 
     saveBtn.addEventListener('click', async () => {
       const payload = {
-        name:         overlay.querySelector('#veh-f-name').value.trim(),
-        make:         overlay.querySelector('#veh-f-make').value.trim(),
-        model:        overlay.querySelector('#veh-f-model').value.trim(),
-        year:         overlay.querySelector('#veh-f-year').value.trim(),
-        fuel_type:    overlay.querySelector('#veh-f-fuel').value,
-        color:        overlay.querySelector('#veh-f-color').value.trim(),
-        plate_number: overlay.querySelector('#veh-f-plate').value.trim(),
+        name:          overlay.querySelector('#veh-f-name').value.trim(),
+        make:          overlay.querySelector('#veh-f-make').value.trim(),
+        model:         overlay.querySelector('#veh-f-model').value.trim(),
+        year:          overlay.querySelector('#veh-f-year').value.trim(),
+        fuel_type:     overlay.querySelector('#veh-f-fuel').value,
+        color:         overlay.querySelector('#veh-f-color').value.trim(),
+        plate_number:  overlay.querySelector('#veh-f-plate').value.trim(),
+        tank_capacity: overlay.querySelector('#veh-f-tank').value.trim(),
+        odometer:      overlay.querySelector('#veh-f-odometer').value.trim(),
       };
 
       if (!payload.name) {
@@ -334,13 +370,15 @@
           if (idx !== -1) {
             vehicles[idx] = {
               ...vehicles[idx],
-              name:         payload.name,
-              make:         payload.make || null,
-              model:        payload.model || null,
-              year:         payload.year !== '' ? parseInt(payload.year, 10) : null,
-              fuel_type:    payload.fuel_type || null,
-              color:        payload.color || null,
-              plate_number: payload.plate_number || null,
+              name:          payload.name,
+              make:          payload.make          || null,
+              model:         payload.model         || null,
+              year:          payload.year          !== '' ? parseInt(payload.year, 10)          : null,
+              fuel_type:     payload.fuel_type     || null,
+              color:         payload.color         || null,
+              plate_number:  payload.plate_number  || null,
+              tank_capacity: payload.tank_capacity !== '' ? parseFloat(payload.tank_capacity) : null,
+              odometer:      payload.odometer      !== '' ? parseInt(payload.odometer, 10)     : null,
             };
           }
           showToast('Vehicle updated.', 'success');
