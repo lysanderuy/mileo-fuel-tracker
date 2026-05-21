@@ -256,3 +256,154 @@
   .hist-form-actions { flex-direction: column-reverse; }
   .hist-form-actions .mm-btn { width: 100%; }
 }
+
+/* ── Instant Stats Panel ── */
+.hist-instant-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 2px 0;
+}
+
+/* Header: check icon + headline + meta, horizontal */
+.hist-stats-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hist-stats-check {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  background: #228A55;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hist-stats-headline {
+  font-family: 'Sora', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #38362F;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.hist-stats-meta {
+  font-size: 0.78rem;
+  color: #7B756A;
+  margin-top: 2px;
+}
+
+/* Performance hero card */
+.hist-stats-perf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #F9F8F6;
+  border: 1px solid #E8E8E4;
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.hist-perf-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.hist-perf-value {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #38362F;
+  line-height: 1.1;
+}
+
+.hist-perf-unit {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #7B756A;
+}
+
+.hist-perf-delta {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* Performance badge */
+.hist-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 5px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hist-badge--good    { background: #D4EDDA; color: #228A55; }
+.hist-badge--neutral { background: #FFF3CD; color: #7A5800; }
+.hist-badge--bad     { background: #FDE8E8; color: #D93520; }
+
+/* Shared delta colors (used in hero and grid) */
+.hist-delta--good { color: #228A55; }
+.hist-delta--bad  { color: #D93520; }
+
+/* Stat cards grid */
+.hist-stats-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.hist-stats-grid--3col { grid-template-columns: repeat(3, 1fr); }
+.hist-stats-grid--2col { grid-template-columns: repeat(2, 1fr); }
+
+/* Lone card in last row of 2-col grid spans full width */
+.hist-stats-grid--2col .hist-stat-card:last-child:nth-child(odd) {
+  grid-column: span 2;
+}
+
+.hist-stat-card {
+  background: #F9F8F6;
+  border: 1px solid #E8E8E4;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hist-stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #7B756A;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.hist-stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #38362F;
+}
+
+.hist-stat-delta {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #7B756A;
+}
+
+@media (max-width: 540px) {
+  .hist-stats-grid--3col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .hist-stats-grid--3col .hist-stat-card:last-child:nth-child(odd) {
+    grid-column: span 2;
+  }
+  .hist-perf-value { font-size: 1.5rem; }
+}
