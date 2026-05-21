@@ -32,6 +32,8 @@
     return '₱' + n.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
+  var EDIT_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>';
+
   function buildRow(log) {
     const tr = document.createElement('tr');
 
@@ -47,14 +49,14 @@
     } else if (log.efficiency_kml !== null) {
       const kml = log.efficiency_kml;
       let cls = 'yellow', icon = '';
-      if (kml >= 12.5) { 
-        cls = 'green'; 
+      if (kml >= 12.5) {
+        cls = 'green';
         icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>';
-      } else if (kml >= 10) { 
-        cls = 'yellow'; 
+      } else if (kml >= 10) {
+        cls = 'yellow';
         icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M5 12h14"/></svg>';
-      } else { 
-        cls = 'red'; 
+      } else {
+        cls = 'red';
         icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>';
       }
       effHtml = '<span class="hist-badge hist-badge-' + cls + '">' + icon + kml.toFixed(1) + ' km/L</span>';
@@ -65,12 +67,17 @@
     var total = log.fuel_price * log.liters_filled;
 
     tr.innerHTML =
-      '<td class="hist-td hist-td-date">'   + esc(fmtDate(log.log_date))                   + '</td>' +
-      '<td class="hist-td">'                + esc(log.vehicle_name)                        + '</td>' +
-      '<td class="hist-td hist-td-vol">'    + esc(log.liters_filled.toFixed(2) + ' L')      + '</td>' +
-      '<td class="hist-td hist-td-price">'  + esc(fmtPeso(log.fuel_price))                  + '</td>' +
-      '<td class="hist-td hist-td-cost">'   + esc(fmtPeso(total))                           + '</td>' +
-      '<td class="hist-td hist-td-eff">'    + effHtml                                       + '</td>';
+      '<td class="hist-td hist-td-date">'    + esc(fmtDate(log.log_date))              + '</td>' +
+      '<td class="hist-td">'                 + esc(log.vehicle_name)                   + '</td>' +
+      '<td class="hist-td hist-td-vol">'     + esc(log.liters_filled.toFixed(2) + ' L') + '</td>' +
+      '<td class="hist-td hist-td-price">'   + esc(fmtPeso(log.fuel_price))             + '</td>' +
+      '<td class="hist-td hist-td-cost">'    + esc(fmtPeso(total))                      + '</td>' +
+      '<td class="hist-td hist-td-eff">'     + effHtml                                  + '</td>' +
+      '<td class="hist-td hist-td-actions">' +
+        '<button class="hist-edit-btn" data-id="' + log.id + '" aria-label="Edit fill-up">' +
+          EDIT_ICON +
+        '</button>' +
+      '</td>';
 
     return tr;
   }
@@ -117,6 +124,7 @@
         '<th class="hist-th">Price / L</th>' +
         '<th class="hist-th">Total</th>' +
         '<th class="hist-th">Efficiency</th>' +
+        '<th class="hist-th hist-th-actions"></th>' +
       '</tr></thead>';
     const tbody = document.createElement('tbody');
     tbody.id = 'hist-tbody';
@@ -124,6 +132,17 @@
     table.appendChild(tbody);
     return table;
   }
+
+  // Edit button click delegation — works for both initial load and load-more appended rows
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.hist-edit-btn');
+    if (!btn) return;
+    e.preventDefault();
+    var logId = Number(btn.dataset.id);
+    if (logId && typeof window.openEditModal === 'function') {
+      window.openEditModal(logId);
+    }
+  });
 
   async function loadPage(vehicleId, page, append) {
     if (isLoading) return;

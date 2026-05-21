@@ -166,6 +166,39 @@
   cursor: not-allowed;
 }
 
+/* ── Actions column ── */
+.hist-th-actions { width: 40px; padding-right: 16px; }
+.hist-td-actions { padding: 8px 16px 8px 8px; text-align: right; }
+
+.hist-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  color: #BCBAB4;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+  flex-shrink: 0;
+}
+.hist-edit-btn:hover {
+  background: #F0EFE9;
+  color: #57544C;
+}
+.hist-edit-btn:active {
+  background: #E8E6DF;
+}
+
+/* ── Error state on form inputs ── */
+.hist-form-input.is-error,
+.hist-form-select.is-error {
+  border-color: #D93520;
+  box-shadow: 0 0 0 3px rgba(217, 53, 32, 0.1);
+}
+
 @media (max-width: 768px) {
   .hist-wrap { padding: 28px 16px 72px; }
   .hist-topbar { margin-bottom: 20px; flex-direction: column; }

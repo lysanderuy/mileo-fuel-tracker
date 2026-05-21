@@ -1,12 +1,17 @@
 (function () {
   'use strict';
 
-  let vehicles = new Map();
+  let vehicles      = new Map();
   let isInitialized = false;
 
-  /**
-   * API: Create Fuel Log
-   */
+  // Edit-mode state
+  let isEditMode              = false;
+  let editModePrevOdometer    = null;
+  let editModeNextOdometer    = null;
+  let editModeOriginalTrip    = null;
+
+  // ── API ────────────────────────────────────────────────────────────────────
+
   async function createFuelLog(payload) {
     const res = await fetch('?api=fuel-logs/create', {
       method: 'POST',
@@ -14,15 +19,30 @@
       body: JSON.stringify(payload),
     });
     const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || 'Failed to save fuel log.');
-    }
+    if (!res.ok) throw new Error(data.error || 'Failed to save fuel log.');
     return data;
   }
 
-  /**
-   * UI: Toast Notification
-   */
+  async function updateFuelLog(payload) {
+    const res = await fetch('?api=fuel-logs/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to update fuel log.');
+    return data;
+  }
+
+  async function fetchLog(logId) {
+    const res = await fetch('?api=fuel-logs/get&id=' + logId);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to load log.');
+    return data;
+  }
+
+  // ── Toast ──────────────────────────────────────────────────────────────────
+
   function showToast(message, type) {
     const root = document.getElementById('mm-toast-root');
     if (!root) return;
@@ -33,9 +53,8 @@
     setTimeout(() => toast.remove(), 3200);
   }
 
-  /**
-   * UI: Trip Distance State Management
-   */
+  // ── Odometer Helpers ───────────────────────────────────────────────────────
+
   function clearOdometerError() {
     const input = document.getElementById('hist-odometer');
     const error = document.getElementById('hist-odometer-error');
@@ -65,42 +84,54 @@
   }
 
   function applyTripState() {
-    const vehicle = getCurrentVehicle();
     const odometerInput = document.getElementById('hist-odometer');
-    const helper = document.getElementById('hist-odometer-helper');
-
+    const helper        = document.getElementById('hist-odometer-helper');
     if (!odometerInput || !helper) return;
 
-    const hasPriorLog = vehicle && Number.isFinite(vehicle.lastOdometer);
+    // In edit mode, use the fetched prev odometer; in create mode, use vehicle's last odometer.
+    const lastOdo = isEditMode
+      ? editModePrevOdometer
+      : (function () {
+          const v = getCurrentVehicle();
+          return v ? v.lastOdometer : null;
+        }());
+
+    const hasPriorLog   = lastOdo !== null && Number.isFinite(lastOdo);
     const odometerValue = Number(odometerInput.value);
-    const hasOdometer = odometerInput.value !== '' && Number.isFinite(odometerValue);
+    const hasOdometer   = odometerInput.value !== '' && Number.isFinite(odometerValue);
 
     clearOdometerError();
 
+    // Show/hide manual trip distance field (only when there is no prior log)
+    const tripSection = document.getElementById('hist-trip-distance-section');
+    if (tripSection) {
+      tripSection.style.display = (!hasPriorLog && isEditMode) ? '' : 'none';
+    }
+
     if (!hasPriorLog) {
-      helper.textContent = 'First log for this vehicle.';
+      helper.textContent = isEditMode ? 'No previous fill-up for this vehicle.' : 'First log for this vehicle.';
       return;
     }
 
-    const last = vehicle.lastOdometer;
-
-    if (hasOdometer && odometerValue < last) {
-      showOdometerError('Odometer must be ≥ ' + String(last) + ' km.');
-      helper.textContent = 'Last recorded: ' + String(last) + ' km';
+    if (hasOdometer && odometerValue < lastOdo) {
+      showOdometerError('Odometer must be ≥ ' + String(lastOdo) + ' km.');
+      helper.textContent = 'Last recorded: ' + String(lastOdo) + ' km';
+    } else if (hasOdometer && editModeNextOdometer !== null && odometerValue > editModeNextOdometer) {
+      showOdometerError('Odometer must be ≤ ' + String(editModeNextOdometer) + ' km (next fill-up).');
+      helper.textContent = 'Last recorded: ' + String(lastOdo) + ' km';
     } else if (hasOdometer) {
-      const computed = odometerValue - last;
+      const computed = odometerValue - lastOdo;
       helper.textContent = 'Estimated trip: ' + computed.toFixed(1) + ' km';
     } else {
-      helper.textContent = 'Last recorded: ' + String(last) + ' km';
+      helper.textContent = 'Last recorded: ' + String(lastOdo) + ' km';
     }
   }
 
-  /**
-   * Data Loading
-   */
+  // ── Vehicle Select ─────────────────────────────────────────────────────────
+
   async function fetchVehicles() {
     try {
-      const res = await fetch('?api=vehicles/list');
+      const res  = await fetch('?api=vehicles/list');
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to load vehicles');
       return data.vehicles || [];
@@ -113,14 +144,10 @@
   function buildVehicleMap(list) {
     const map = new Map();
     list.forEach((item) => {
-      const id = Number(item.id);
+      const id   = Number(item.id);
       if (!Number.isFinite(id)) return;
       const last = item.odometer === null ? null : Number(item.odometer);
-      map.set(id, {
-        id,
-        name: item.name || '',
-        lastOdometer: Number.isFinite(last) ? last : null,
-      });
+      map.set(id, { id, name: item.name || '', lastOdometer: Number.isFinite(last) ? last : null });
     });
     return map;
   }
@@ -129,36 +156,52 @@
     const select = document.getElementById('hist-vehicle_id');
     if (!select) return;
     select.innerHTML = '';
-    
-    // Sort list so default is first (optional but good for UI)
     const sorted = [...list].sort((a, b) => (b.is_default ? 1 : 0) - (a.is_default ? 1 : 0));
-    
-    sorted.forEach(item => {
+    sorted.forEach((item) => {
       if (item.is_archived) return;
       const opt = document.createElement('option');
-      opt.value = item.id;
+      opt.value       = item.id;
       opt.textContent = item.name;
       if (item.is_default) opt.selected = true;
       select.appendChild(opt);
     });
   }
 
-  /**
-   * Modal Actions
-   */
+  // ── Modal Open / Close ─────────────────────────────────────────────────────
+
+  function resetToCreateMode() {
+    isEditMode           = false;
+    editModePrevOdometer = null;
+    editModeNextOdometer = null;
+    editModeOriginalTrip = null;
+
+    const logIdInput = document.getElementById('hist-log-id');
+    if (logIdInput) logIdInput.value = '';
+
+    const title = document.getElementById('hist-modal-title');
+    if (title) title.textContent = 'Log Fill-Up';
+
+    const submitBtn = document.getElementById('hist-form-submit-btn');
+    if (submitBtn) submitBtn.textContent = 'Save Entry';
+
+    const vehicleSelect = document.getElementById('hist-vehicle_id');
+    if (vehicleSelect) vehicleSelect.disabled = false;
+
+    const tripSection = document.getElementById('hist-trip-distance-section');
+    if (tripSection) tripSection.style.display = 'none';
+  }
+
   function openModal() {
     const overlay = document.getElementById('hist-modal-overlay');
-    const form = document.getElementById('hist-fuel-form');
+    const form    = document.getElementById('hist-fuel-form');
     if (!overlay || !form) return;
 
     overlay.removeAttribute('hidden');
     document.body.style.overflow = 'hidden';
     form.reset();
-    
+
     const dateInput = document.getElementById('hist-log_date');
-    if (dateInput) {
-      dateInput.value = new Date().toISOString().split('T')[0];
-    }
+    if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
 
     applyTripState();
     applyNotesCount();
@@ -170,62 +213,21 @@
       overlay.setAttribute('hidden', '');
       document.body.style.overflow = '';
     }
+    resetToCreateMode();
   }
-
 
   function applyNotesCount() {
     const input = document.getElementById('hist-notes');
     const count = document.getElementById('hist-notes-count');
-    if (input && count) {
-      count.textContent = String(input.value.length) + ' / 200';
-    }
+    if (input && count) count.textContent = String(input.value.length) + ' / 200';
   }
 
-
-  /**
-   * Event Listeners Setup
-   */
-  function setupModalListeners() {
-    const overlay = document.getElementById('hist-modal-overlay');
-    const closeBtn = document.getElementById('hist-modal-close');
-    const cancelBtn = document.getElementById('hist-form-cancel-btn');
-    const form = document.getElementById('hist-fuel-form');
-    
-    const vehicleSelect = document.getElementById('hist-vehicle_id');
-    const odometerInput = document.getElementById('hist-odometer');
-    const fullTankInput = document.getElementById('hist-is_full_tank');
-    const notesInput = document.getElementById('hist-notes');
-
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
-    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
-    if (overlay) {
-      overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) closeModal();
-      });
-    }
-
-    if (vehicleSelect) {
-      vehicleSelect.addEventListener('change', applyTripState);
-    }
-
-    if (odometerInput) {
-      odometerInput.addEventListener('input', applyTripState);
-    }
-
-
-    if (notesInput) {
-      notesInput.addEventListener('input', applyNotesCount);
-    }
-
-    if (form) {
-      form.addEventListener('submit', handleFormSubmit);
-    }
-  }
+  // ── Form Submit ────────────────────────────────────────────────────────────
 
   async function handleFormSubmit(event) {
     event.preventDefault();
-    const form = event.target;
-    const submitBtn = form.querySelector('button[type="submit"]');
+    const form      = event.target;
+    const submitBtn = document.getElementById('hist-form-submit-btn');
 
     applyTripState();
     if (!form.checkValidity()) {
@@ -233,105 +235,207 @@
       return;
     }
 
-    const vehicle = getCurrentVehicle();
-    const lastOdo = vehicle ? vehicle.lastOdometer : null;
     const currentOdo = Number(document.getElementById('hist-odometer').value);
-    
+    const hasPrev    = editModePrevOdometer !== null;
+
     const payload = {
-      vehicle_id: Number(document.getElementById('hist-vehicle_id').value),
-      log_date: String(document.getElementById('hist-log_date').value || ''),
-      odometer: currentOdo,
-      trip_distance: (lastOdo !== null && currentOdo >= lastOdo) ? (currentOdo - lastOdo) : 0,
+      log_date:      String(document.getElementById('hist-log_date').value || ''),
+      odometer:      currentOdo,
       liters_filled: Number(document.getElementById('hist-liters_filled').value),
-      fuel_price: Number(document.getElementById('hist-fuel_price').value),
-      manual_trip_override: false,
-      is_full_tank: document.getElementById('hist-is_full_tank').checked,
-      notes: document.getElementById('hist-notes').value.trim(),
+      fuel_price:    Number(document.getElementById('hist-fuel_price').value),
+      is_full_tank:  document.getElementById('hist-is_full_tank').checked,
+      notes:         document.getElementById('hist-notes').value.trim(),
     };
 
+    if (isEditMode) {
+      payload.id = Number(document.getElementById('hist-log-id').value);
+
+      if (!hasPrev) {
+        // First log — backend cannot auto-compute trip_distance; send original value.
+        const tripInput = document.getElementById('hist-trip_distance');
+        payload.manual_trip_override = true;
+        payload.trip_distance = tripInput && tripInput.value !== '' ? Number(tripInput.value) : (editModeOriginalTrip || 0);
+      } else {
+        payload.manual_trip_override = false;
+        payload.trip_distance = 0; // backend recomputes from odometer diff
+      }
+    } else {
+      const vehicle = getCurrentVehicle();
+      const lastOdo = vehicle ? vehicle.lastOdometer : null;
+      payload.vehicle_id           = Number(document.getElementById('hist-vehicle_id').value);
+      payload.trip_distance        = (lastOdo !== null && currentOdo >= lastOdo) ? (currentOdo - lastOdo) : 0;
+      payload.manual_trip_override = false;
+    }
+
     if (submitBtn) {
-      submitBtn.disabled = true;
-      var prevText = submitBtn.textContent;
-      submitBtn.textContent = 'Saving...';
+      submitBtn.disabled    = true;
+      var prevText          = submitBtn.textContent;
+      submitBtn.textContent = isEditMode ? 'Saving…' : 'Saving...';
     }
 
     try {
-      await createFuelLog(payload);
-      const vehicle = vehicles.get(payload.vehicle_id);
-      if (vehicle) {
-        vehicle.lastOdometer = payload.odometer;
+      if (isEditMode) {
+        await updateFuelLog(payload);
+      } else {
+        const result = await createFuelLog(payload);
+        const v = vehicles.get(payload.vehicle_id);
+        if (v) v.lastOdometer = payload.odometer;
+        // eslint-disable-next-line no-unused-vars
+        void result;
       }
 
-      showToast('Fill-up saved successfully.', 'success');
+      showToast(isEditMode ? 'Fill-up updated.' : 'Fill-up saved successfully.', 'success');
       closeModal();
-
-      setTimeout(() => {
-        location.reload();
-      }, 700);
+      setTimeout(() => location.reload(), 700);
     } catch (err) {
       showToast(err.message, 'error');
       if (submitBtn) {
-        submitBtn.disabled = false;
+        submitBtn.disabled    = false;
         submitBtn.textContent = prevText;
       }
     }
   }
 
-  /**
-   * Main Initialization
-   */
+  // ── Listeners Setup ────────────────────────────────────────────────────────
+
+  function setupModalListeners() {
+    const overlay       = document.getElementById('hist-modal-overlay');
+    const closeBtn      = document.getElementById('hist-modal-close');
+    const cancelBtn     = document.getElementById('hist-form-cancel-btn');
+    const form          = document.getElementById('hist-fuel-form');
+    const vehicleSelect = document.getElementById('hist-vehicle_id');
+    const odometerInput = document.getElementById('hist-odometer');
+    const notesInput    = document.getElementById('hist-notes');
+
+    if (closeBtn)  closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+    if (overlay)   overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+
+    if (vehicleSelect) vehicleSelect.addEventListener('change', applyTripState);
+    if (odometerInput) odometerInput.addEventListener('input', applyTripState);
+    if (notesInput)    notesInput.addEventListener('input', applyNotesCount);
+    if (form)          form.addEventListener('submit', handleFormSubmit);
+  }
+
+  // ── Initialization ─────────────────────────────────────────────────────────
+
   async function ensureInitialized() {
     if (isInitialized) return true;
-    
     const overlay = document.getElementById('hist-modal-overlay');
     if (!overlay) return false;
 
-    // Fetch vehicles and setup DOM-dependent state
     const list = await fetchVehicles();
-    vehicles = buildVehicleMap(list);
+    vehicles   = buildVehicleMap(list);
     populateVehicleSelect(list);
-    
     setupModalListeners();
     isInitialized = true;
     return true;
   }
 
-  // Exposed Global API
-  window.openFillupModal = async function(preferredId = null) {
+  // ── Public API ─────────────────────────────────────────────────────────────
+
+  window.openFillupModal = async function (preferredId = null) {
     const ready = await ensureInitialized();
-    if (ready) {
-      if (preferredId) {
-        const select = document.getElementById('hist-vehicle_id');
-        if (select) select.value = preferredId;
-      }
-      openModal();
-    } else {
-      console.warn('FillupModal: Cannot open, modal DOM elements missing.');
+    if (!ready) { console.warn('FillupModal: DOM elements missing.'); return; }
+
+    resetToCreateMode();
+    openModal();
+
+    if (preferredId) {
+      const select = document.getElementById('hist-vehicle_id');
+      if (select) { select.value = preferredId; applyTripState(); }
     }
+  };
+
+  window.openEditModal = async function (logId) {
+    const ready = await ensureInitialized();
+    if (!ready) { console.warn('FillupModal: DOM elements missing.'); return; }
+
+    let logData;
+    try {
+      logData = await fetchLog(logId);
+    } catch (err) {
+      showToast(err.message, 'error');
+      return;
+    }
+
+    const { log, prev_odometer, next_odometer } = logData;
+
+    // Set edit-mode state
+    isEditMode           = true;
+    editModePrevOdometer = prev_odometer;   // null if first log
+    editModeNextOdometer = next_odometer;   // null if last log
+    editModeOriginalTrip = log.trip_distance;
+
+    // Populate form fields
+    const form = document.getElementById('hist-fuel-form');
+    if (form) form.reset();
+
+    const logIdInput = document.getElementById('hist-log-id');
+    if (logIdInput) logIdInput.value = log.id;
+
+    const vehicleSelect = document.getElementById('hist-vehicle_id');
+    if (vehicleSelect) {
+      vehicleSelect.value    = log.vehicle_id;
+      vehicleSelect.disabled = true;
+    }
+
+    const dateInput = document.getElementById('hist-log_date');
+    if (dateInput) dateInput.value = log.log_date;
+
+    const odometerInput = document.getElementById('hist-odometer');
+    if (odometerInput) odometerInput.value = log.odometer;
+
+    const litersInput = document.getElementById('hist-liters_filled');
+    if (litersInput) litersInput.value = log.liters_filled;
+
+    const priceInput = document.getElementById('hist-fuel_price');
+    if (priceInput) priceInput.value = log.fuel_price;
+
+    const fullTankInput = document.getElementById('hist-is_full_tank');
+    if (fullTankInput) fullTankInput.checked = log.is_full_tank;
+
+    const notesInput = document.getElementById('hist-notes');
+    if (notesInput) notesInput.value = log.notes || '';
+
+    // Pre-fill trip distance for first-log edits
+    const tripInput = document.getElementById('hist-trip_distance');
+    if (tripInput) tripInput.value = log.trip_distance !== null ? log.trip_distance : 0;
+
+    // Update modal chrome
+    const title = document.getElementById('hist-modal-title');
+    if (title) title.textContent = 'Edit Fill-Up';
+
+    const submitBtn = document.getElementById('hist-form-submit-btn');
+    if (submitBtn) submitBtn.textContent = 'Save Changes';
+
+    // Open overlay
+    const overlay = document.getElementById('hist-modal-overlay');
+    if (overlay) {
+      overlay.removeAttribute('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    applyTripState();
+    applyNotesCount();
   };
 
   // Legacy compatibility
   window.initFillupModal = ensureInitialized;
 
-  // Global Click Delegation - Always Active
+  // Global click delegation for Log Fill-Up buttons
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('#db-log-fillup-btn, #hist-log-fillup-btn');
     if (btn) {
       e.preventDefault();
-      console.debug('FillupModal: Click detected on', btn.id);
       const activeId = localStorage.getItem('mileo_active_vehicle_id');
       window.openFillupModal(activeId);
     }
   });
 
-  // Try to initialize if DOM is ready, but don't block
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      console.debug('FillupModal: DOMContentLoaded, ensuring initialization...');
-      ensureInitialized();
-    });
+    document.addEventListener('DOMContentLoaded', () => ensureInitialized());
   } else {
     ensureInitialized();
   }
 })();
-
