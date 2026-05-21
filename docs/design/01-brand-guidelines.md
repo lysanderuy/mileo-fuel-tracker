@@ -477,7 +477,7 @@ The spring easing is Mileo's signature motion moment. It is used **only** for th
 
 ### Key Motion Moments
 
-**1. Total Cost live update (Quick Log)**
+**1. Total Cost live update (Log Fill-Up)**
 As the user types fuel price or volume, the Total Cost figure updates immediately (`instant`, 80ms). No animation — just instant recalculation. Speed is the feature.
 
 **2. Save Fill-Up → Instant Stats reveal**

@@ -53,8 +53,8 @@ switch($requested_page) {
   case 'dashboard':
     include '../app/pages/dashboard.php';
     break;
-  case 'quick-log':
-    include '../app/pages/quick-log.php';
+  case 'log-fill-up':
+    include '../app/pages/log-fill-up.php';
     break;
   case 'history':
     include '../app/pages/history.php';
@@ -106,7 +106,7 @@ Create reusable components:
 <nav class="navbar">
   <ul>
     <li><a href="?page=dashboard">Dashboard</a></li>
-    <li><a href="?page=quick-log">Quick Log</a></li>
+    <li><a href="?page=log-fill-up">Log Fill-Up</a></li>
     <li><a href="?page=history">History</a></li>
     <li><a href="?page=vehicles">Vehicles</a></li>
   </ul>
@@ -150,7 +150,7 @@ include '../includes/footer.php';
 ```
 
 Create similar templates for:
-- `quick-log.php` (fuel logging form)
+- `log-fill-up.php` (fuel logging form)
 - `history.php` (logs list with sorting)
 - `vehicles.php` (vehicle management)
 
@@ -414,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
 - [ ] Create `/app/includes/navbar.php`
 - [ ] Create `/app/includes/footer.php`
 - [ ] Create `/app/pages/dashboard.php`
-- [ ] Create `/app/pages/quick-log.php`
+- [ ] Create `/app/pages/log-fill-up.php`
 - [ ] Create `/app/pages/history.php`
 - [ ] Create `/app/pages/vehicles.php`
 - [ ] Create `/public/js/app.js`
@@ -429,7 +429,7 @@ document.addEventListener('DOMContentLoaded', function() {
 - [ ] Test Delete Log API
 - [ ] Test Stats API
 - [ ] Test Dashboard page
-- [ ] Test Quick Log page
+- [ ] Test Log Fill-Up page
 - [ ] Test History page with sorting
 - [ ] Test Mobile responsiveness
 
