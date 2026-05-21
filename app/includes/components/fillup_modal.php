@@ -1,14 +1,17 @@
-<!-- Modal for logging fuel fill-ups -->
+<!-- Modal for logging / editing fuel fill-ups -->
 <div class="hist-modal-overlay" id="hist-modal-overlay" hidden>
   <div class="hist-modal" id="hist-modal">
     <div class="hist-modal-head">
-      <h2 class="hist-modal-title">Log Fill-Up</h2>
+      <h2 class="hist-modal-title" id="hist-modal-title">Log Fill-Up</h2>
       <button class="hist-modal-close" id="hist-modal-close" aria-label="Close modal">×</button>
     </div>
 
     <div class="hist-modal-body">
       <form class="hist-fuel-form" id="hist-fuel-form">
-        
+
+        <!-- Hidden: present only in edit mode -->
+        <input type="hidden" id="hist-log-id" value="">
+
         <!-- 1. Context Section -->
         <div class="hist-form-section context-section">
           <div class="hist-form-field">
@@ -45,7 +48,16 @@
           </div>
         </div>
 
-        <!-- 3. Controls & Notes -->
+        <!-- 3. Trip Distance (shown only when editing the first log — no auto-compute possible) -->
+        <div class="hist-form-section" id="hist-trip-distance-section" style="display:none">
+          <div class="hist-form-field">
+            <label for="hist-trip_distance">Trip Distance (km)</label>
+            <input id="hist-trip_distance" class="hist-form-input" type="number" name="trip_distance" min="0" step="0.1" placeholder="0.0">
+            <p class="hist-form-help">Distance driven since the previous fill-up (required for the first log).</p>
+          </div>
+        </div>
+
+        <!-- 4. Controls & Notes -->
         <div class="hist-form-section extras-section">
           <div class="hist-form-field toggle-field">
             <div class="toggle-container">
@@ -73,7 +85,7 @@
 
         <div class="hist-form-actions">
           <button type="button" class="mm-btn mm-btn-secondary mm-btn-sm" id="hist-form-cancel-btn">Cancel</button>
-          <button type="submit" class="mm-btn mm-btn-primary mm-btn-sm">Save Entry</button>
+          <button type="submit" class="mm-btn mm-btn-primary mm-btn-sm" id="hist-form-submit-btn">Save Entry</button>
         </div>
       </form>
     </div>
