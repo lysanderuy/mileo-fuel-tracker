@@ -35,6 +35,18 @@ include_once __DIR__ . '/../includes/header.php';
 <!-- Fuel Log Modal -->
 <?php include __DIR__ . '/../includes/components/fillup_modal.php'; ?>
 
+<!-- Delete Confirmation Modal -->
+<div class="hist-confirm-overlay" id="hist-confirm-overlay" hidden>
+  <div class="hist-confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="hist-confirm-title">
+    <h2 class="hist-confirm-title" id="hist-confirm-title">Delete fill-up?</h2>
+    <p class="hist-confirm-body">This fill-up will be permanently removed. If a later fill-up exists, its trip distance will be recomputed.</p>
+    <div class="hist-confirm-actions">
+      <button type="button" class="mm-btn mm-btn-secondary mm-btn-sm" id="hist-confirm-cancel-btn">Cancel</button>
+      <button type="button" class="mm-btn mm-btn-danger mm-btn-sm" id="hist-confirm-delete-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
 <script src="js/fillup-modal.js"></script>
 <script src="js/history.js"></script>
 
