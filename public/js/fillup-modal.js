@@ -50,7 +50,7 @@
     toast.className = 'ql-toast' + (type ? ' ' + type : '');
     toast.textContent = message;
     root.appendChild(toast);
-    setTimeout(() => toast.remove(), 3200);
+    setTimeout(() => toast.remove(), 5500);
   }
 
   // ── Odometer Helpers ───────────────────────────────────────────────────────
@@ -189,6 +189,7 @@
 
     const tripSection = document.getElementById('hist-trip-distance-section');
     if (tripSection) tripSection.style.display = 'none';
+
   }
 
   function openModal() {

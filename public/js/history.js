@@ -7,6 +7,17 @@
   let hasMore          = false;
   let vehicles = new Map();
 
+  async function deleteFuelLog(logId) {
+    const res = await fetch('?api=fuel-logs/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: logId }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to delete fill-up.');
+    return data;
+  }
+
   async function fetchLogs(vehicleId, page) {
     const res  = await fetch(`?api=fuel-logs/list&vehicle_id=${vehicleId}&page=${page}`);
     const data = await res.json();
@@ -32,7 +43,8 @@
     return '₱' + n.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
-  var EDIT_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>';
+  var EDIT_ICON  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>';
+  var TRASH_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
 
   function buildRow(log) {
     const tr = document.createElement('tr');
@@ -74,9 +86,8 @@
       '<td class="hist-td hist-td-cost">'    + esc(fmtPeso(total))                      + '</td>' +
       '<td class="hist-td hist-td-eff">'     + effHtml                                  + '</td>' +
       '<td class="hist-td hist-td-actions">' +
-        '<button class="hist-edit-btn" data-id="' + log.id + '" aria-label="Edit fill-up">' +
-          EDIT_ICON +
-        '</button>' +
+        '<button class="hist-edit-btn" data-id="' + log.id + '" aria-label="Edit fill-up">' + EDIT_ICON + '</button>' +
+        '<button class="hist-delete-btn" data-id="' + log.id + '" aria-label="Delete fill-up">' + TRASH_ICON + '</button>' +
       '</td>';
 
     return tr;
@@ -133,7 +144,7 @@
     return table;
   }
 
-  // Edit button click delegation — works for both initial load and load-more appended rows
+  // Edit button click delegation
   document.addEventListener('click', function (e) {
     const btn = e.target.closest('.hist-edit-btn');
     if (!btn) return;
@@ -141,6 +152,71 @@
     var logId = Number(btn.dataset.id);
     if (logId && typeof window.openEditModal === 'function') {
       window.openEditModal(logId);
+    }
+  });
+
+  // ── Toast ─────────────────────────────────────────────────────────────────
+
+  function showToast(message, type) {
+    var root = document.getElementById('mm-toast-root');
+    if (!root) return;
+    var toast = document.createElement('div');
+    toast.className = 'ql-toast' + (type ? ' ' + type : '');
+    toast.textContent = message;
+    root.appendChild(toast);
+    setTimeout(function () { toast.remove(); }, 5500);
+  }
+
+  // ── Delete confirmation modal ──────────────────────────────────────────────
+
+  var pendingDeleteId = null;
+
+  function openDeleteConfirm(logId) {
+    pendingDeleteId = logId;
+    var overlay = document.getElementById('hist-confirm-overlay');
+    if (overlay) {
+      overlay.removeAttribute('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeDeleteConfirm() {
+    pendingDeleteId = null;
+    var overlay = document.getElementById('hist-confirm-overlay');
+    if (overlay) {
+      overlay.setAttribute('hidden', '');
+      document.body.style.overflow = '';
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('#hist-confirm-cancel-btn') || e.target.id === 'hist-confirm-overlay') {
+      closeDeleteConfirm();
+      return;
+    }
+
+    if (e.target.closest('#hist-confirm-delete-btn')) {
+      var deleteBtn = document.getElementById('hist-confirm-delete-btn');
+      if (!deleteBtn || deleteBtn.disabled) return;
+      var logId = pendingDeleteId;
+      if (!logId) return;
+      deleteBtn.disabled = true;
+      deleteBtn.textContent = 'Deleting…';
+      deleteFuelLog(logId).then(function () {
+        showToast('Fill-up deleted.', 'success');
+        closeDeleteConfirm();
+        setTimeout(function () { location.reload(); }, 700);
+      }).catch(function (err) {
+        showToast(err.message, 'error');
+        if (deleteBtn) { deleteBtn.disabled = false; deleteBtn.textContent = 'Delete'; }
+      });
+      return;
+    }
+
+    var btn = e.target.closest('.hist-delete-btn');
+    if (btn) {
+      e.preventDefault();
+      openDeleteConfirm(Number(btn.dataset.id));
     }
   });
 

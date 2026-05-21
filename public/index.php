@@ -18,6 +18,7 @@ if ($api !== null) {
         'fuel-logs/get',
         'fuel-logs/list',
         'fuel-logs/update',
+        'fuel-logs/delete',
         'dashboard/summary',
     ];
 

@@ -8,7 +8,7 @@
     toast.className = 'fl-toast' + (type ? ' ' + type : '');
     toast.textContent = message;
     root.appendChild(toast);
-    setTimeout(() => toast.remove(), 3200);
+    setTimeout(() => toast.remove(), 5500);
   }
 
   async function createFuelLog(payload) {
