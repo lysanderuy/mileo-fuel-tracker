@@ -19,8 +19,11 @@
 <?php if (($page ?? '') === 'fuel-log'): ?>
 <link rel="stylesheet" href="css/fuel-log.css">
 <?php endif; ?>
-<?php if (($page ?? '') === 'history'): ?>
+<?php if (in_array($page ?? '', ['history', 'fuel-log-detail'])): ?>
 <link rel="stylesheet" href="css/history.css">
+<?php endif; ?>
+<?php if (($page ?? '') === 'fuel-log-detail'): ?>
+<link rel="stylesheet" href="css/fuel-log-detail.css">
 <?php endif; ?>
 <?php if (in_array($page ?? '', ['login', 'signup'])): ?>
 <link rel="stylesheet" href="css/auth.css">
@@ -41,7 +44,7 @@
         <div class="mm-nav-tabs" aria-label="Primary sections">
           <button class="mm-nav-tab<?= ($page ?? '') === 'dashboard' ? ' is-active' : '' ?>" onclick="location.href='?page=dashboard'">Dashboard</button>
           <button class="mm-nav-tab<?= ($page ?? '') === 'vehicles' ? ' is-active' : '' ?>" onclick="location.href='?page=vehicles'">Vehicles</button>
-          <button class="mm-nav-tab<?= ($page ?? '') === 'history' ? ' is-active' : '' ?>" onclick="location.href='?page=history'">History</button>
+          <button class="mm-nav-tab<?= in_array($page ?? '', ['history', 'fuel-log-detail']) ? ' is-active' : '' ?>" onclick="location.href='?page=history'">History</button>
         </div>
         <button class="mm-btn mm-btn-secondary mm-btn-sm" onclick="localStorage.removeItem('mileo_active_vehicle_id'); location.href='?page=logout'">Logout</button>
       <?php else: ?>
@@ -51,4 +54,4 @@
     </div>
   </div>
 </nav>
-<main style="flex:1">
+<main>
