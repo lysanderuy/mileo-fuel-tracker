@@ -15,7 +15,10 @@ if ($api !== null) {
         'vehicles/delete',
         'vehicles/set-default',
         'fuel-logs/create',
+        'fuel-logs/get',
         'fuel-logs/list',
+        'fuel-logs/update',
+        'fuel-logs/delete',
         'dashboard/summary',
     ];
 

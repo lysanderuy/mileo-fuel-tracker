@@ -29,7 +29,7 @@
     el.className = 'veh-toast' + (type ? ' ' + type : '');
     el.textContent = message;
     root.appendChild(el);
-    setTimeout(() => el.remove(), 3200);
+    setTimeout(() => el.remove(), 5500);
   }
 
   /* ── Render helpers ─────────────────────── */

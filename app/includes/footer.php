@@ -21,7 +21,6 @@
 
 <!-- MODAL + TOAST MOUNTS -->
 <div id="mm-modal-root"></div>
-<div id="mm-toast-root"></div>
 
 <?php if (($page ?? '') === 'vehicles'): ?>
 <script src="js/vehicles.js"></script>
@@ -33,5 +32,6 @@
 <script src="js/history.js"></script>
 <?php endif; ?>
 <script src="js/landing.js"></script>
+<div id="mm-toast-root"></div>
 </body>
 </html>
