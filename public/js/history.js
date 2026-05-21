@@ -48,6 +48,8 @@
 
   function buildRow(log) {
     const tr = document.createElement('tr');
+    tr.dataset.id = log.id;
+    tr.style.cursor = 'pointer';
 
     let effHtml;
     if (!log.is_full_tank) {
@@ -153,6 +155,15 @@
     if (logId && typeof window.openEditModal === 'function') {
       window.openEditModal(logId);
     }
+  });
+
+  // Row click — navigate to detail page (skip when clicking action buttons)
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('.hist-edit-btn') || e.target.closest('.hist-delete-btn')) return;
+    var row = e.target.closest('tr[data-id]');
+    if (!row) return;
+    var id = row.dataset.id;
+    if (id) location.href = '?page=fuel-log-detail&id=' + id;
   });
 
   // ── Toast ─────────────────────────────────────────────────────────────────

@@ -795,6 +795,8 @@
 .mm-cta-btn:hover { background: #FFF8ED; transform: translateY(-2px); }
 
 /* ── Footer ─────────────────────────────────────── */
+main { flex: 1; }
+
 .mm-footer {
   background: #0F0E0C;
   color: #CCC9C2;
