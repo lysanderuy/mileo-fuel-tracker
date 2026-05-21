@@ -88,6 +88,16 @@
           <button type="submit" class="mm-btn mm-btn-primary mm-btn-sm" id="hist-form-submit-btn">Save Entry</button>
         </div>
       </form>
+
+      <!-- Instant stats panel — shown after a successful log-create -->
+      <div class="hist-instant-stats" id="hist-instant-stats" hidden>
+        <div class="hist-stats-header" id="hist-stats-header"></div>
+        <div class="hist-stats-perf" id="hist-stats-perf" hidden></div>
+        <div class="hist-stats-grid" id="hist-stats-grid"></div>
+        <div class="hist-form-actions">
+          <button type="button" class="mm-btn mm-btn-primary mm-btn-sm" id="hist-stats-done-btn">Done</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
