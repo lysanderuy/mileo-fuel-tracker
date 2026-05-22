@@ -102,7 +102,6 @@ CREATE TABLE IF NOT EXISTS `fuel_logs` (
   `is_full_tank` tinyint(1) NOT NULL DEFAULT 1,
   `cost_per_liter` decimal(10,2) GENERATED ALWAYS AS (CASE WHEN `liters_filled` > 0 THEN `fuel_price` / `liters_filled` ELSE NULL END) STORED,
   `cost_per_km` decimal(10,4) GENERATED ALWAYS AS (CASE WHEN `trip_distance` > 0 THEN `fuel_price` / `trip_distance` ELSE NULL END) STORED,
-  `efficiency_l100km` decimal(8,2) GENERATED ALWAYS AS (CASE WHEN `trip_distance` > 0 THEN (`liters_filled` / `trip_distance`) * 100 ELSE NULL END) STORED,
   `notes` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -110,7 +109,6 @@ CREATE TABLE IF NOT EXISTS `fuel_logs` (
   KEY `idx_user_id` (`user_id`),
   KEY `idx_vehicle_id_log_date` (`vehicle_id`, `log_date`),
   KEY `idx_log_date` (`log_date`),
-  KEY `idx_efficiency` (`efficiency_l100km`),
   CONSTRAINT `fuel_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fuel_logs_ibfk_2` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
