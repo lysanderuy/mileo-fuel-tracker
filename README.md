@@ -24,12 +24,14 @@ Mileo helps drivers track fuel without turning it into a chore. It gives you a f
 ### Key Features
 
 - **Quick fuel logging.** Capture a fill-up with minimal friction.
-- **Dashboard overview.** See stats and recent fill-ups at a glance.
+- **Dashboard overview.** See aggregate stats, recent fill-ups, and fleet efficiency at a glance.
+- **Fuel log history.** Browse, search, and filter all fill-ups with computed efficiency metrics.
+- **Fuel log detail.** View per-fill-up breakdown including efficiency compared to the prior fill-up.
 - **Vehicle management.** Add, edit, archive, restore, and delete vehicles.
 - **Archive support.** Keep inactive vehicles out of the way without losing their data.
-- **Room to grow.** The current structure leaves space for the future fuel-log flow and history views.
+- **Default vehicle.** Pin one vehicle so the log form pre-selects it every time.
 
-## Project Structure (Working Copy)
+## Project Structure
 
 ```text
 mileo/
@@ -39,21 +41,32 @@ mileo/
 │   │   │   ├── login.php
 │   │   │   ├── logout.php
 │   │   │   └── signup.php
+│   │   ├── dashboard/
+│   │   │   └── summary.php
+│   │   ├── fuel-logs/
+│   │   │   ├── create.php
+│   │   │   ├── delete.php
+│   │   │   ├── detail.php
+│   │   │   ├── get.php
+│   │   │   ├── list.php
+│   │   │   └── update.php
 │   │   └── vehicles/
 │   │       ├── archive.php
 │   │       ├── create.php
 │   │       ├── delete.php
 │   │       ├── list.php
+│   │       ├── set-default.php
 │   │       └── update.php
 │   ├── includes/
 │   │   ├── components/
-│   │   │   ├── fillups_section.php
-│   │   │   ├── stat_card.php
+│   │   │   ├── fillup_modal.php
 │   │   │   └── vehicles_section.php
 │   │   ├── footer.php
 │   │   └── header.php
 │   └── pages/
 │       ├── dashboard.php
+│       ├── fuel-log-detail.php
+│       ├── history.php
 │       ├── landing.php
 │       ├── login.php
 │       ├── logout.php
@@ -63,7 +76,9 @@ mileo/
 │   └── db.php
 ├── database/
 │   ├── migrations/
-│   │   └── 20260425_add_vehicle_archive.sql
+│   │   ├── add_is_default_to_vehicles.sql
+│   │   ├── add_tank_capacity_odometer_to_vehicles.sql
+│   │   └── drop_efficiency_l100km_column.sql
 │   └── schema.sql
 ├── docs/
 │   ├── design/
@@ -82,10 +97,19 @@ mileo/
 │   │   ├── auth.css
 │   │   ├── dashboard.css
 │   │   ├── design-tokens.css
+│   │   ├── fillup-modal.css
+│   │   ├── fuel-log-detail.css
+│   │   ├── fuel-log.css
+│   │   ├── history.css
 │   │   ├── landing.css
 │   │   └── vehicles.css
 │   ├── index.php
 │   └── js/
+│       ├── dashboard.js
+│       ├── fillup-modal.js
+│       ├── fuel-log-detail.js
+│       ├── fuel-log.js
+│       ├── history.js
 │       ├── landing.js
 │       └── vehicles.js
 └── README.md
