@@ -81,6 +81,23 @@ $stmt->execute();
 $new_id = $stmt->insert_id;
 $stmt->close();
 
+// If this is the user's first vehicle, mark it as the default
+$count_stmt = $conn->prepare("SELECT COUNT(*) FROM vehicles WHERE user_id = ? AND is_archived = 0");
+$count_stmt->bind_param('i', $user_id);
+$count_stmt->execute();
+$count_stmt->bind_result($vehicle_count);
+$count_stmt->fetch();
+$count_stmt->close();
+
+$is_default = false;
+if ($vehicle_count === 1) {
+    $def_stmt = $conn->prepare("UPDATE vehicles SET is_default = 1 WHERE id = ?");
+    $def_stmt->bind_param('i', $new_id);
+    $def_stmt->execute();
+    $def_stmt->close();
+    $is_default = true;
+}
+
 http_response_code(201);
 echo json_encode([
     'vehicle' => [
@@ -95,5 +112,6 @@ echo json_encode([
         'tank_capacity' => $tank_capacity,
         'odometer'      => $odometer,
         'is_archived'   => false,
+        'is_default'    => $is_default,
     ],
 ]);
