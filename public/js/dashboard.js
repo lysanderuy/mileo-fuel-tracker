@@ -26,12 +26,15 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to load dashboard data');
 
-      // If no selection yet, and we have a default vehicle, use it
-      if (vehicleId === null && data.vehicles && data.vehicles.length > 0) {
-        const def = data.vehicles.find(v => v.is_default);
-        if (def) {
+      if (data.vehicles && data.vehicles.length > 0) {
+        const ids = data.vehicles.map(v => String(v.id));
+        if (vehicleId !== null && vehicleId !== '' && !ids.includes(String(vehicleId))) {
+          localStorage.removeItem('mileo_active_vehicle_id');
+          vehicleId = null;
+        }
+        if (vehicleId === null) {
+          const def = data.vehicles.find(v => v.is_default) || data.vehicles[0];
           localStorage.setItem('mileo_active_vehicle_id', def.id);
-          // Re-load to get the specific vehicle stats
           loadDashboard();
           return;
         }
@@ -46,7 +49,10 @@
   }
 
   function renderDashboard(data) {
-    const { stats, vehicles, has_vehicles, fillups } = data;
+    const { stats, vehicles, has_vehicles, fillups, fleet } = data;
+
+    const activeVehicleId = localStorage.getItem('mileo_active_vehicle_id') || '';
+    const isAllVehicles = activeVehicleId === '';
 
     // Topbar action
     const topbarActions = document.getElementById('db-topbar-actions');
@@ -101,36 +107,22 @@
 
     if (stats.total_fillups === 0) {
       statsData.push({ label: 'Total Fill-ups', value: '—', sub_html: 'Start logging fill-ups' });
-      statsData.push({ label: 'Avg Efficiency', value: '—', sub_html: '—' });
+      statsData.push({ label: 'Total Distance', value: '—', sub_html: '—' });
       statsData.push({ label: 'Total Spent', value: '—', sub_html: '—' });
-      statsData.push({ label: 'Avg Cost / km', value: '—', sub_html: '—' });
     } else {
-      const displayFillups = isAllTime ? stats.total_fillups : stats.month_fillups;
-      const displaySpent = isAllTime ? stats.total_spent : stats.month_spent;
-      const displayKml = isAllTime ? stats.avg_kml : stats.month_avg_kml;
-      const displayCostKm = isAllTime ? stats.avg_cost_km : stats.month_avg_cost_km;
-
+      const displayFillups = isAllTime ? stats.total_fillups       : stats.month_fillups;
+      const displaySpent   = isAllTime ? stats.total_spent         : stats.month_spent;
+      const displayDist    = isAllTime ? stats.total_distance      : stats.month_total_distance;
+      statsData.push({ label: 'Total Fill-ups', value: displayFillups, sub_html: subtextSuffix });
       statsData.push({
-        label: 'Total Fill-ups',
-        value: displayFillups,
+        label: 'Total Distance',
+        value: displayDist !== null ? displayDist.toLocaleString('en-PH', { maximumFractionDigits: 0 }) + ' km' : '—',
         sub_html: subtextSuffix
       });
-      statsData.push({
-        label: 'Avg Efficiency',
-        value: displayKml !== null ? displayKml.toFixed(1) + ' km/L' : '—',
-        sub_html: subtextSuffix
-      });
-      statsData.push({
-        label: 'Total Spent',
-        value: fmtPeso(displaySpent),
-        sub_html: subtextSuffix
-      });
-      statsData.push({
-        label: 'Avg Cost / km',
-        value: displayCostKm !== null ? fmtPeso(displayCostKm) : '—',
-        sub_html: subtextSuffix
-      });
+      statsData.push({ label: 'Total Spent', value: fmtPeso(displaySpent), sub_html: subtextSuffix });
     }
+
+    statsContainer.style.gridTemplateColumns = '';
 
     statsData.forEach(s => {
       const div = document.createElement('div');
@@ -142,6 +134,50 @@
       `;
       statsContainer.appendChild(div);
     });
+
+    // Fleet breakdown
+    const fleetSection = document.getElementById('db-fleet-section');
+    if (fleetSection) {
+      const visibleFleet = isAllVehicles
+        ? fleet
+        : fleet.filter(v => String(v.id) === activeVehicleId);
+      if (visibleFleet && visibleFleet.length > 0) {
+        const maxKml = Math.max(...visibleFleet.filter(v => v.avg_kml !== null).map(v => v.avg_kml), 0);
+        const sectionTitle = isAllVehicles ? 'Fleet Overview' : 'Vehicle Overview';
+        const showBar = visibleFleet.length > 1;
+        let rowsHtml = '';
+        visibleFleet.forEach(v => {
+          const barPct = (maxKml > 0 && v.avg_kml !== null) ? Math.round((v.avg_kml / maxKml) * 100) : 0;
+          rowsHtml += `
+            <div class="db-fleet-row">
+              <div class="db-fleet-header">
+                <div class="db-fleet-name">${esc(v.name)}</div>
+                <div class="db-fleet-total">${fmtPeso(v.total_spent)}</div>
+              </div>
+              <div class="db-fleet-metrics">
+                <div class="db-fleet-metric">
+                  <div class="db-fleet-metric-val db-fleet-metric-val--eff">${v.avg_kml !== null ? v.avg_kml.toFixed(1) + ' km/L' : '—'}</div>
+                  <div class="db-fleet-metric-key">Efficiency</div>
+                </div>
+                <div class="db-fleet-metric">
+                  <div class="db-fleet-metric-val db-fleet-metric-val--cost">${v.avg_cost_km !== null ? fmtPeso(v.avg_cost_km) + '/km' : '—'}</div>
+                  <div class="db-fleet-metric-key">Cost per km</div>
+                </div>
+              </div>
+              ${showBar ? `<div class="db-fleet-bar-track"><div class="db-fleet-bar-fill" style="width:${barPct}%"></div></div>` : ''}
+            </div>
+          `;
+        });
+        fleetSection.innerHTML = `
+          <div class="db-section db-fleet-section">
+            <div class="db-section-head"><div class="db-section-title">${sectionTitle}</div></div>
+            ${rowsHtml}
+          </div>
+        `;
+      } else {
+        fleetSection.innerHTML = '';
+      }
+    }
 
     // Fillups
     const fillupsSection = document.getElementById('db-fillups-section');
@@ -170,35 +206,58 @@
     } else {
       let tbodyHtml = '';
       fillups.forEach(row => {
-        let badge = 'yellow', icon = '';
-        if (row.efficiency_kml === null) { 
-          badge = 'yellow'; 
-        } else if (row.efficiency_kml >= 12.5) { 
-          badge = 'green'; 
-          icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>';
-        } else if (row.efficiency_kml >= 10) { 
-          badge = 'yellow'; 
-          icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M5 12h14"/></svg>';
-        } else { 
-          badge = 'red'; 
-          icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>';
+        let effCell;
+        if (!row.is_full_tank) {
+          effCell = '<span class="db-badge hist-badge-partial" title="Partial fill — efficiency not calculated">'
+            + '<svg class="hist-partial-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">'
+            + '<rect x="1" y="8" width="14" height="7" rx="1.5" fill="currentColor" opacity=".35"/>'
+            + '<rect x="1" y="1" width="14" height="7" rx="1.5" fill="currentColor"/>'
+            + '<path d="M13 1v14" stroke="white" stroke-width="1"/>'
+            + '</svg>'
+            + 'Partial</span>';
+        } else if (row.efficiency_kml === null) {
+          effCell = '—';
+        } else {
+          let badge = 'yellow', icon = '';
+          if (row.prior_efficiency_kml !== null) {
+            const pct = ((row.efficiency_kml - row.prior_efficiency_kml) / row.prior_efficiency_kml) * 100;
+            if (pct > 5) {
+              badge = 'green';
+              icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>';
+            } else if (pct < -5) {
+              badge = 'red';
+              icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>';
+            } else {
+              badge = 'yellow';
+              icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M5 12h14"/></svg>';
+            }
+          } else {
+            if (row.efficiency_kml >= 12.5) {
+              badge = 'green';
+              icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>';
+            } else if (row.efficiency_kml >= 10) {
+              badge = 'yellow';
+              icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M5 12h14"/></svg>';
+            } else {
+              badge = 'red';
+              icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>';
+            }
+          }
+          effCell = `<span class="db-badge db-badge-${badge}">${icon}${row.efficiency_kml.toFixed(1)} km/L</span>`;
         }
 
         tbodyHtml += `
           <tr>
-            <td>${esc(fmtDate(row.date))}</td>
             <td>
-              <div>${esc(row.station)}</div>
-              ${row.notes ? `<div class="db-row-note">${esc(row.notes)}</div>` : ''}
+              <div>${esc(fmtDate(row.date))}</div>
+              ${!isAllVehicles && row.notes ? `<div class="db-row-note">${esc(row.notes)}</div>` : ''}
             </td>
-            <td>${row.liters_filled.toFixed(1)} L</td>
+            ${isAllVehicles ? `<td><div>${esc(row.station)}</div>${row.notes ? `<div class="db-row-note">${esc(row.notes)}</div>` : ''}</td>` : ''}
+            <td>${row.trip_distance !== null ? row.trip_distance.toFixed(1) + ' km' : '—'}</td>
+            <td>${row.liters_filled.toFixed(2)} L</td>
             <td>${fmtPeso(row.cost_per_liter)}</td>
             <td>${fmtPeso(row.fuel_price)}</td>
-            <td>
-              ${row.efficiency_kml !== null 
-                ? `<span class="db-badge db-badge-${badge}">${icon}${row.efficiency_kml.toFixed(1)} km/L</span>` 
-                : '—'}
-            </td>
+            <td>${effCell}</td>
           </tr>
         `;
       });
@@ -208,7 +267,8 @@
           <thead>
             <tr>
               <th>Date</th>
-              <th>Vehicle</th>
+              ${isAllVehicles ? '<th>Vehicle</th>' : ''}
+              <th>Distance</th>
               <th>Liters</th>
               <th>Price / L</th>
               <th>Total</th>

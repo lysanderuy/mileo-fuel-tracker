@@ -63,29 +63,45 @@
     } else if (log.efficiency_kml !== null) {
       const kml = log.efficiency_kml;
       let cls = 'yellow', icon = '';
-      if (kml >= 12.5) {
-        cls = 'green';
-        icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>';
-      } else if (kml >= 10) {
-        cls = 'yellow';
-        icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M5 12h14"/></svg>';
+
+      // Compare to prior fill-up of same vehicle
+      if (log.prior_efficiency_kml !== null) {
+        const pct = ((kml - log.prior_efficiency_kml) / log.prior_efficiency_kml) * 100;
+        if (pct > 5) {
+          cls = 'green';
+          icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>';
+        } else if (pct < -5) {
+          cls = 'red';
+          icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>';
+        } else {
+          cls = 'yellow';
+          icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M5 12h14"/></svg>';
+        }
       } else {
-        cls = 'red';
-        icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>';
+        // No prior fill-up, use absolute thresholds
+        if (kml >= 12.5) {
+          cls = 'green';
+          icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>';
+        } else if (kml >= 10) {
+          cls = 'yellow';
+          icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M5 12h14"/></svg>';
+        } else {
+          cls = 'red';
+          icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>';
+        }
       }
       effHtml = '<span class="hist-badge hist-badge-' + cls + '">' + icon + kml.toFixed(1) + ' km/L</span>';
     } else {
       effHtml = '<span class="hist-eff-na">—</span>';
     }
 
-    var total = log.fuel_price * log.liters_filled;
-
     tr.innerHTML =
       '<td class="hist-td hist-td-date">'    + esc(fmtDate(log.log_date))              + '</td>' +
       '<td class="hist-td">'                 + esc(log.vehicle_name)                   + '</td>' +
+      '<td class="hist-td hist-td-dist">'   + (log.trip_distance !== null ? log.trip_distance.toFixed(1) + ' km' : '—') + '</td>' +
       '<td class="hist-td hist-td-vol">'     + esc(log.liters_filled.toFixed(2) + ' L') + '</td>' +
-      '<td class="hist-td hist-td-price">'   + esc(fmtPeso(log.fuel_price))             + '</td>' +
-      '<td class="hist-td hist-td-cost">'    + esc(fmtPeso(total))                      + '</td>' +
+      '<td class="hist-td hist-td-price">'   + esc(log.cost_per_liter !== null ? fmtPeso(log.cost_per_liter) : '—') + '</td>' +
+      '<td class="hist-td hist-td-cost">'    + esc(fmtPeso(log.fuel_price))             + '</td>' +
       '<td class="hist-td hist-td-eff">'     + effHtml                                  + '</td>' +
       '<td class="hist-td hist-td-actions">' +
         '<button class="hist-edit-btn" data-id="' + log.id + '" aria-label="Edit fill-up">' + EDIT_ICON + '</button>' +
@@ -133,6 +149,7 @@
       '<thead><tr>' +
         '<th class="hist-th">Date</th>' +
         '<th class="hist-th">Vehicle</th>' +
+        '<th class="hist-th">Distance</th>' +
         '<th class="hist-th">Liters</th>' +
         '<th class="hist-th">Price / L</th>' +
         '<th class="hist-th">Total</th>' +
@@ -344,9 +361,14 @@
       }
 
       let initialVehicleId = localStorage.getItem('mileo_active_vehicle_id');
-      if (initialVehicleId === null && list.length > 0) {
-        const def = list.find(v => v.is_default);
-        if (def) {
+      if (list.length > 0) {
+        const ids = list.map(v => String(v.id));
+        if (initialVehicleId !== null && initialVehicleId !== '' && !ids.includes(initialVehicleId)) {
+          localStorage.removeItem('mileo_active_vehicle_id');
+          initialVehicleId = null;
+        }
+        if (initialVehicleId === null) {
+          const def = list.find(v => v.is_default) || list[0];
           initialVehicleId = String(def.id);
           localStorage.setItem('mileo_active_vehicle_id', initialVehicleId);
         }

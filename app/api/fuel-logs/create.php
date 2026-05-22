@@ -151,6 +151,12 @@ $stmt->execute();
 $new_id = (int)$stmt->insert_id;
 $stmt->close();
 
+// Update vehicle's odometer to latest
+$stmt = $conn->prepare("UPDATE vehicles SET odometer = ? WHERE id = ? AND user_id = ?");
+$stmt->bind_param('iii', $odometer, $vehicle_id, $user_id);
+$stmt->execute();
+$stmt->close();
+
 http_response_code(201);
 echo json_encode([
     'fuel_log' => [

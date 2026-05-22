@@ -25,8 +25,9 @@ include_once __DIR__ . '/../includes/header.php';
       <div class="db-card"><div class="hist-skeleton-row"></div></div>
       <div class="db-card"><div class="hist-skeleton-row"></div></div>
       <div class="db-card"><div class="hist-skeleton-row"></div></div>
-      <div class="db-card"><div class="hist-skeleton-row"></div></div>
     </div>
+
+    <div id="db-fleet-section"></div>
 
     <!-- Skeleton loader for fillups -->
     <div class="db-section" id="db-fillups-section">
