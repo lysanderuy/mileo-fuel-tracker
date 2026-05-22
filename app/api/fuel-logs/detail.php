@@ -37,7 +37,6 @@ if ($id <= 0) {
 $stmt = $conn->prepare("
     SELECT fl.id, fl.vehicle_id, fl.log_date, fl.odometer, fl.trip_distance,
            fl.liters_filled, fl.fuel_price, fl.is_full_tank, fl.notes,
-           CASE WHEN fl.efficiency_l100km > 0 THEN ROUND(100.0 / fl.efficiency_l100km, 2) END AS efficiency_kml,
            fl.cost_per_liter,
            fl.cost_per_km,
            v.name AS vehicle_name
@@ -73,20 +72,75 @@ $row = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 $fillup_number = (int)$row['cnt'];
 
+$efficiency_kml = null;
+if ((bool)$log['is_full_tank']) {
+    $eff_row = $conn->query("
+        SELECT SUM(fl2.liters_filled) / NULLIF({$log['odometer']} - pf.odometer, 0) * 100 AS efficiency_l100km
+        FROM fuel_logs fl2
+        JOIN (
+            SELECT id, odometer, log_date
+            FROM fuel_logs
+            WHERE vehicle_id = {$vehicle_id} AND user_id = {$user_id}
+              AND is_full_tank = 1
+              AND (log_date < '{$log_date}' OR (log_date = '{$log_date}' AND id < {$log_id}))
+            ORDER BY log_date DESC, id DESC LIMIT 1
+        ) pf ON (fl2.log_date > pf.log_date OR (fl2.log_date = pf.log_date AND fl2.id > pf.id))
+        WHERE fl2.vehicle_id = {$vehicle_id} AND fl2.user_id = {$user_id}
+          AND (fl2.log_date < '{$log_date}' OR (fl2.log_date = '{$log_date}' AND fl2.id <= {$log_id}))
+    ")->fetch_assoc();
+    $l100 = $eff_row['efficiency_l100km'] ?? null;
+    if ($l100 !== null && $l100 > 0) {
+        $efficiency_kml = 100.0 / (float)$l100;
+    }
+}
+
 $stmt = $conn->prepare("
-    SELECT id, log_date,
-           CASE WHEN efficiency_l100km > 0 THEN ROUND(100.0 / efficiency_l100km, 2) END AS efficiency_kml,
-           cost_per_km
+    SELECT id, log_date, odometer, cost_per_km, is_full_tank
     FROM fuel_logs
     WHERE user_id = ? AND vehicle_id = ?
+      AND is_full_tank = 1
       AND (log_date < ? OR (log_date = ? AND id < ?))
     ORDER BY log_date DESC, id DESC
     LIMIT 1
 ");
 $stmt->bind_param('iissi', $user_id, $vehicle_id, $log_date, $log_date, $log_id);
 $stmt->execute();
-$prior = $stmt->get_result()->fetch_assoc();
+$prior_row = $stmt->get_result()->fetch_assoc();
 $stmt->close();
+
+$prior = null;
+if ($prior_row) {
+    $p_id  = (int)$prior_row['id'];
+    $p_date = $prior_row['log_date'];
+    $p_odometer = (int)$prior_row['odometer'];
+
+    $prior_l100 = null;
+    if ((bool)$prior_row['is_full_tank']) {
+        $p_eff_row = $conn->query("
+            SELECT SUM(fl2.liters_filled) / NULLIF({$p_odometer} - pf.odometer, 0) * 100 AS efficiency_l100km
+            FROM fuel_logs fl2
+            JOIN (
+                SELECT id, odometer, log_date
+                FROM fuel_logs
+                WHERE vehicle_id = {$vehicle_id} AND user_id = {$user_id}
+                  AND is_full_tank = 1
+                  AND (log_date < '{$p_date}' OR (log_date = '{$p_date}' AND id < {$p_id}))
+                ORDER BY log_date DESC, id DESC LIMIT 1
+            ) pf ON (fl2.log_date > pf.log_date OR (fl2.log_date = pf.log_date AND fl2.id > pf.id))
+            WHERE fl2.vehicle_id = {$vehicle_id} AND fl2.user_id = {$user_id}
+              AND (fl2.log_date < '{$p_date}' OR (fl2.log_date = '{$p_date}' AND fl2.id <= {$p_id}))
+        ")->fetch_assoc();
+        $prior_l100 = $p_eff_row['efficiency_l100km'] ?? null;
+    }
+
+    $prior_eff = ($prior_l100 !== null && $prior_l100 > 0) ? 100.0 / (float)$prior_l100 : null;
+    $prior = [
+        'id'             => $p_id,
+        'log_date'       => $p_date,
+        'efficiency_kml' => $prior_eff,
+        'cost_per_km'    => $prior_row['cost_per_km'] !== null ? (float)$prior_row['cost_per_km'] : null,
+    ];
+}
 
 echo json_encode([
     'log' => [
@@ -100,15 +154,10 @@ echo json_encode([
         'fuel_price'    => (float)$log['fuel_price'],
         'is_full_tank'  => (bool)$log['is_full_tank'],
         'notes'         => $log['notes'],
-        'efficiency_kml'  => $log['efficiency_kml'] !== null ? (float)$log['efficiency_kml'] : null,
+        'efficiency_kml'  => $efficiency_kml,
         'cost_per_liter'  => $log['cost_per_liter'] !== null ? (float)$log['cost_per_liter'] : null,
         'cost_per_km'     => $log['cost_per_km'] !== null ? (float)$log['cost_per_km'] : null,
     ],
-    'prior' => $prior ? [
-        'id'             => (int)$prior['id'],
-        'log_date'       => $prior['log_date'],
-        'efficiency_kml' => $prior['efficiency_kml'] !== null ? (float)$prior['efficiency_kml'] : null,
-        'cost_per_km'    => $prior['cost_per_km'] !== null ? (float)$prior['cost_per_km'] : null,
-    ] : null,
+    'prior'         => $prior,
     'fillup_number' => $fillup_number,
 ]);
