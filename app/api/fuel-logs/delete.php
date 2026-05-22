@@ -111,5 +111,17 @@ if ($next) {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Update vehicle's odometer to the previous log's odometer, or NULL if no prior logs
+$new_vehicle_odometer = $prev ? (int)$prev['odometer'] : null;
+if ($new_vehicle_odometer !== null) {
+    $stmt = $conn->prepare("UPDATE vehicles SET odometer = ? WHERE id = ? AND user_id = ?");
+    $stmt->bind_param('iii', $new_vehicle_odometer, $vehicle_id, $user_id);
+} else {
+    $stmt = $conn->prepare("UPDATE vehicles SET odometer = NULL WHERE id = ? AND user_id = ?");
+    $stmt->bind_param('ii', $vehicle_id, $user_id);
+}
+$stmt->execute();
+$stmt->close();
+
 http_response_code(200);
 echo json_encode(['success' => true]);

@@ -202,6 +202,24 @@ $stmt->bind_param(
 $stmt->execute();
 $stmt->close();
 
+// Update vehicle's odometer if this is the latest log
+$stmt = $conn->prepare("
+    SELECT COUNT(*) as cnt FROM fuel_logs
+    WHERE user_id = ? AND vehicle_id = ?
+      AND (log_date > ? OR (log_date = ? AND id > ?))
+");
+$stmt->bind_param('iissi', $user_id, $vehicle_id, $log_date, $log_date, $id);
+$stmt->execute();
+$is_latest = $stmt->get_result()->fetch_assoc()['cnt'] == 0;
+$stmt->close();
+
+if ($is_latest) {
+    $stmt = $conn->prepare("UPDATE vehicles SET odometer = ? WHERE id = ? AND user_id = ?");
+    $stmt->bind_param('iii', $odometer, $vehicle_id, $user_id);
+    $stmt->execute();
+    $stmt->close();
+}
+
 // ── Downstream Recomputation ─────────────────────────────────────────────────
 // After the update, the log is now at its new position.
 // 1. new_next's trip_distance = new_next.odometer - new_odometer
