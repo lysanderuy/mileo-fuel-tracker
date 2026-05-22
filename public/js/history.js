@@ -98,6 +98,7 @@
     tr.innerHTML =
       '<td class="hist-td hist-td-date">'    + esc(fmtDate(log.log_date))              + '</td>' +
       '<td class="hist-td">'                 + esc(log.vehicle_name)                   + '</td>' +
+      '<td class="hist-td hist-td-dist">'   + (log.trip_distance !== null ? log.trip_distance.toFixed(1) + ' km' : '—') + '</td>' +
       '<td class="hist-td hist-td-vol">'     + esc(log.liters_filled.toFixed(2) + ' L') + '</td>' +
       '<td class="hist-td hist-td-price">'   + esc(log.cost_per_liter !== null ? fmtPeso(log.cost_per_liter) : '—') + '</td>' +
       '<td class="hist-td hist-td-cost">'    + esc(fmtPeso(log.fuel_price))             + '</td>' +
@@ -148,6 +149,7 @@
       '<thead><tr>' +
         '<th class="hist-th">Date</th>' +
         '<th class="hist-th">Vehicle</th>' +
+        '<th class="hist-th">Distance</th>' +
         '<th class="hist-th">Liters</th>' +
         '<th class="hist-th">Price / L</th>' +
         '<th class="hist-th">Total</th>' +
