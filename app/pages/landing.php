@@ -51,7 +51,7 @@
           </div>
           <div class="mm-receipt-stat is-hero">
             <div class="mm-receipt-stat-value">12.7</div>
-            <div class="mm-receipt-stat-label">km / L</div>
+            <div class="mm-receipt-stat-label">Efficiency</div>
           </div>
           <div class="mm-receipt-stat">
             <div class="mm-receipt-stat-value">₱4.76</div>
@@ -76,7 +76,7 @@
         Product tour
       </div>
       <h2 class="mm-ft-heading">
-        Six views. One job. <span class="mm-ft-amber">Done well.</span>
+        Five views. One job. <span class="mm-ft-amber">Done well.</span>
       </h2>
     </div>
 
