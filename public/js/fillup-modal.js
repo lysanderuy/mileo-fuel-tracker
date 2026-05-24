@@ -1,6 +1,9 @@
 (function () {
   'use strict';
 
+  var showToast = window.MileoUtils.showToast;
+  var fmtPeso   = window.MileoUtils.fmtPeso;
+
   let vehicles      = new Map();
   let isInitialized = false;
 
@@ -39,22 +42,6 @@
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Failed to load log.');
     return data;
-  }
-
-  // ── Toast ──────────────────────────────────────────────────────────────────
-
-  function showToast(message, type) {
-    const root = document.getElementById('mm-toast-root');
-    if (!root) return;
-    const toast = document.createElement('div');
-    toast.className = 'ql-toast' + (type ? ' ' + type : '');
-    toast.textContent = message;
-    root.appendChild(toast);
-    setTimeout(() => toast.remove(), 5500);
-  }
-
-  function fmtPeso(n) {
-    return '₱' + Number(n).toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   }
 
   // ── Odometer Helpers ───────────────────────────────────────────────────────
@@ -294,9 +281,10 @@
       payload.manual_trip_override = false;
     }
 
+    let prevText;
     if (submitBtn) {
       submitBtn.disabled    = true;
-      var prevText          = submitBtn.textContent;
+      prevText              = submitBtn.textContent;
       submitBtn.textContent = isEditMode ? 'Saving…' : 'Saving...';
     }
 
@@ -353,13 +341,18 @@
     const tripKm    = log.trip_distance;
     const isFullT   = log.is_full_tank;
     const costPerL  = liters > 0 ? totalCost / liters : null;
-    const effKml    = (isFullT && tripKm > 0 && liters > 0) ? tripKm / liters : null;
-    const costPerKm = tripKm > 0 ? totalCost / tripKm : null;
+    const effKml    = log.efficiency_kml !== undefined
+      ? log.efficiency_kml
+      : (isFullT && tripKm > 0 && liters > 0 ? tripKm / liters : null);
+    const costPerKm = (tripKm !== null && tripKm > 0) ? totalCost / tripKm : null;
 
-    const stats     = summary && summary.stats ? summary.stats : null;
-    const avgKml    = stats ? stats.avg_kml     : null;
-    const avgCostKm = stats ? stats.avg_cost_km : null;
-    const totalLogs = stats ? stats.total_fillups : null;
+    const stats      = summary && summary.stats ? summary.stats : null;
+    const totalLogs  = stats ? stats.total_fillups : null;
+    const fleetEntry = summary && summary.fleet
+      ? summary.fleet.find(function (v) { return String(v.id) === String(payload.vehicle_id); })
+      : null;
+    const avgKml    = fleetEntry ? fleetEntry.avg_kml     : null;
+    const avgCostKm = fleetEntry ? fleetEntry.avg_cost_km : null;
 
     renderStatsHeader(payload.log_date, totalLogs);
     renderStatsPerf(effKml, avgKml);
@@ -425,8 +418,8 @@
 
     const cards = [];
     cards.push({ label: 'Liters Filled', value: liters.toFixed(2) + ' L' });
-    cards.push({ label: 'Total Cost',    value: fmtPeso(totalCost) });
-    cards.push({ label: 'Price / Liter', value: costPerL !== null ? fmtPeso(costPerL) : '—' });
+    cards.push({ label: 'Total Cost',    value: fmtPeso(totalCost, 0) });
+    cards.push({ label: 'Price / Liter', value: costPerL !== null ? fmtPeso(costPerL, 0) : '—' });
 
     if (tripKm > 0) {
       cards.push({ label: 'Trip Distance', value: tripKm.toFixed(1) + ' km' });
@@ -442,7 +435,7 @@
         const cls   = pct <= 0 ? 'hist-delta--good' : 'hist-delta--bad';
         deltaHtml = '<div class="hist-stat-delta ' + cls + '">' + arrow + ' ' + sign + pct.toFixed(1) + '% vs avg</div>';
       }
-      cards.push({ label: 'Cost / km', value: fmtPeso(costPerKm), delta: deltaHtml });
+      cards.push({ label: 'Cost / km', value: fmtPeso(costPerKm, 0), delta: deltaHtml });
     }
 
     // ≤3 cards → 3-col single row; 4+ cards → 2-col

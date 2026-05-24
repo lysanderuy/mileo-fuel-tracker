@@ -1,9 +1,11 @@
 (function () {
   'use strict';
 
+  var esc       = window.MileoUtils.esc;
+  var showToast = window.MileoUtils.showToast;
+
   const FUEL_TYPES = ['Gasoline', 'Diesel', 'Electric', 'Hybrid'];
 
-  /** @type {{ id: number, name: string, make: string|null, model: string|null, year: number|null, fuel_type: string|null, color: string|null, plate_number: string|null, tank_capacity: number|null, odometer: number|null, is_archived: boolean }[]} */
   let vehicles = [];
   let activeTab = 'active';
 
@@ -19,17 +21,6 @@
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Request failed');
     return data;
-  }
-
-  /* ── Toast ──────────────────────────────── */
-
-  function showToast(message, type = '') {
-    const root = document.getElementById('mm-toast-root');
-    const el = document.createElement('div');
-    el.className = 'veh-toast' + (type ? ' ' + type : '');
-    el.textContent = message;
-    root.appendChild(el);
-    setTimeout(() => el.remove(), 5500);
   }
 
   /* ── Render helpers ─────────────────────── */
@@ -89,20 +80,11 @@
       </div>
     `;
 
-    row.querySelector('[data-action]') && row.querySelectorAll('[data-action]').forEach(btn => {
+    row.querySelectorAll('[data-action]').forEach(btn => {
       btn.addEventListener('click', () => handleRowAction(v.id, btn.dataset.action));
     });
 
     return row;
-  }
-
-  function esc(str) {
-    if (!str) return '';
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
   }
 
   function renderLists() {
@@ -115,18 +97,18 @@
     const countEl = document.getElementById('veh-active-count');
     if (countEl) countEl.textContent = String(active.length);
 
-    const archivedCount   = document.getElementById('veh-archived-count');
+    const archivedCount = document.getElementById('veh-archived-count');
     if (archivedCount) archivedCount.textContent = String(archived.length);
     updateTabViews();
   }
 
   function updateTabViews() {
-    const activePanel = document.getElementById('veh-active-panel');
-    const archivedPanel = document.getElementById('veh-archived-panel');
-    const activeTabBtn = document.getElementById('veh-tab-active');
+    const activePanel    = document.getElementById('veh-active-panel');
+    const archivedPanel  = document.getElementById('veh-archived-panel');
+    const activeTabBtn   = document.getElementById('veh-tab-active');
     const archivedTabBtn = document.getElementById('veh-tab-archived');
 
-    if (activePanel) activePanel.style.display = activeTab === 'active' ? '' : 'none';
+    if (activePanel)   activePanel.style.display   = activeTab === 'active'   ? '' : 'none';
     if (archivedPanel) archivedPanel.style.display = activeTab === 'archived' ? '' : 'none';
 
     if (activeTabBtn) {
@@ -183,9 +165,7 @@
   async function doSetDefault(id) {
     try {
       await api('set-default', { id });
-      vehicles.forEach(v => {
-        v.is_default = (v.id === id);
-      });
+      vehicles.forEach(v => { v.is_default = (v.id === id); });
       renderLists();
       showToast('Default vehicle updated.', 'success');
     } catch (err) {
@@ -221,7 +201,7 @@
         </div>
         <div class="veh-confirm-actions">
           <button class="mm-btn mm-btn-secondary mm-btn-sm" id="veh-cancel-del">Cancel</button>
-          <button class="mm-btn mm-btn-sm" id="veh-confirm-del" style="background:#D93520;color:#fff;border-color:#D93520">Delete</button>
+          <button class="mm-btn mm-btn-danger mm-btn-sm" id="veh-confirm-del">Delete</button>
         </div>
       </div>
     `;
@@ -311,7 +291,7 @@
               <input class="veh-input" id="veh-f-odometer" type="number" placeholder="12500" min="0" max="9999999" value="${v && v.odometer != null ? v.odometer : ''}">
             </div>
           </div>
-          <div id="veh-modal-error" style="display:none;color:#D93520;font-size:0.8125rem;font-weight:500;padding:8px 12px;background:#FDECEA;border-radius:8px;"></div>
+          <div id="veh-modal-error" style="display:none;"></div>
         </div>
         <div class="veh-modal-footer">
           <button class="mm-btn mm-btn-secondary mm-btn-sm" id="veh-modal-cancel">Cancel</button>
@@ -322,9 +302,9 @@
 
     document.getElementById('mm-modal-root').appendChild(overlay);
 
-    const nameInput  = overlay.querySelector('#veh-f-name');
-    const errorBox   = overlay.querySelector('#veh-modal-error');
-    const saveBtn    = overlay.querySelector('#veh-modal-save');
+    const nameInput = overlay.querySelector('#veh-f-name');
+    const errorBox  = overlay.querySelector('#veh-modal-error');
+    const saveBtn   = overlay.querySelector('#veh-modal-save');
 
     function closeModal() { overlay.remove(); }
 
@@ -406,19 +386,13 @@
     if (addBtn) {
       addBtn.addEventListener('click', () => openModal());
     }
-    const activeTabBtn = document.getElementById('veh-tab-active');
+    const activeTabBtn   = document.getElementById('veh-tab-active');
     const archivedTabBtn = document.getElementById('veh-tab-archived');
     if (activeTabBtn) {
-      activeTabBtn.addEventListener('click', () => {
-        activeTab = 'active';
-        updateTabViews();
-      });
+      activeTabBtn.addEventListener('click', () => { activeTab = 'active'; updateTabViews(); });
     }
     if (archivedTabBtn) {
-      archivedTabBtn.addEventListener('click', () => {
-        activeTab = 'archived';
-        updateTabViews();
-      });
+      archivedTabBtn.addEventListener('click', () => { activeTab = 'archived'; updateTabViews(); });
     }
     updateTabViews();
     if (document.getElementById('veh-active-list')) {

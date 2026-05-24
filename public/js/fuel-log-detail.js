@@ -1,23 +1,10 @@
 (function () {
   'use strict';
 
-  function esc(str) {
-    if (str == null) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  function fmtDate(dateStr) {
-    var d = new Date(dateStr + 'T00:00:00');
-    return d.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
-  }
-
-  function fmtPeso(n) {
-    return '&#8369;' + Number(n).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
+  var esc       = window.MileoUtils.esc;
+  var fmtDate   = window.MileoUtils.fmtDate;
+  var fmtPeso   = window.MileoUtils.fmtPeso;
+  var showToast = window.MileoUtils.showToast;
 
   function effBadgeClass(kml, priorKml) {
     if (priorKml != null) {
@@ -97,12 +84,12 @@
 
     // Efficiency hero card with gauge
     if (!log.is_full_tank) {
-      var INFO_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;margin-right:8px;margin-top:1px;opacity:0.7;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>';
-      html += '<div class="fld-partial-info" style="display:flex;align-items:flex-start;background:var(--color-surface-2,#f5f5f5);border:1px solid var(--color-border,#e0e0e0);border-radius:10px;padding:14px 16px;margin-bottom:16px;color:var(--color-text-muted,#6b7280);">' +
+      var INFO_ICON = '<svg class="fld-partial-info-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>';
+      html += '<div class="fld-partial-info">' +
         INFO_ICON +
         '<div>' +
-          '<div class="fld-partial-info-title" style="font-weight:600;font-size:0.875rem;margin-bottom:4px;color:var(--color-text,#374151);">Efficiency not calculated</div>' +
-          '<div class="fld-partial-info-body" style="font-size:0.8125rem;line-height:1.5;">Partial fills are excluded to keep your averages accurate. The liters from this fill-up will be included in the next full fill-up\'s efficiency.</div>' +
+          '<div class="fld-partial-info-title">Efficiency not calculated</div>' +
+          '<div class="fld-partial-info-body">Partial fills are excluded to keep your averages accurate. The liters from this fill-up will be included in the next full fill-up\'s efficiency.</div>' +
         '</div>' +
       '</div>';
     } else if (log.efficiency_kml !== null) {
@@ -207,16 +194,6 @@
     html += '</div>'; // close .fld-inner
 
     return html;
-  }
-
-  function showToast(message, type) {
-    var root = document.getElementById('mm-toast-root');
-    if (!root) return;
-    var toast = document.createElement('div');
-    toast.className = 'ql-toast' + (type ? ' ' + type : '');
-    toast.textContent = message;
-    root.appendChild(toast);
-    setTimeout(function () { toast.remove(); }, 5500);
   }
 
   var currentLogId = null;

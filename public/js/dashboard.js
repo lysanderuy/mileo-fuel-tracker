@@ -1,28 +1,19 @@
 (function () {
   'use strict';
 
-  function fmtPeso(n) {
-    return '₱' + n.toLocaleString('en-PH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-  }
-
-  function fmtDate(dateStr) {
-    const d = new Date(dateStr + 'T00:00:00');
-    return d.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
-  }
-
-  function esc(str) {
-    if (str == null) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
+  var esc          = window.MileoUtils.esc;
+  var fmtDate      = window.MileoUtils.fmtDate;
+  var fmtPeso      = window.MileoUtils.fmtPeso;
+  var effBadgeInfo = window.MileoUtils.effBadgeInfo;
 
   async function loadDashboard() {
     try {
       let vehicleId = localStorage.getItem('mileo_active_vehicle_id');
-      const res = await fetch(`?api=dashboard/summary${vehicleId ? '&vehicle_id=' + vehicleId : ''}`);
+      const timeRange = localStorage.getItem('mileo_dashboard_time_range') || 'all_time';
+      const params = new URLSearchParams();
+      if (vehicleId) params.set('vehicle_id', vehicleId);
+      params.set('time_range', timeRange);
+      const res = await fetch(`?api=dashboard/summary&${params.toString()}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to load dashboard data');
 
@@ -32,19 +23,13 @@
           localStorage.removeItem('mileo_active_vehicle_id');
           vehicleId = null;
         }
-        if (vehicleId === null) {
-          const def = data.vehicles.find(v => v.is_default) || data.vehicles[0];
-          localStorage.setItem('mileo_active_vehicle_id', def.id);
-          loadDashboard();
-          return;
-        }
       }
 
       renderDashboard(data);
     } catch (err) {
-      console.error(err);
+      console.error('Dashboard error:', err);
       const stack = document.getElementById('db-overview-stack');
-      if (stack) stack.innerHTML = '<div class="hist-error">Failed to load dashboard data.</div>';
+      if (stack) stack.innerHTML = '<div class="hist-error">Failed to load dashboard data: ' + esc(err.message) + '</div>';
     }
   }
 
@@ -54,7 +39,6 @@
     const activeVehicleId = localStorage.getItem('mileo_active_vehicle_id') || '';
     const isAllVehicles = activeVehicleId === '';
 
-    // Topbar action
     const topbarActions = document.getElementById('db-topbar-actions');
     if (has_vehicles) {
       topbarActions.style.display = 'flex';
@@ -73,7 +57,6 @@
         });
         switcherContainer.innerHTML = `<select class="db-switcher" id="db-vehicle-switcher">${options}</select>`;
 
-        // Initialize custom popover
         const selectEl = document.getElementById('db-vehicle-switcher');
         if (selectEl && window.Popover) {
           window.Popover.init(selectEl, {
@@ -104,19 +87,18 @@
         </select>
       `;
 
-      // Initialize custom popover
       const selectEl = document.getElementById('db-time-switcher');
       if (selectEl && window.Popover) {
         window.Popover.init(selectEl, {
           onChange: (value) => {
             localStorage.setItem('mileo_dashboard_time_range', value);
-            renderDashboard(data);
+            loadDashboard();
           }
         });
       } else if (selectEl) {
         selectEl.addEventListener('change', (e) => {
           localStorage.setItem('mileo_dashboard_time_range', e.target.value);
-          renderDashboard(data);
+          loadDashboard();
         });
       }
     }
@@ -128,7 +110,8 @@
     const isAllTime = currentTimeRange === 'all_time';
     const subtextSuffix = isAllTime ? 'All time' : 'This month';
 
-    if (stats.total_fillups === 0) {
+    const periodEmpty = isAllTime ? stats.total_fillups === 0 : stats.month_fillups === 0;
+    if (periodEmpty) {
       statsData.push({ label: 'Total Fill-ups', value: '—', sub_html: 'Start logging fill-ups' });
       statsData.push({ label: 'Total Distance', value: '—', sub_html: '—' });
       statsData.push({ label: 'Total Spent', value: '—', sub_html: '—' });
@@ -142,7 +125,7 @@
         value: displayDist !== null ? displayDist.toLocaleString('en-PH', { maximumFractionDigits: 0 }) + ' km' : '—',
         sub_html: subtextSuffix
       });
-      statsData.push({ label: 'Total Spent', value: fmtPeso(displaySpent), sub_html: subtextSuffix });
+      statsData.push({ label: 'Total Spent', value: fmtPeso(displaySpent, 0), sub_html: subtextSuffix });
     }
 
     statsContainer.style.gridTemplateColumns = '';
@@ -175,7 +158,7 @@
             <div class="db-fleet-row">
               <div class="db-fleet-header">
                 <div class="db-fleet-name">${esc(v.name)}</div>
-                <div class="db-fleet-total">${fmtPeso(v.total_spent)}</div>
+                <div class="db-fleet-total">${fmtPeso(v.total_spent, 0)}</div>
               </div>
               <div class="db-fleet-metrics">
                 <div class="db-fleet-metric">
@@ -241,32 +224,8 @@
         } else if (row.efficiency_kml === null) {
           effCell = '—';
         } else {
-          let badge = 'yellow', icon = '';
-          if (row.prior_efficiency_kml !== null) {
-            const pct = ((row.efficiency_kml - row.prior_efficiency_kml) / row.prior_efficiency_kml) * 100;
-            if (pct > 5) {
-              badge = 'green';
-              icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>';
-            } else if (pct < -5) {
-              badge = 'red';
-              icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>';
-            } else {
-              badge = 'yellow';
-              icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M5 12h14"/></svg>';
-            }
-          } else {
-            if (row.efficiency_kml >= 12.5) {
-              badge = 'green';
-              icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>';
-            } else if (row.efficiency_kml >= 10) {
-              badge = 'yellow';
-              icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M5 12h14"/></svg>';
-            } else {
-              badge = 'red';
-              icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;vertical-align:middle;"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>';
-            }
-          }
-          effCell = `<span class="db-badge db-badge-${badge}">${icon}${row.efficiency_kml.toFixed(1)} km/L</span>`;
+          const info = effBadgeInfo(row.efficiency_kml, row.prior_efficiency_kml);
+          effCell = `<span class="db-badge db-badge-${info.cls}">${info.icon}${row.efficiency_kml.toFixed(1)} km/L</span>`;
         }
 
         tbodyHtml += `
@@ -275,11 +234,11 @@
               <div>${esc(fmtDate(row.date))}</div>
               ${!isAllVehicles && row.notes ? `<div class="db-row-note">${esc(row.notes)}</div>` : ''}
             </td>
-            ${isAllVehicles ? `<td><div>${esc(row.station)}</div>${row.notes ? `<div class="db-row-note">${esc(row.notes)}</div>` : ''}</td>` : ''}
+            ${isAllVehicles ? `<td><div>${esc(row.vehicle_name)}</div>${row.notes ? `<div class="db-row-note">${esc(row.notes)}</div>` : ''}</td>` : ''}
             <td>${row.trip_distance !== null ? row.trip_distance.toFixed(1) + ' km' : '—'}</td>
             <td>${row.liters_filled.toFixed(2)} L</td>
             <td>${fmtPeso(row.cost_per_liter)}</td>
-            <td>${fmtPeso(row.fuel_price)}</td>
+            <td>${fmtPeso(row.fuel_price, 0)}</td>
             <td>${effCell}</td>
           </tr>
         `;

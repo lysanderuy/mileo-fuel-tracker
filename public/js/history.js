@@ -1,11 +1,16 @@
 (function () {
   'use strict';
 
+  var esc          = window.MileoUtils.esc;
+  var fmtDate      = window.MileoUtils.fmtDate;
+  var fmtPeso      = window.MileoUtils.fmtPeso;
+  var showToast    = window.MileoUtils.showToast;
+  var effBadgeInfo = window.MileoUtils.effBadgeInfo;
+
   let currentVehicleId = null;
   let currentPage      = 1;
   let isLoading        = false;
   let hasMore          = false;
-  let vehicles = new Map();
 
   async function deleteFuelLog(logId) {
     const res = await fetch('?api=fuel-logs/delete', {
@@ -25,24 +30,6 @@
     return data;
   }
 
-  function esc(str) {
-    if (str == null) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  function fmtDate(dateStr) {
-    const d = new Date(dateStr + 'T00:00:00');
-    return d.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
-  }
-
-  function fmtPeso(n) {
-    return '₱' + n.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
-
   var EDIT_ICON  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>';
   var TRASH_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
 
@@ -53,7 +40,7 @@
 
     let effHtml;
     if (!log.is_full_tank) {
-      effHtml = '<span class="hist-badge hist-badge-partial" title="Partial fill — efficiency estimate may vary">'
+      effHtml = '<span class="hist-badge hist-badge-partial" title="Partial fill — efficiency not calculated">'
               + '<svg class="hist-partial-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">'
               + '<rect x="1" y="8" width="14" height="7" rx="1.5" fill="currentColor" opacity=".35"/>'
               + '<rect x="1" y="1" width="14" height="7" rx="1.5" fill="currentColor"/>'
@@ -61,36 +48,8 @@
               + '</svg>'
               + 'Partial</span>';
     } else if (log.efficiency_kml !== null) {
-      const kml = log.efficiency_kml;
-      let cls = 'yellow', icon = '';
-
-      // Compare to prior fill-up of same vehicle
-      if (log.prior_efficiency_kml !== null) {
-        const pct = ((kml - log.prior_efficiency_kml) / log.prior_efficiency_kml) * 100;
-        if (pct > 5) {
-          cls = 'green';
-          icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>';
-        } else if (pct < -5) {
-          cls = 'red';
-          icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>';
-        } else {
-          cls = 'yellow';
-          icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M5 12h14"/></svg>';
-        }
-      } else {
-        // No prior fill-up, use absolute thresholds
-        if (kml >= 12.5) {
-          cls = 'green';
-          icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>';
-        } else if (kml >= 10) {
-          cls = 'yellow';
-          icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M5 12h14"/></svg>';
-        } else {
-          cls = 'red';
-          icon = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>';
-        }
-      }
-      effHtml = '<span class="hist-badge hist-badge-' + cls + '">' + icon + kml.toFixed(1) + ' km/L</span>';
+      const info = effBadgeInfo(log.efficiency_kml, log.prior_efficiency_kml);
+      effHtml = '<span class="hist-badge hist-badge-' + info.cls + '">' + info.icon + log.efficiency_kml.toFixed(1) + ' km/L</span>';
     } else {
       effHtml = '<span class="hist-eff-na">—</span>';
     }
@@ -101,7 +60,7 @@
       '<td class="hist-td hist-td-dist">'   + (log.trip_distance !== null ? log.trip_distance.toFixed(1) + ' km' : '—') + '</td>' +
       '<td class="hist-td hist-td-vol">'     + esc(log.liters_filled.toFixed(2) + ' L') + '</td>' +
       '<td class="hist-td hist-td-price">'   + esc(log.cost_per_liter !== null ? fmtPeso(log.cost_per_liter) : '—') + '</td>' +
-      '<td class="hist-td hist-td-cost">'    + esc(fmtPeso(log.fuel_price))             + '</td>' +
+      '<td class="hist-td hist-td-cost">'    + esc(fmtPeso(log.fuel_price, 0))          + '</td>' +
       '<td class="hist-td hist-td-eff">'     + effHtml                                  + '</td>' +
       '<td class="hist-td hist-td-actions">' +
         '<button class="hist-edit-btn" data-id="' + log.id + '" aria-label="Edit fill-up">' + EDIT_ICON + '</button>' +
@@ -163,7 +122,6 @@
     return table;
   }
 
-  // Edit button click delegation
   document.addEventListener('click', function (e) {
     const btn = e.target.closest('.hist-edit-btn');
     if (!btn) return;
@@ -174,7 +132,6 @@
     }
   });
 
-  // Row click — navigate to detail page (skip when clicking action buttons)
   document.addEventListener('click', function (e) {
     if (e.target.closest('.hist-edit-btn') || e.target.closest('.hist-delete-btn')) return;
     var row = e.target.closest('tr[data-id]');
@@ -182,18 +139,6 @@
     var id = row.dataset.id;
     if (id) location.href = '?page=fuel-log-detail&id=' + id;
   });
-
-  // ── Toast ─────────────────────────────────────────────────────────────────
-
-  function showToast(message, type) {
-    var root = document.getElementById('mm-toast-root');
-    if (!root) return;
-    var toast = document.createElement('div');
-    toast.className = 'ql-toast' + (type ? ' ' + type : '');
-    toast.textContent = message;
-    root.appendChild(toast);
-    setTimeout(function () { toast.remove(); }, 5500);
-  }
 
   // ── Delete confirmation modal ──────────────────────────────────────────────
 
@@ -311,7 +256,7 @@
       const list = data.vehicles || [];
 
       const contentArea = document.getElementById('hist-content-area');
-      
+
       if (list.length === 0) {
         contentArea.innerHTML = `
           <div class="hist-empty">
@@ -339,10 +284,8 @@
           list.forEach(v => {
             options += `<option value="${v.id}" ${String(v.id) === currentId ? 'selected' : ''}>${esc(v.name)}</option>`;
           });
-          // Note: using hist-switcher for styling or reusing db-switcher style
           switcherContainer.innerHTML = `<select class="hist-switcher" id="hist-vehicle-select">${options}</select>`;
 
-          // Initialize custom popover
           const selectEl = document.getElementById('hist-vehicle-select');
           if (selectEl && window.Popover) {
             window.Popover.init(selectEl, {
@@ -377,11 +320,6 @@
         if (initialVehicleId !== null && initialVehicleId !== '' && !ids.includes(initialVehicleId)) {
           localStorage.removeItem('mileo_active_vehicle_id');
           initialVehicleId = null;
-        }
-        if (initialVehicleId === null) {
-          const def = list.find(v => v.is_default) || list[0];
-          initialVehicleId = String(def.id);
-          localStorage.setItem('mileo_active_vehicle_id', initialVehicleId);
         }
       }
       switchVehicle(initialVehicleId || '');
