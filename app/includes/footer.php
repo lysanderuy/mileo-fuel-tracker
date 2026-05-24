@@ -10,9 +10,7 @@
       </div>
       <div class="mm-footer-links">
         <a class="mm-footer-link" href="#docs">Documentation</a>
-        <a class="mm-footer-link" href="#privacy">Privacy</a>
-        <a class="mm-footer-link" href="#terms">Terms</a>
-        <a class="mm-footer-link" href="#contact">Contact</a>
+        <a class="mm-footer-link" href="https://github.com/lysanderuy">Contact</a>
       </div>
     </div>
     <div class="mm-footer-bottom">© 2026 Mileo. Built for drivers.</div>
