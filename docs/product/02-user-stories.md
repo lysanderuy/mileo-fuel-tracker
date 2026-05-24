@@ -18,7 +18,7 @@
 ## Table of Contents
 
 1. [Onboarding](#1-onboarding)
-2. [Quick Log — Record a Fill-Up](#2-quick-log--record-a-fill-up)
+2. [Record a Fill-Up](#2-record-a-fill-up)
 3. [Instant Stats](#3-instant-stats)
 4. [Dashboard](#4-dashboard)
 5. [Fill-Up History](#5-fill-up-history)
@@ -45,19 +45,19 @@
 
 ---
 
-## 2. Quick Log — Record a Fill-Up
+## 2. Record a Fill-Up
 
-### US-010 — Open Quick Log
+### US-010 — Open Log Fill-Up Screen
 
 **Role:** Driver
 **Priority:** Urgent
 
-> As a Driver, I want to open the Quick Log screen from the Dashboard so that I can start logging my fill-up.
+> As a Driver, I want to open the Log Fill-Up screen from the Dashboard so that I can start logging my fill-up.
 
 **Acceptance Criteria:**
 - [ ] A prominent **Log Fill-Up** button (FAB or persistent CTA) is visible on the Dashboard when at least one vehicle exists
 - [ ] The button is not shown when no vehicles exist
-- [ ] The Quick Log screen opens when the button is tapped
+- [ ] The Log Fill-Up screen opens when the button is tapped
 - [ ] The default vehicle is pre-selected at the top of the screen
 
 ---
@@ -67,11 +67,11 @@
 **Role:** Driver
 **Priority:** Urgent
 
-> As a Driver, I want to enter my odometer reading, fuel price, volume filled, and trip distance on the Quick Log screen.
+> As a Driver, I want to enter my odometer reading, fuel price, volume filled, and trip distance on the Log Fill-Up screen.
 
 **Acceptance Criteria:**
-- [ ] The Quick Log screen displays all required input fields: Odometer, Trip Distance, Fuel Price per Unit, Volume Filled
-- [ ] The **Save Fill-Up** button is accessible on the Quick Log screen
+- [ ] The Log Fill-Up screen displays all required input fields: Odometer, Trip Distance, Fuel Price per Unit, Volume Filled
+- [ ] The **Save Fill-Up** button is accessible on the Log Fill-Up screen
 - [ ] All field values are editable
 
 ---
@@ -99,7 +99,7 @@
 > As a Driver, I want to see my total cost update in real time as I enter price and volume so that I can confirm the cost before saving.
 
 **Acceptance Criteria:**
-- [ ] Total Cost is displayed prominently on the Quick Log screen as a read-only computed field
+- [ ] Total Cost is displayed prominently on the Log Fill-Up screen as a read-only computed field
 - [ ] Total Cost updates instantly as the user edits Fuel Price per Unit or Volume Filled
 - [ ] Total Cost is never directly editable by the user
 - [ ] Total Cost displays in the user's configured currency
@@ -114,7 +114,7 @@
 > As a Driver, I want to indicate whether I filled the tank completely so that the app can accurately calculate my fuel efficiency.
 
 **Acceptance Criteria:**
-- [ ] A **Full Tank** toggle is present on the Quick Log screen, defaulting to `true`
+- [ ] A **Full Tank** toggle is present on the Log Fill-Up screen, defaulting to `true`
 - [ ] When set to `false`, efficiency is still computed but flagged with a Coach-tone note: *"Partial fill — efficiency estimate may vary"*
 - [ ] The toggle state is saved with the Fuel Log
 
@@ -128,7 +128,7 @@
 > As a Driver, I want to optionally add a note to a fill-up so that I can record context (e.g., "highway trip," "car felt sluggish") without it cluttering the default screen.
 
 **Acceptance Criteria:**
-- [ ] A **Notes** field exists on the Quick Log screen, collapsed by default
+- [ ] A **Notes** field exists on the Log Fill-Up screen, collapsed by default
 - [ ] A single tap expands the Notes field
 - [ ] The Notes field accepts free text up to 200 characters
 - [ ] The Notes field is not required — omitting it does not block saving
@@ -144,7 +144,7 @@
 > As a Driver, I want to change the date and time of a fill-up so that I can correct a log I forgot to record at the pump.
 
 **Acceptance Criteria:**
-- [ ] Date/time defaults to the current time when Quick Log opens
+- [ ] Date/time defaults to the current time when the Log Fill-Up screen opens
 - [ ] The date/time field is tappable and opens a date-time picker
 - [ ] The user cannot set a future date/time
 - [ ] The user cannot set a date before the vehicle's `created_at` date
@@ -152,31 +152,31 @@
 
 ---
 
-### US-017 — Switch Vehicle on Quick Log
+### US-017 — Switch Vehicle on Log Fill-Up Screen
 
 **Role:** Driver
 **Priority:** Normal
 
-> As a Driver with multiple vehicles, I want to switch the active vehicle on the Quick Log screen so that I can log for the right car without going back to the Dashboard.
+> As a Driver with multiple vehicles, I want to switch the active vehicle on the Log Fill-Up screen so that I can log for the right car without going back to the Dashboard.
 
 **Acceptance Criteria:**
-- [ ] The vehicle selector at the top of the Quick Log screen is tappable
+- [ ] The vehicle selector at the top of the Log Fill-Up screen is tappable
 - [ ] Tapping shows a list of all active vehicles
 - [ ] Selecting a different vehicle updates the auto-computed Trip Distance based on that vehicle's last log
 - [ ] The selected vehicle is saved with the Fuel Log
 
 ---
 
-### US-018 — Validation Errors on Quick Log
+### US-018 — Validation Errors on Log Fill-Up Screen
 
 **Role:** Driver
 **Priority:** Urgent
 
-> As a Driver, I want to see inline validation errors on the Quick Log screen so that I know exactly which field needs fixing without losing my entered data.
+> As a Driver, I want to see inline validation errors on the Log Fill-Up screen so that I know exactly which field needs fixing without losing my entered data.
 
 **Acceptance Criteria:**
 - [ ] Tapping **Save Fill-Up** with any required field empty shows an inline error beneath that field (not a modal)
-- [ ] Inline errors also appear for: `volume_filled ≤ 0`, `fuel_price_per_unit ≤ 0`, `trip_distance ≤ 0`, odometer less than previous reading
+- [ ] Inline errors also appear for: `liters_filled ≤ 0`, `fuel_price ≤ 0`, `trip_distance ≤ 0`, odometer less than previous reading
 - [ ] All other field values are preserved when a validation error is shown
 - [ ] Errors clear when the user corrects the relevant field
 
@@ -280,7 +280,7 @@
 
 **Acceptance Criteria:**
 - [ ] When no vehicles exist, the Dashboard displays a Coach-tone prompt: *"Add your first vehicle to start tracking."* with a CTA to Add Vehicle
-- [ ] When a vehicle exists but no Fuel Logs have been logged, the Dashboard displays: *"Log your first fill-up to see your numbers."* with a CTA to Quick Log
+- [ ] When a vehicle exists but no Fuel Logs have been logged, the Dashboard displays: *"Log your first fill-up to see your numbers."* with a CTA to log a fill-up
 - [ ] The Log Fill-Up FAB is not shown when no vehicles exist
 - [ ] Empty states are not shown once at least one log exists for the active vehicle
 
@@ -393,8 +393,8 @@
 **Acceptance Criteria:**
 - [ ] The Edit screen is accessible via the **Edit** button on the Fuel Log Detail screen
 - [ ] The Edit screen is pre-populated with all fields from the existing log
-- [ ] The Edit screen layout is identical to the Quick Log screen (no new UI to learn)
-- [ ] All validations from Quick Log apply on edit
+- [ ] The Edit screen layout is identical to the Log Fill-Up screen (no new UI to learn)
+- [ ] All validations from the Log Fill-Up screen apply on edit
 - [ ] Computed fields (Total Cost, Efficiency) update in real time as the user edits fields
 - [ ] Tapping **Save Changes** persists the update and returns to the Detail screen with updated values
 - [ ] A success toast confirms the save
@@ -472,12 +472,12 @@
 **Role:** Driver
 **Priority:** Normal
 
-> As a Driver with multiple vehicles, I want to set a default vehicle so that the correct car is pre-selected every time I open Quick Log.
+> As a Driver with multiple vehicles, I want to set a default vehicle so that the correct car is pre-selected every time I log a fill-up.
 
 **Acceptance Criteria:**
 - [ ] The Vehicle management screen shows which vehicle is currently set as default
 - [ ] The Driver can change the default vehicle from this screen
-- [ ] The new default is immediately reflected in the Quick Log vehicle selector
+- [ ] The new default is immediately reflected in the Log Fill-Up vehicle selector
 - [ ] Only one vehicle can be the default at a time
 
 ---
@@ -491,7 +491,7 @@
 
 **Acceptance Criteria:**
 - [ ] An **Archive** option is available on the Vehicle detail or management screen
-- [ ] Archived vehicles are hidden from the Dashboard vehicle selector and Quick Log vehicle picker
+- [ ] Archived vehicles are hidden from the Dashboard vehicle selector and Log Fill-Up vehicle picker
 - [ ] All Fuel Logs for an archived vehicle are preserved and accessible via the History screen with a filter for archived vehicles
 - [ ] Archiving a vehicle that is currently the default automatically prompts the user to select a new default (if other active vehicles exist)
 
@@ -563,8 +563,8 @@
 | **S01** | Welcome / Splash | New Driver | First app launch (no active session) |
 | **S02** | Sign Up | New Driver | Tap "Get Started" on S01 |
 | **S03** | Log In | Driver | Tap "Log In" on S01 |
-| **S06** | Dashboard | Driver | After sign-up, after login, after completing Quick Log |
-| **S07** | Quick Log | Driver | Tap "Log Fill-Up" CTA from S06 |
+| **S06** | Dashboard | Driver | After sign-up, after login, after completing a fill-up log |
+| **S07** | Log Fill-Up | Driver | Tap "Log Fill-Up" CTA from S06 |
 | **S08** | Instant Stats | Driver | Successful save from S07 |
 | **S09** | Fill-Up History | Driver | Tap "View all" on S06, or navigate via main navigation |
 | **S10** | Fuel Log Detail | Driver | Tap any fill-up row on S09 or S06 recent list |

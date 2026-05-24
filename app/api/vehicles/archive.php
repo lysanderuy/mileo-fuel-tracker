@@ -1,20 +1,10 @@
 <?php
 require_once __DIR__ . '/../../../config/db.php';
+require_once __DIR__ . '/../../../app/includes/api_helpers.php';
 
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
-
+api_require_auth();
 header('Content-Type: application/json');
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
-    exit;
-}
+api_require_method('POST');
 
 $body = json_decode(file_get_contents('php://input'), true);
 
@@ -30,11 +20,11 @@ if ($id <= 0) {
 $user_id     = (int)$_SESSION['user_id'];
 $is_archived = $archived ? 1 : 0;
 
-$check = $conn->prepare("SELECT id FROM vehicles WHERE id = ? AND user_id = ?");
-$check->bind_param('ii', $id, $user_id);
-$check->execute();
-$found = $check->get_result()->fetch_assoc();
-$check->close();
+$stmt = $conn->prepare("SELECT id FROM vehicles WHERE id = ? AND user_id = ?");
+$stmt->bind_param('ii', $id, $user_id);
+$stmt->execute();
+$found = $stmt->get_result()->fetch_assoc();
+$stmt->close();
 
 if (!$found) {
     http_response_code(404);

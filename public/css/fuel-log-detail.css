@@ -1,0 +1,402 @@
+/* ── Page wrapper ──────────────────────────────────────────────────────── */
+
+.fld-wrap {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 28px 80px;
+  box-sizing: border-box;
+}
+
+/* ── Topbar — back link + actions ─────────────────────────────────────────── */
+
+.fld-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #E8E8E4;
+}
+
+.fld-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #7B756A;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.fld-back-btn:hover { color: #38362F; }
+
+.fld-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fld-topbar-actions button {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #E5E3DE;
+  background: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #57544C;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease, color 120ms ease;
+  white-space: nowrap;
+}
+
+.fld-topbar-actions button:hover {
+  background: #F7F5F1;
+  border-color: #DCCFB9;
+  transform: translateY(-1px);
+}
+
+#fld-delete-btn {
+  color: #D93520;
+  border-color: #FDDBD7;
+}
+
+#fld-delete-btn:hover {
+  background: #FDECEA;
+  border-color: #F4A39A;
+}
+
+/* ── Page header ──────────────────────────────────────────────────────────── */
+
+.fld-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 0 14px;
+  margin-bottom: 14px;
+}
+
+.fld-header-left { min-width: 0; }
+
+.fld-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: #38362F;
+  line-height: 1.2;
+}
+
+.fld-meta {
+  font-size: 0.8125rem;
+  color: #AAA79E;
+  margin-top: 3px;
+}
+
+.fld-meta-vehicle {
+  color: #F59500;
+  font-weight: 600;
+}
+
+/* ── Tank badges ──────────────────────────────────────────────────────────── */
+
+.fld-tank-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.fld-tank-badge--full    { background: #D4EDDA; color: #228A55; }
+.fld-tank-badge--partial { background: #F0EFEB; color: #7B756A; }
+
+/* ── Partial fill info banner ─────────────────────────────────────────────── */
+
+.fld-partial-info {
+  display: flex;
+  align-items: flex-start;
+  background: var(--color-surface-2, #f5f5f5);
+  border: 1px solid var(--color-border, #e0e0e0);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: var(--color-text-muted, #6b7280);
+}
+
+.fld-partial-info-icon {
+  flex-shrink: 0;
+  margin-right: 8px;
+  margin-top: 1px;
+  opacity: 0.7;
+}
+
+.fld-partial-info-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 4px;
+  color: var(--color-text, #374151);
+}
+
+.fld-partial-info-body {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+/* ── Content sections ──────────────────────────────────────────────────────── */
+
+.fld-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.fld-metrics-row {
+  display: flex;
+  gap: 12px;
+}
+
+.fld-metrics-row .fld-metric-card {
+  flex: 1;
+}
+
+/* ── Metric cards (hero) ─────────────────────────────────────────────────── */
+
+.fld-metric-card {
+  background: #fff;
+  border: 1px solid #E8E8E4;
+  border-radius: 16px;
+  padding: 24px 28px;
+  flex-shrink: 0;
+  animation: fld-fade-in 0.5s ease-out;
+}
+
+.fld-metric-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #AAA79E;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.fld-metric-value {
+  font-family: 'Sora', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #38362F;
+  line-height: 1.1;
+}
+
+.fld-metric-unit {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #7B756A;
+  display: inline;
+}
+
+/* ── Stats sections ───────────────────────────────────────────────────────── */
+
+.fld-stats-section {
+  flex-shrink: 0;
+}
+
+.fld-stats-section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #AAA79E;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.hist-stats-grid--2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ── Section title (comparison, notes) ───────────────────────────────────── */
+
+.fld-section-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #C4BFB6;
+  margin-bottom: 7px;
+}
+
+/* ── Comparison ───────────────────────────────────────────────────────────── */
+
+.fld-comparison {
+  flex-shrink: 0;
+}
+
+.fld-comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.fld-comparison-item {
+  background: #fff;
+  border: 1px solid #E8E8E4;
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.fld-comparison-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: #E8E8E4;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.fld-comparison-item:hover {
+  border-color: #DCCFB9;
+  background: #FAFAF8;
+}
+
+.fld-cmp-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.fld-cmp-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #AAA79E;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.fld-cmp-flow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.fld-cmp-from {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  color: #AAA79E;
+  text-decoration: line-through;
+}
+
+.fld-cmp-sep {
+  color: #D4BFA0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.fld-cmp-to {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #38362F;
+}
+
+.fld-cmp-delta {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.fld-cmp-delta.hist-delta--good {
+  background: #E8F5EC;
+  color: #1B6E3F;
+}
+
+.fld-cmp-delta.hist-delta--bad {
+  background: #FEE8E4;
+  color: #B32E1F;
+}
+
+/* ── Notes ────────────────────────────────────────────────────────────────── */
+
+.fld-notes { flex-shrink: 0; }
+
+.fld-notes-body {
+  background: #fff;
+  border: 1px solid #E8E8E4;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.875rem;
+  color: #57544C;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* ── Error state ──────────────────────────────────────────────────────────── */
+
+.fld-error-msg {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 0.9375rem;
+  color: #D93520;
+  padding: 24px 0;
+}
+
+/* ── Skeletons ────────────────────────────────────────────────────────────── */
+
+@keyframes fld-shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+
+.fld-skeleton-header,
+.fld-skeleton-card,
+.fld-skeleton-grid {
+  border-radius: 10px;
+  background: linear-gradient(90deg, #EDECE8 25%, #F8F7F4 50%, #EDECE8 75%);
+  background-size: 600px 100%;
+  animation: fld-shimmer 1.4s infinite linear;
+}
+
+.fld-skeleton-header { height: 56px; margin-bottom: 14px; }
+.fld-skeleton-card   { height: 80px; margin-bottom: 12px; }
+.fld-skeleton-grid   { height: 150px; }
+
+/* ── Mobile ───────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .fld-wrap { padding: 0 16px; }
+  .fld-title { font-size: 1.25rem; }
+  .fld-metric-value { font-size: 1.5rem; }
+}
+
+@media (max-width: 540px) {
+  .fld-comparison-grid { grid-template-columns: 1fr; }
+  .fld-topbar-actions { gap: 12px; }
+}

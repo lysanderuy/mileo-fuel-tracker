@@ -19,9 +19,8 @@
 | **Efficiency** | Fuel consumption expressed as km/L or L/100km. Lower or higher can be better depending on the display format. |
 | **Odometer** | The cumulative distance reading on the vehicle's dashboard at time of fill-up. |
 | **Trip Distance** | The distance driven since the last fill-up (Point A → Point B), either entered manually or computed from consecutive odometer readings. |
-| **Log Completion Time** | The elapsed time from when a user opens the Quick Log screen to when they see their Instant Stats. |
+| **Log Completion Time** | The elapsed time from when a user opens the Log Fill-Up screen to when they see their Instant Stats. |
 | **The Coach** | Mileo's brand personality: direct, honest, practical — like a motivating coach, not a judge. |
-| **Quick Log** | The primary screen for recording a new Fill-Up. One screen, four fields. |
 | **Data Export** | A downloadable CSV of all Fuel Logs for a given vehicle or date range. |
 | **Multi-Vehicle** | The ability for a single user account to track more than one Vehicle. |
 
@@ -101,10 +100,9 @@ The person who owns the Mileo account.
 | Field | Type | Notes |
 |---|---|---|
 | `id` | INT | Primary key, auto-increment |
-| `email` | string | Unique, used for auth |
-| `password` | string | Hashed |
-| `first_name` | string | Optional, display only |
-| `last_name` | string | Optional, display only |
+| `name` | VARCHAR(100) | Required display name |
+| `email` | VARCHAR(255) | Unique, used for auth |
+| `password` | VARCHAR(255) | Bcrypt-hashed |
 | `created_at` | timestamp | |
 | `updated_at` | timestamp | |
 
@@ -115,23 +113,25 @@ A car or motorized vehicle owned by the user.
 | Field | Type | Notes |
 |---|---|---|
 | `id` | INT | Primary key, auto-increment |
-| `user_id` | INT | FK → User |
-| `name` | string | User-defined label (e.g., "My Civic", "Work Van") |
-| `make` | string | Optional (e.g., Honda) |
-| `model` | string | Optional (e.g., Civic) |
-| `year` | integer | Optional (e.g., 2019) |
-| `fuel_type` | enum | `gasoline`, `diesel`, `lpg`, `electric` |
-| `color` | string | Optional |
-| `plate_number` | string | Optional |
-| `is_default` | boolean | The vehicle pre-selected on Quick Log |
-| `status` | enum | `active`, `archived` |
+| `user_id` | INT | FK → User (cascade delete) |
+| `name` | VARCHAR(100) | User-defined label (e.g., "My Civic", "Work Van") |
+| `make` | VARCHAR(50) | Optional (e.g., Honda) |
+| `model` | VARCHAR(50) | Optional (e.g., Civic) |
+| `year` | INT | Optional (e.g., 2019) |
+| `fuel_type` | VARCHAR(20) | Optional |
+| `color` | VARCHAR(50) | Optional |
+| `plate_number` | VARCHAR(20) | Optional; unique per user |
+| `tank_capacity` | DECIMAL(6,2) | Full tank size in liters; optional |
+| `odometer` | INT | Synced from latest fuel log; optional |
+| `is_archived` | TINYINT(1) | `0` = active, `1` = archived; default `0` |
+| `is_default` | TINYINT(1) | `1` = user's default vehicle; default `0` |
 | `created_at` | timestamp | |
 | `updated_at` | timestamp | |
 
 **Rules:**
 - A User needs at least one active Vehicle to log a fill-up.
 - The first Vehicle created is automatically set as `is_default = true`.
-- Archived Vehicles are hidden from the Dashboard and Quick Log but their Fuel Logs remain visible in history.
+- Archived Vehicles are hidden from the Dashboard and Log Fill-Up screen but their Fuel Logs remain visible in history.
 - Maximum 10 Vehicles per User.
 
 ### 4.3 Fuel Log
@@ -141,33 +141,33 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 | Field | Type | Notes |
 |---|---|---|
 | `id` | INT | Primary key, auto-increment |
-| `vehicle_id` | INT | FK → Vehicle |
-| `user_id` | INT | FK → User (denormalized for query performance) |
-| `logged_at` | timestamp | When the fill-up occurred (user-set, defaults to now) |
-| `odometer_reading` | decimal | Cumulative vehicle distance at time of fill-up |
-| `trip_distance` | decimal | Distance since last fill-up (A→B). Auto-computed if prior log exists; editable |
-| `fuel_price_per_unit` | decimal | Price paid per liter at the pump |
-| `volume_filled` | decimal | Amount of fuel added (liters) |
-| `is_full_tank` | boolean | Whether the tank was filled completely |
-| `total_cost` | decimal | Computed: `fuel_price_per_unit × volume_filled` |
-| `cost_per_distance_unit` | decimal | Computed: `total_cost / trip_distance` |
-| `efficiency_km_l` | decimal | Computed: `trip_distance / volume_filled` (km/L) |
-| `notes` | string | Optional free-text field (max 200 chars) |
+| `vehicle_id` | INT | FK → Vehicle (cascade delete) |
+| `user_id` | INT | FK → User (cascade delete) |
+| `log_date` | DATE | Fill-up date (`YYYY-MM-DD`) |
+| `odometer` | INT | Odometer reading at fill-up (km) |
+| `trip_distance` | DECIMAL(8,2) | Distance since last fill-up (km); auto-computed from odometer delta; nullable for first log |
+| `liters_filled` | DECIMAL(8,2) | Fuel volume added (L); required |
+| `fuel_price` | DECIMAL(10,2) | Total cost of this fill-up; required |
+| `is_full_tank` | TINYINT(1) | `1` = full fill-up; default `1` |
+| `cost_per_liter` | DECIMAL(10,2) | **Generated:** `fuel_price / liters_filled` |
+| `cost_per_km` | DECIMAL(10,4) | **Generated:** `fuel_price / trip_distance` (NULL when trip_distance is NULL or 0) |
+| `notes` | TEXT | Optional; max 200 characters enforced at API layer |
 | `created_at` | timestamp | |
 | `updated_at` | timestamp | |
 
 **Computation Rules:**
-- `total_cost` = `fuel_price_per_unit × volume_filled` (always computed, not user-entered)
-- `trip_distance` = `current_odometer - previous_odometer` if a prior log exists for the same vehicle; otherwise user must enter it manually
-- `efficiency_km_l` = `trip_distance / volume_filled` (always computed; partial fills are flagged in the UI but still calculated)
+- `cost_per_liter` = `fuel_price / liters_filled` (generated column, never written directly)
+- `cost_per_km` = `fuel_price / trip_distance` (generated column; NULL when trip_distance is NULL or 0)
+- `trip_distance` = `current_odometer - previous_odometer` if a prior log exists for the same vehicle; otherwise user must enter it manually via `manual_trip_override`
+- Efficiency (`km/L`) is computed at query time using window functions over full fill-ups only; partial fills (`is_full_tank = false`) do not reset the efficiency baseline
 
 **Validation Rules:**
-- `odometer_reading` must be ≥ the previous log's `odometer_reading` for the same Vehicle
-- `volume_filled` must be > 0
-- `fuel_price_per_unit` must be > 0
-- `trip_distance` must be > 0
-- `logged_at` cannot be in the future
-- `logged_at` cannot be before the Vehicle's `created_at`
+- `odometer` must be ≥ the previous log's `odometer` for the same Vehicle
+- `liters_filled` must be > 0
+- `fuel_price` must be > 0
+- `trip_distance` must be > 0 (when provided)
+- `log_date` cannot be in the future
+- `log_date` cannot be before the Vehicle's `created_at`
 
 ---
 
@@ -195,13 +195,13 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 
 ---
 
-### Flow 2: Quick Log — Record a Fill-Up
+### Flow 2: Record a Fill-Up
 
 **Trigger:** User taps the **Log Fill-Up** button (primary CTA, accessible from Dashboard).
 
 **Steps:**
 
-1. Quick Log screen opens. Selected vehicle is the default vehicle (tappable to switch).
+1. Log Fill-Up screen opens. Selected vehicle is the default vehicle (tappable to switch).
 2. User enters **Odometer reading** (pre-filled with last known value).
 3. App auto-computes **Trip Distance** from previous log. Displayed with an edit icon if user needs to override.
 4. User enters **Fuel Price per liter**.
@@ -216,7 +216,7 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 13. User taps **Done** or returns to Dashboard.
 
 **Acceptance Criteria:**
-- [ ] All required fields (odometer, price, volume, trip distance) are accessible on the Quick Log screen
+- [ ] All required fields (odometer, price, volume, trip distance) are accessible on the Log Fill-Up screen
 - [ ] Total Cost updates in real time as price and volume fields are edited
 - [ ] If a previous log exists for the same vehicle, Trip Distance is auto-computed
 - [ ] Tapping Save with any required field empty shows an inline validation error (not a modal)
@@ -283,8 +283,8 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 6. If the edited odometer affects the trip distance of the *next* log, the next log's trip distance and efficiency are also recomputed silently.
 
 **Acceptance Criteria:**
-- [ ] Edit screen is identical to Quick Log layout (no new UI to learn)
-- [ ] All validations from Quick Log apply on edit
+- [ ] Edit screen is identical to Log Fill-Up layout (no new UI to learn)
+- [ ] All validations from the Log Fill-Up screen apply on edit
 - [ ] Saving an edit recomputes downstream logs (next fill-up's trip distance and efficiency)
 - [ ] A success toast confirms the save
 - [ ] Cancel discards all changes and returns to the detail screen unchanged
@@ -332,7 +332,7 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 
 ## 6. Feature Specifications
 
-### 6.1 Quick Log
+### 6.1 Log Fill-Up
 
 **Purpose:** The primary feature for logging fill-ups. Creates a new Fuel Log.
 
@@ -404,7 +404,7 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 - "This Month" = current calendar month (Jan 1 – today)
 - "Last Month" = prior full calendar month
 - Avg Efficiency only displayed if ≥2 full-tank logs exist in the selected period
-- Dashboard refreshes when returning from Quick Log or after edit/delete
+- Dashboard refreshes when returning from the Log Fill-Up screen or after edit/delete
 
 ### 6.4 Fill-Up History
 
@@ -427,7 +427,7 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 - Max 10 vehicles per account
 - Each vehicle has its own isolated Fuel Log history and stats
 - Dashboard shows one vehicle at a time; vehicle switcher always visible
-- One vehicle is marked `is_default` — this is the vehicle pre-selected in Quick Log
+- One vehicle is marked `is_default` — this is the vehicle pre-selected when logging a fill-up
 - User can archive a vehicle (hides it from active views but preserves all data)
 
 
@@ -468,14 +468,14 @@ Mileo has a single user role: **Driver** (the account owner).
 
 | State | Description |
 |---|---|
-| `active` | Vehicle is visible in Dashboard, Quick Log, and History |
+| `active` | Vehicle is visible in Dashboard, Log Fill-Up screen, and History |
 | `archived` | Vehicle hidden from active UI; historical data preserved and accessible via search/filter |
 
 ### 8.3 Fuel Log States
 
 | State | Description |
 |---|---|
-| `draft` | In-progress entry on Quick Log screen (not persisted) |
+| `draft` | In-progress entry on the Log Fill-Up screen (not persisted) |
 | `saved` | Successfully persisted; appears in History and Dashboard |
 | `deleted` | Removed by user; not shown anywhere; downstream logs recomputed |
 

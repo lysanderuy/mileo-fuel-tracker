@@ -33,11 +33,43 @@
     const timerEl    = $('[data-receipt-timer]');
     if (!fieldsRoot) return;
 
+    // CONFIG - edit values here
+    const CONFIG = {
+      odometer: 83318,
+      trip: 345,
+      liters: 35.74,
+      pricePerLiter: 83.40,  // Edit this, totalPrice auto-calculated
+    };
+
+    const state = { ...CONFIG };
+
+    function computeDerived() {
+      state.totalPrice = state.pricePerLiter * state.liters;
+    }
+
+    function computeStats() {
+      const totalCost = state.totalPrice;
+      const efficiency = state.liters > 0 ? state.trip / state.liters : 0;
+      const costPerKm = efficiency > 0 ? totalCost / state.trip : 0;
+      return { totalCost, efficiency, costPerKm };
+    }
+
+    function formatStats() {
+      const { totalCost, efficiency, costPerKm } = computeStats();
+      return {
+        totalCost: `₱${totalCost.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        efficiency: efficiency.toFixed(1),
+        costPerKm: `₱${costPerKm.toFixed(2)}`,
+      };
+    }
+
+    computeDerived();
+
     const steps = [
-      { label: 'Odometer',  value: '42,318', unit: 'km', duration: 1200 },
-      { label: 'Trip',      value: '487',    unit: 'km', duration: 900  },
-      { label: 'Price / L', value: '60.40',  unit: '₱',  duration: 900  },
-      { label: 'Liters',    value: '38.4',   unit: 'L',  duration: 900  },
+      { key: 'odometer', label: 'Odometer (km)', value: () => state.odometer.toLocaleString(), unit: 'km', duration: 1200 },
+      { key: 'trip', label: 'Trip', value: () => state.trip.toLocaleString(), unit: 'km', duration: 900 },
+      { key: 'liters', label: 'Liters Filled', value: () => state.liters.toFixed(1), unit: 'L', duration: 900 },
+      { key: 'totalPrice', label: 'Total Price', value: () => `₱${state.totalPrice.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`, unit: '₱', duration: 900 },
     ];
     const TOTAL = steps.reduce((s, x) => s + x.duration, 0) + 800;
     const LOOP  = TOTAL + 2800;
@@ -56,7 +88,7 @@
         h('div', { class: 'mm-receipt-field-label' }, s.label),
         h('div', { class: 'mm-receipt-field-value' }, prefix, num, suffix, caret),
       );
-      return { wrap, num, caret };
+      return { wrap, num, caret, key: s.key };
     });
     fieldEls.forEach(f => fieldsRoot.appendChild(f.wrap));
 
@@ -81,12 +113,19 @@
         f.wrap.classList.toggle('is-active', active);
         f.wrap.classList.toggle('is-done', done);
         f.caret.style.display = active ? '' : 'none';
-        const shown = done ? steps[i].value : steps[i].value.slice(0, Math.floor(steps[i].value.length * p));
+        const shown = done ? steps[i].value() : steps[i].value().slice(0, Math.floor(steps[i].value().length * p));
         f.num.textContent = shown;
       }
 
       const allDone = t >= TOTAL - 800;
-      statsEl.classList.toggle('is-visible', allDone);
+      if (allDone) {
+        statsEl.classList.add('is-visible');
+        const stats = formatStats();
+        const statValues = $$('.mm-receipt-stat-value', statsEl);
+        if (statValues[0]) statValues[0].textContent = stats.totalCost;
+        if (statValues[1]) statValues[1].textContent = stats.efficiency;
+        if (statValues[2]) statValues[2].textContent = stats.costPerKm;
+      }
 
       fillEl.style.width = `${Math.min(100, (t / TOTAL) * 100)}%`;
       const elapsed = Math.min(15, (t / TOTAL) * 15);
@@ -102,163 +141,267 @@
     {
       key: 'log',
       kicker: 'At the pump',
-      title: 'Quick Log',
-      desc: 'Enter four fields in seconds. Done.',
+      title: 'Fuel Log',
+      desc: 'Simple form, fast entry.',
       render: () => `
-        <div class="mm-mock mm-mock-log">
-          <div class="mm-mock-head">
-            <div class="mm-mock-back">←</div>
-            <div class="mm-mock-title">New fill-up</div>
-            <div class="mm-mock-save">Save</div>
+        <div class="mm-mock mm-mock-log-actual">
+          <div class="mm-mock-log-header">
+            <div class="mm-mock-log-title">Log Fill-Up</div>
           </div>
-          <div class="mm-mock-grid">
-            ${mockField('Odometer', '42,318', 'km')}
-            ${mockField('Trip', '487', 'km', false, true)}
-            ${mockField('Price / L', '60.40', '₱', true)}
-            ${mockField('Liters', '38.4', 'L')}
+          <div class="mm-mock-log-sections">
+            <div class="mm-mock-log-context">
+              <div class="mm-mock-field-row">
+                <div class="mm-mock-field">
+                  <div class="mm-mock-field-label">Vehicle</div>
+                  <div class="mm-mock-field-val mm-mock-field-val-sm">Toyota Vios</div>
+                </div>
+                <div class="mm-mock-field">
+                  <div class="mm-mock-field-label">Date</div>
+                  <div class="mm-mock-field-val mm-mock-field-val-sm">May 25, 2026</div>
+                </div>
+              </div>
+              <div class="mm-mock-field">
+                <div class="mm-mock-field-label">Odometer (km)</div>
+                <div class="mm-mock-field-val">42,318</div>
+                <div class="mm-mock-field-help">Last recorded: 41,906 km</div>
+              </div>
+            </div>
+            <div class="mm-mock-log-fuel">
+              <div class="mm-mock-field">
+                <div class="mm-mock-field-label">Liters</div>
+                <div class="mm-mock-field-val">32.8 L</div>
+              </div>
+              <div class="mm-mock-field">
+                <div class="mm-mock-field-label">Total Price</div>
+                <div class="mm-mock-field-val">₱2,706</div>
+              </div>
+            </div>
+            <div class="mm-mock-log-extras">
+              <div class="mm-mock-toggle-row">
+                <span class="mm-mock-toggle-label">Full tank</span>
+                <div class="mm-mock-toggle-on"></div>
+              </div>
+            </div>
           </div>
-          <button class="mm-mock-cta">Save fill-up</button>
+          <div class="mm-mock-log-actions">
+            <button class="mm-mock-btn-primary">Save Entry</button>
+          </div>
         </div>`,
     },
     {
       key: 'stats',
       kicker: 'Right after save',
       title: 'Instant Stats',
-      desc: 'Cost breakdown and fuel efficiency, instantly.',
+      desc: 'Performance at a glance.',
       render: () => `
-        <div class="mm-mock mm-mock-stats">
-          <div class="mm-mock-stats-top">
-            <div class="mm-mock-stats-label">This fill-up</div>
-            <div class="mm-mock-stats-hero">12.7<span>km/L</span></div>
-            <div class="mm-mock-stats-delta">↑ 0.8 better than last</div>
+        <div class="mm-mock mm-mock-stats-actual">
+          <div class="mm-mock-stats-header">
+            <div class="mm-mock-stats-check">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <div>
+              <div class="mm-mock-stats-headline">Fill-Up Logged!</div>
+              <div class="mm-mock-stats-meta">Fill-up #47 · May 25, 2026</div>
+            </div>
           </div>
-          <div class="mm-mock-stats-row">
-            ${mockStat('₱2,319', 'Total')}
-            ${mockStat('₱4.76', 'per km')}
-            ${mockStat('38.4 L', 'Filled')}
+          <div class="mm-mock-stats-perf">
+            <div class="mm-mock-perf-left">
+              <div class="mm-mock-stat-label">Efficiency</div>
+              <div class="mm-mock-perf-value">12.6<span class="mm-mock-perf-unit"> km/L</span></div>
+              <div class="mm-mock-perf-delta hist-delta--good">↑ +0.7 vs last</div>
+            </div>
+            <div class="mm-mock-badge mm-mock-badge--good">Better than avg</div>
           </div>
-          <div class="mm-mock-stats-chip">Your cheapest km this month</div>
+          <div class="mm-mock-stats-grid mm-mock-stats-grid--2col">
+            ${mockStatCard('32.8 L', 'Liters')}
+            ${mockStatCard('₱2,706', 'Total Cost')}
+            ${mockStatCard('₱82.50', '/ Liter')}
+            ${mockStatCard('₱6.58', 'Cost / km')}
+          </div>
         </div>`,
     },
     {
       key: 'dash',
       kicker: 'Every morning',
       title: 'Dashboard',
-      desc: 'Monthly trends and spending patterns at a glance.',
+      desc: 'Your fuel story.',
       render: () => `
-        <div class="mm-mock mm-mock-dash">
-          <div class="mm-mock-dash-header">
-            <div class="mm-mock-dash-period">April 2026</div>
-            <div class="mm-mock-dash-metrics">
-              <div class="mm-mock-dash-metric"><div class="mm-mock-dash-metric-v">₱9,240</div><div class="mm-mock-dash-metric-k">Total</div></div>
-              <div class="mm-mock-dash-metric"><div class="mm-mock-dash-metric-v">12.4</div><div class="mm-mock-dash-metric-k">km/L</div></div>
-              <div class="mm-mock-dash-metric is-down"><div class="mm-mock-dash-metric-v">-12%</div><div class="mm-mock-dash-metric-k">vs Mar</div></div>
+        <div class="mm-mock mm-mock-dash-actual">
+          <div class="mm-mock-dash-topbar">
+            <div>
+              <div class="mm-mock-dash-title">Dashboard</div>
+              <div class="mm-mock-dash-subtitle">Your fuel tracking overview</div>
+            </div>
+            <div class="mm-mock-dash-actions">
+              <div class="mm-mock-dash-vehicle-select">Toyota Vios</div>
+              <button class="mm-mock-dash-log-btn">+ Log Fill-Up</button>
             </div>
           </div>
-          ${mockChart()}
+          <div class="mm-mock-dash-stats">
+            <div class="mm-mock-dash-stat-card">
+              <div class="mm-mock-dash-stat-label">Total Fill-ups</div>
+              <div class="mm-mock-dash-stat-val">47</div>
+              <div class="mm-mock-dash-stat-sub">All time</div>
+            </div>
+            <div class="mm-mock-dash-stat-card">
+              <div class="mm-mock-dash-stat-label">Total Distance</div>
+              <div class="mm-mock-dash-stat-val">18,432<span class="mm-mock-dash-stat-unit">km</span></div>
+              <div class="mm-mock-dash-stat-sub">All time</div>
+            </div>
+            <div class="mm-mock-dash-stat-card">
+              <div class="mm-mock-dash-stat-label">Total Spent</div>
+              <div class="mm-mock-dash-stat-val">₱28,450</div>
+              <div class="mm-mock-dash-stat-sub">All time</div>
+            </div>
+          </div>
+          <div class="mm-mock-dash-fleet">
+            <div class="mm-mock-dash-fleet-head">
+              <span>Fleet Overview</span>
+              <span class="mm-mock-dash-fleet-total">₱28,450</span>
+            </div>
+            <div class="mm-mock-dash-fleet-row">
+              <div class="mm-mock-dash-fleet-left">
+                <div class="mm-mock-dash-fleet-name">Toyota Vios</div>
+                <div class="mm-mock-dash-fleet-metrics">
+                  <div class="mm-mock-dash-fleet-metric">
+                    <div class="mm-mock-dash-fleet-val mm-mock-dash-fleet-val--eff">12.7</div>
+                    <div class="mm-mock-dash-fleet-key">km/L</div>
+                  </div>
+                  <div class="mm-mock-dash-fleet-metric">
+                    <div class="mm-mock-dash-fleet-val mm-mock-dash-fleet-val--cost">4.76</div>
+                    <div class="mm-mock-dash-fleet-key">₱/km</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mm-mock-dash-fleet-bar-track"><div class="mm-mock-dash-fleet-bar-fill" style="width:100%"></div></div>
+          </div>
         </div>`,
     },
     {
       key: 'cars',
-      kicker: 'Garage',
+      kicker: 'Your fleet',
       title: 'Multiple Vehicles',
-      desc: 'Track up to 10 cars with independent stats.',
+      desc: 'Manage your garage.',
       render: () => `
-        <div class="mm-mock mm-mock-cars">
-          <div class="mm-mock-cars-head">Your garage · 3 of 10</div>
-          ${mockCar('Toyota Vios', 'ABC 1234', '12.7 km/L', true, '#F59500')}
-          ${mockCar('Honda Click 125', 'XYZ 5678', '48.2 km/L', false, '#228A55')}
-          ${mockCar('Ford Ranger', 'TRK 4201', '8.1 km/L', false, '#2B72C0')}
+        <div class="mm-mock mm-mock-cars-actual">
+          <div class="mm-mock-cars-tabs">
+            <div class="mm-mock-cars-tab is-active">Active <span class="mm-mock-cars-tab-count">2</span></div>
+            <div class="mm-mock-cars-tab">Archived <span class="mm-mock-cars-tab-count">1</span></div>
+          </div>
+          <div class="mm-mock-cars-list">
+            ${mockCarActual('Toyota Vios', 'ABC 1234', '12.7 km/L', '₱4.76/km', true, true)}
+            ${mockCarActual('Honda Click 125', 'XYZ 5678', '48.2 km/L', '₱1.85/km', false, false)}
+          </div>
         </div>`,
     },
     {
       key: 'history',
       kicker: 'Anytime',
       title: 'Full History',
-      desc: 'Every fill-up sortable and filterable by date, efficiency, or vehicle.',
+      desc: 'Every fill-up tracked.',
       render: () => `
-        <div class="mm-mock mm-mock-history">
-          <div class="mm-mock-hist-head">
-            <div class="mm-mock-hist-title">History</div>
-            <div class="mm-mock-hist-sort">Sort · km/L ↓</div>
-          </div>
-          ${mockRow('Apr 18', '38.4', '₱2,319', '12.7', 'up')}
-          ${mockRow('Apr 04', '34.2', '₱2,054', '11.9', 'up')}
-          ${mockRow('Mar 22', '40.1', '₱2,389', '11.1', 'down')}
-          ${mockRow('Mar 08', '37.8', '₱2,252', '12.3', 'up')}
-          ${mockRow('Feb 24', '35.6', '₱2,115', '11.8', 'flat')}
-        </div>`,
-    },
-    {
-      key: 'export',
-      kicker: 'Your data',
-      title: 'Data Export',
-      desc: 'Download your entire log as CSV. Your data, always yours.',
-      render: () => `
-        <div class="mm-mock mm-mock-export">
-          <div class="mm-mock-export-header">
-            <div class="mm-mock-export-icon">📥</div>
+        <div class="mm-mock mm-mock-history-actual">
+          <div class="mm-mock-history-header">
             <div>
-              <div class="mm-mock-export-title">Export your data</div>
-              <div class="mm-mock-export-sub">CSV · 47 fill-ups · 8.2 KB</div>
+              <div class="mm-mock-history-title">History</div>
+              <div class="mm-mock-history-subtitle">All fill-ups for your selected vehicle</div>
+            </div>
+            <div class="mm-mock-history-actions">
+              <div class="mm-mock-history-vehicle-select">Toyota Vios</div>
+              <button class="mm-mock-history-log-btn">+ Log Fill-Up</button>
             </div>
           </div>
-          <div class="mm-mock-export-opts">
-            <label class="mm-mock-export-opt is-on"><span class="mm-mock-check">✓</span>All fill-ups</label>
-            <label class="mm-mock-export-opt is-on"><span class="mm-mock-check">✓</span>Vehicle metadata</label>
-            <label class="mm-mock-export-opt"><span class="mm-mock-check"></span>Calculated stats</label>
+          <div class="mm-mock-history-table">
+            <div class="mm-mock-history-row mm-mock-history-head">
+              <div class="mm-mock-history-th">Date</div>
+              <div class="mm-mock-history-th">Distance</div>
+              <div class="mm-mock-history-th">Liters</div>
+              <div class="mm-mock-history-th">Price / L</div>
+              <div class="mm-mock-history-th">Total</div>
+              <div class="mm-mock-history-th">Efficiency</div>
+            </div>
+            ${mockHistoryRow('Apr 18, 2026', '412 km', '32.8 L', '₱82.50', '₱2,706', '12.6', 'up')}
+            ${mockHistoryRow('Apr 04, 2026', '389 km', '34.2 L', '₱71.50', '₱2,458', '11.9', 'up')}
+            ${mockHistoryRow('Mar 22, 2026', '445 km', '40.1 L', '₱72.00', '₱2,891', '11.1', 'down')}
           </div>
-          <button class="mm-mock-cta">Download CSV</button>
         </div>`,
     },
   ];
 
-  function mockField(label, value, unit, prefix, active) {
+  function mockFieldSimple(label, value, unit, prefix, active) {
     return `
-      <div class="mm-mockfield ${active ? 'is-active' : ''}">
-        <div class="mm-mockfield-label">${label}</div>
-        <div class="mm-mockfield-val">
-          ${prefix ? `<span class="mm-mockfield-unit">${unit}</span>` : ''}
+      <div class="mm-mockfield-simple ${active ? 'is-active' : ''}">
+        <div class="mm-mockfield-simple-label">${label}</div>
+        <div class="mm-mockfield-simple-val">
+          ${prefix ? `<span class="mm-mockfield-simple-unit">${unit}</span>` : ''}
           ${value}
-          ${!prefix ? `<span class="mm-mockfield-unit">${unit}</span>` : ''}
+          ${!prefix ? `<span class="mm-mockfield-simple-unit">${unit}</span>` : ''}
         </div>
       </div>`;
   }
-  function mockStat(v, l) {
-    return `<div class="mm-mockstat"><div class="mm-mockstat-v">${v}</div><div class="mm-mockstat-l">${l}</div></div>`;
+  function mockStatCompact(v, l) {
+    return `<div class="mm-mockstat-compact"><div class="mm-mockstat-compact-v">${v}</div><div class="mm-mockstat-compact-l">${l}</div></div>`;
   }
-  function mockChart() {
-    const bars = [9800, 10200, 11100, 10500, 10500, 9240];
-    const months = ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
-    const max = Math.max(...bars);
-    return `<div class="mm-mockchart">${bars.map((b, i) => `
-      <div class="mm-mockchart-col">
-        <div class="mm-mockchart-bar" style="height:${(b / max) * 100}%;background:${i === bars.length - 1 ? '#F59500' : '#E5E3DE'}"></div>
-        <div class="mm-mockchart-lbl">${months[i]}</div>
-      </div>`).join('')}</div>`;
-  }
-  function mockCar(name, plate, stat, active, color) {
+  function mockCarSimple(name, stat, active, color) {
     const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2);
     return `
-      <div class="mm-mockcar ${active ? 'is-active' : ''}">
-        <div class="mm-mockcar-badge" style="background:${color}">${initials}</div>
-        <div style="flex:1;min-width:0">
-          <div class="mm-mockcar-name">${name}</div>
-          <div class="mm-mockcar-plate">${plate}</div>
+      <div class="mm-mockcar-simple ${active ? 'is-active' : ''}">
+        <div class="mm-mockcar-simple-badge" style="background:${color}">${initials}</div>
+        <div class="mm-mockcar-simple-body">
+          <div class="mm-mockcar-simple-name">${name}</div>
+          <div class="mm-mockcar-simple-stat">${stat}</div>
         </div>
-        <div class="mm-mockcar-stat">${stat}</div>
       </div>`;
   }
-  function mockRow(date, liters, price, eff, trend) {
-    const arrow = trend === 'up' ? '↑' : trend === 'down' ? '↓' : '—';
+
+  function mockStatCard(value, label) {
     return `
-      <div class="mm-mockrow">
-        <div class="mm-mockrow-date">${date}</div>
-        <div class="mm-mockrow-mid">
-          <div class="mm-mockrow-price">${price}</div>
-          <div class="mm-mockrow-liters">${liters} L</div>
+      <div class="mm-mock-stat-card">
+        <div class="mm-mock-stat-card-val">${value}</div>
+        <div class="mm-mock-stat-card-label">${label}</div>
+      </div>`;
+  }
+
+  function mockCarActual(name, plate, eff, cost, active, isDefault) {
+    const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2);
+    const color = active ? '#F59500' : '#2B72C0';
+    return `
+      <div class="mm-mock-veh-row ${active ? 'is-active' : ''}">
+        <button class="mm-mock-veh-star ${isDefault ? 'is-default' : ''}" aria-label="Set as default">${isDefault ? '★' : '☆'}</button>
+        <div class="mm-mock-veh-icon">
+          <span class="mm-mock-veh-icon-mark">🚗</span>
         </div>
-        <div class="mm-mockrow-eff is-${trend}">${arrow} ${eff}<span>km/L</span></div>
+        <div class="mm-mock-veh-info">
+          <div class="mm-mock-veh-head">
+            <div class="mm-mock-veh-name">${name}</div>
+            <div class="mm-mock-veh-meta">
+              <span class="mm-mock-veh-plate-inline">${plate}</span>
+            </div>
+          </div>
+          <div class="mm-mock-veh-badges">
+            <span class="mm-mock-veh-badge">Eff: ${eff}</span>
+            <span class="mm-mock-veh-badge">Cost: ${cost}</span>
+          </div>
+        </div>
+        <div class="mm-mock-veh-actions">
+          <button class="mm-mock-veh-btn">Edit</button>
+          <button class="mm-mock-veh-btn mm-mock-veh-btn-danger">Delete</button>
+        </div>
+      </div>`;
+  }
+
+  function mockHistoryRow(date, distance, liters, price, total, eff, direction) {
+    const effClass = direction === 'up' ? 'up' : 'down';
+    const arrow = direction === 'up' ? '↑' : '↓';
+    return `
+      <div class="mm-mock-history-row">
+        <div class="mm-mock-history-cell">${date}</div>
+        <div class="mm-mock-history-cell">${distance}</div>
+        <div class="mm-mock-history-cell">${liters}</div>
+        <div class="mm-mock-history-cell">${price}</div>
+        <div class="mm-mock-history-cell">${total}</div>
+        <div class="mm-mock-history-eff ${effClass}">${arrow} ${eff}</div>
       </div>`;
   }
 

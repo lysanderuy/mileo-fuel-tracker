@@ -795,6 +795,8 @@
 .mm-cta-btn:hover { background: #FFF8ED; transform: translateY(-2px); }
 
 /* ── Footer ─────────────────────────────────────── */
+main { flex: 1; }
+
 .mm-footer {
   background: #0F0E0C;
   color: #CCC9C2;
@@ -1284,6 +1286,24 @@
 .mm-mockstat-l { font-size: 11px; color: #A8A49B; margin-top: 4px; }
 .mm-mock-stats-chip { font-size: 12px; color: #F59500; background: #FFF8ED; padding: 8px 12px; border-radius: 8px; text-align: center; margin-top: 12px; }
 
+/* New dashboard mock styles (matches actual app) */
+.mm-mock-dash-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.mm-mock-dash-stat { padding: 12px; background: #F2F1EE; border-radius: 10px; text-align: center; }
+.mm-mock-dash-stat-label { font-size: 10px; color: #A8A49B; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+.mm-mock-dash-stat-val { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; color: #38362F; }
+.mm-mock-dash-stat-sub { font-size: 9px; color: #A8A49B; margin-top: 2px; }
+.mm-mock-dash-fleet { margin-bottom: 14px; }
+.mm-mock-dash-fleet-head { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 10px; color: #38362F; }
+.mm-mock-dash-fleet-row { padding: 10px; background: #F2F1EE; border-radius: 10px; }
+.mm-mock-dash-fleet-name { font-weight: 600; font-size: 13px; margin-bottom: 8px; }
+.mm-mock-dash-fleet-metrics { display: flex; gap: 8px; }
+.mm-mock-dash-fleet-metric { flex: 1; padding: 8px; background: #fff; border-radius: 8px; text-align: center; }
+.mm-mock-dash-fleet-metric-v { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; color: #38362F; }
+.mm-mock-dash-fleet-metric-k { font-size: 9px; color: #A8A49B; margin-top: 2px; text-transform: uppercase; }
+.mm-mock-dash-fillups { }
+.mm-mock-dash-fillups-head { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 10px; color: #38362F; }
+
+/* Old dashboard mock styles (chart-based) */
 .mm-mock-dash-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #E5E3DE; }
 .mm-mock-dash-period { font-size: 12px; color: #A8A49B; text-transform: uppercase; font-weight: 600; }
 .mm-mock-dash-metrics { display: flex; gap: 10px; flex: 1; }
@@ -1296,7 +1316,6 @@
 .mm-mockchart-bar { width: 100%; border-radius: 4px 4px 0 0; }
 .mm-mockchart-lbl { font-size: 11px; color: #A8A49B; }
 
-.mm-mock-cars-head { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 12px; }
 .mm-mockcar { display: flex; align-items: center; gap: 12px; padding: 10px; background: #F2F1EE; border-radius: 10px; transition: all 200ms; }
 .mm-mockcar.is-active { background: #FFF8ED; border: 1.5px solid #FFE4B8; }
 .mm-mockcar-badge { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; font-size: 12px; flex-shrink: 0; }
@@ -1411,6 +1430,827 @@
   transform: translateX(0);
 }
 
+/* ── Actual-style mocks ────────────────────────────────────────────────── */
+
+/* Fuel Log Mock - actual structure */
+.mm-mock-log-actual {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mm-mock-log-header {
+  display: flex;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #F0EFEB;
+}
+
+.mm-mock-log-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #38362F;
+}
+
+.mm-mock-log-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mm-mock-log-context,
+.mm-mock-log-fuel,
+.mm-mock-log-extras {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mm-mock-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.mm-mock-log-fuel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.mm-mock-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mm-mock-field-wide {
+  grid-column: 1 / -1;
+}
+
+.mm-mock-field-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #AAA79E;
+}
+
+.mm-mock-field-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #57544C;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #FAFAF8;
+  border: 1px solid #E8E8E4;
+}
+
+.mm-mock-field-val-sm {
+  font-size: 0.8125rem;
+  padding: 7px 10px;
+}
+
+.mm-mock-field-help {
+  font-size: 0.68rem;
+  color: #7B756A;
+  margin-top: 1px;
+}
+
+.mm-mock-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #FAFAF8;
+  border: 1px solid #E8E8E4;
+}
+
+.mm-mock-toggle-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #57544C;
+}
+
+.mm-mock-toggle-on {
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #228A55 0%, #1B6E3F 100%);
+  position: relative;
+}
+
+.mm-mock-toggle-on::after {
+  content: '';
+  position: absolute;
+  right: 2px;
+  top: 1px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.mm-mock-log-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 6px;
+}
+
+.mm-mock-btn-primary {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #F59500 0%, #E88A00 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  box-shadow: 0 4px 12px rgba(245, 149, 0, 0.24);
+}
+
+.mm-mock-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(245, 149, 0, 0.32);
+}
+
+/* Instant Stats Mock - actual structure */
+.mm-mock-stats-actual {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mm-mock-stats-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+}
+
+.mm-mock-stats-check {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #228A55 0%, #1B6E3F 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mm-mock-stats-headline {
+  font-family: 'Sora', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #38362F;
+}
+
+.mm-mock-stats-meta {
+  font-size: 0.8125rem;
+  color: #AAA79E;
+  margin-top: 2px;
+}
+
+.mm-mock-stats-perf {
+  background: #FAFAF8;
+  border: 1px solid #E8E8E4;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.mm-mock-perf-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.mm-mock-stat-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #AAA79E;
+  margin-bottom: 4px;
+}
+
+.mm-mock-perf-value {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #38362F;
+  line-height: 1.1;
+}
+
+.mm-mock-perf-unit {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #7B756A;
+}
+
+.mm-mock-perf-delta {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin-top: 6px;
+}
+
+.hist-delta--good {
+  background: #E8F5EC;
+  color: #1B6E3F;
+}
+
+.hist-delta--bad {
+  background: #FEE8E4;
+  color: #B32E1F;
+}
+
+.mm-mock-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.mm-mock-badge--good {
+  background: #D4EDDA;
+  color: #228A55;
+}
+
+.mm-mock-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.mm-mock-stats-grid--2col {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.mm-mock-stat-card {
+  background: #fff;
+  border: 1px solid #E8E8E4;
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+}
+
+.mm-mock-stat-card-val {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #38362F;
+  margin-bottom: 4px;
+}
+
+.mm-mock-stat-card-label {
+  font-size: 0.75rem;
+  color: #AAA79E;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Dashboard Mock - actual structure */
+.mm-mock-dash-actual {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mm-mock-dash-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #F0EFEB;
+}
+
+.mm-mock-dash-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #38362F;
+}
+
+.mm-mock-dash-subtitle {
+  font-size: 0.8125rem;
+  color: #AAA79E;
+  margin-top: 2px;
+}
+
+.mm-mock-dash-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mm-mock-dash-vehicle-select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #FAFAF8;
+  border: 1px solid #E8E8E4;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #57544C;
+}
+
+.mm-mock-dash-log-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #F59500 0%, #E88A00 100%);
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.mm-mock-dash-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.mm-mock-dash-stat-card {
+  background: #fff;
+  border: 1px solid #E8E8E4;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.mm-mock-dash-stat-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #AAA79E;
+  margin-bottom: 6px;
+}
+
+.mm-mock-dash-stat-val {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #38362F;
+}
+
+.mm-mock-dash-stat-val .mm-mock-dash-stat-unit {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #7B756A;
+  margin-left: 2px;
+}
+
+.mm-mock-dash-stat-sub {
+  font-size: 0.75rem;
+  color: #AAA79E;
+  margin-top: 4px;
+}
+
+.mm-mock-dash-fleet {
+  background: #FAFAF8;
+  border: 1px solid #E8E8E4;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.mm-mock-dash-fleet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.mm-mock-dash-fleet-head > span:first-child {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #AAA79E;
+}
+
+.mm-mock-dash-fleet-total {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #38362F;
+}
+
+.mm-mock-dash-fleet-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.mm-mock-dash-fleet-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.mm-mock-dash-fleet-name {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #38362F;
+  margin-bottom: 6px;
+}
+
+.mm-mock-dash-fleet-metrics {
+  display: flex;
+  gap: 6px;
+}
+
+.mm-mock-dash-fleet-metric {
+  flex: 1;
+  padding: 6px 8px;
+  background: #fff;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.mm-mock-dash-fleet-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #38362F;
+}
+
+.mm-mock-dash-fleet-val--eff {
+  color: #228A55;
+}
+
+.mm-mock-dash-fleet-val--cost {
+  color: #D93520;
+}
+
+.mm-mock-dash-fleet-key {
+  font-size: 0.625rem;
+  color: #AAA79E;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+.mm-mock-dash-fleet-bar-track {
+  height: 6px;
+  background: #E8E8E4;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.mm-mock-dash-fleet-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F59500 0%, #E88A00 100%);
+  border-radius: 99px;
+}
+
+/* Vehicles Mock - actual structure */
+.mm-mock-cars-actual {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mm-mock-cars-tabs {
+  display: inline-flex;
+  gap: 12px;
+  padding-bottom: 0;
+  border-bottom: 1px solid #F0EFEB;
+}
+
+.mm-mock-cars-tab {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0 0 10px;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #857F75;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+
+.mm-mock-cars-tab:hover { color: #5F594F; }
+
+.mm-mock-cars-tab.is-active {
+  color: #CC7A00;
+  border-bottom-color: #F59500;
+}
+
+.mm-mock-cars-tab-count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #AAA79E;
+  background: #F2F1EE;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.mm-mock-cars-tab.is-active .mm-mock-cars-tab-count {
+  background: #FFF1CC;
+  color: #B07D00;
+}
+
+.mm-mock-cars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+}
+
+/* Vehicle row - matches actual veh-row structure */
+.mm-mock-veh-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 18px;
+  border: 1px solid #ECE8E1;
+  border-radius: 18px;
+  background: #FFFFFF;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+
+.mm-mock-veh-row:hover {
+  border-color: #E4D5B2;
+  background: #FFFDF9;
+}
+
+.mm-mock-veh-star-btn {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #CCC4B7;
+  transition: transform 120ms ease, color 120ms ease;
+  z-index: 5;
+  padding: 0;
+  font-size: 1.25rem;
+}
+
+.mm-mock-veh-star {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #CCC4B7;
+  transition: transform 120ms ease, color 120ms ease;
+  z-index: 5;
+  padding: 0;
+  font-size: 1.25rem;
+}
+
+.mm-mock-veh-star:hover {
+  color: #CC7A00;
+  transform: scale(1.15);
+}
+
+.mm-mock-veh-star.is-default {
+  color: #F59500;
+}
+
+.mm-mock-veh-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.35) 0%, transparent 38%),
+    linear-gradient(135deg, #FFF5E2 0%, #FFE1A8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(245, 149, 0, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.mm-mock-veh-icon-mark { font-size: 1.5rem; line-height: 1; }
+
+.mm-mock-veh-info { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+
+.mm-mock-veh-head { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+
+.mm-mock-veh-name {
+  font-family: 'Sora', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2F2C27;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mm-mock-veh-meta {
+  font-size: 0.825rem;
+  color: #8D887D;
+}
+
+.mm-mock-veh-plate-inline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #6B6155;
+}
+
+.mm-mock-veh-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.mm-mock-veh-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #7A6C4F;
+  background: #FFF8E8;
+  border: 1px solid #F0DFB0;
+  border-radius: 6px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.mm-mock-veh-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+.mm-mock-veh-btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #E5E3DE;
+  background: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #57544C;
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease, color 120ms ease;
+  white-space: nowrap;
+}
+
+.mm-mock-veh-btn:hover {
+  background: #F7F5F1;
+  border-color: #DCCFB9;
+  transform: translateY(-1px);
+}
+
+.mm-mock-veh-btn-danger { color: #D93520; border-color: #FDDBD7; }
+
+.mm-mock-veh-btn-danger:hover { background: #FDECEA; border-color: #F4A39A; }
+
+/* History Mock - actual structure */
+.mm-mock-history-actual {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mm-mock-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #F0EFEB;
+}
+
+.mm-mock-history-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #38362F;
+}
+
+.mm-mock-history-subtitle {
+  font-size: 0.8125rem;
+  color: #AAA79E;
+  margin-top: 2px;
+}
+
+.mm-mock-history-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mm-mock-history-vehicle-select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #FAFAF8;
+  border: 1px solid #E8E8E4;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #57544C;
+}
+
+.mm-mock-history-log-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #F59500 0%, #E88A00 100%);
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.mm-mock-history-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.mm-mock-history-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #F2F1EE;
+  transition: background 150ms;
+}
+
+.mm-mock-history-row:last-child {
+  border-bottom: none;
+}
+
+.mm-mock-history-row:hover {
+  background: #FAFAF8;
+  margin: 0 -8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 8px;
+}
+
+.mm-mock-history-head {
+  border-bottom: 2px solid #E8E8E4;
+  padding-bottom: 8px;
+}
+
+.mm-mock-history-th {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #AAA79E;
+}
+
+.mm-mock-history-cell {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #57544C;
+}
+
+.mm-mock-history-eff {
+  font-family: 'Sora', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.mm-mock-history-eff.up {
+  color: #228A55;
+}
+
+.mm-mock-history-eff.down {
+  color: #D93520;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .mm-hero {
@@ -1427,4 +2267,64 @@
   .mm-nav-tab { padding: 9px 12px; font-size: 13px; }
   .mm-section { padding: 48px 20px; }
   .mm-section-heading { font-size: 28px; }
+}
+
+/* ── Toast notifications ────────────────────────────────────────────────── */
+#mm-toast-root {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 600;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  pointer-events: none;
+  max-width: 340px;
+  width: calc(100vw - 40px);
+}
+
+.ql-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #38362F;
+  background: #fff;
+  border: 1px solid #E5E3DE;
+  box-shadow: 0px 8px 16px rgba(54, 48, 32, 0.10), 0px 2px 4px rgba(54, 48, 32, 0.06);
+  animation: toast-in 0.2s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.ql-toast::before {
+  content: '';
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #AAA79E;
+}
+
+.ql-toast.success {
+  background: #F0F7F3;
+  border-color: #A8D9BE;
+  color: #135030;
+}
+.ql-toast.success::before { background: #228A55; }
+
+.ql-toast.error {
+  background: #FEF2F0;
+  border-color: #F9B5AC;
+  color: #7F1E12;
+}
+.ql-toast.error::before { background: #D93520; }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(12px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
