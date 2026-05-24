@@ -6,30 +6,6 @@
   var fmtPeso   = window.MileoUtils.fmtPeso;
   var showToast = window.MileoUtils.showToast;
 
-  function effBadgeClass(kml, priorKml) {
-    if (priorKml != null) {
-      var pct = ((kml - priorKml) / priorKml) * 100;
-      if (pct > 5)  return 'hist-badge--good';
-      if (pct < -5) return 'hist-badge--bad';
-      return 'hist-badge--neutral';
-    }
-    if (kml >= 12.5) return 'hist-badge--good';
-    if (kml >= 10)   return 'hist-badge--neutral';
-    return 'hist-badge--bad';
-  }
-
-  function effBadgeLabel(kml, priorKml) {
-    if (priorKml != null) {
-      var pct = ((kml - priorKml) / priorKml) * 100;
-      if (pct > 5)  return 'Improved';
-      if (pct < -5) return 'Declined';
-      return 'Similar';
-    }
-    if (kml >= 12.5) return 'Above Average';
-    if (kml >= 10)   return 'On Track';
-    return 'Below Average';
-  }
-
   function buildStatCard(label, value, delta) {
     return '<div class="hist-stat-card">' +
       '<div class="hist-stat-label">' + esc(label) + '</div>' +
@@ -82,7 +58,7 @@
     // Scrollable content below header
     html += '<div class="fld-inner">';
 
-    // Efficiency hero card with gauge
+    // Hero cards: Efficiency + Cost/km (raw numbers, no delta)
     if (!log.is_full_tank) {
       var INFO_ICON = '<svg class="fld-partial-info-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/></svg>';
       html += '<div class="fld-partial-info">' +
@@ -92,34 +68,24 @@
           '<div class="fld-partial-info-body">Partial fills are excluded to keep your averages accurate. The liters from this fill-up will be included in the next full fill-up\'s efficiency.</div>' +
         '</div>' +
       '</div>';
-    } else if (log.efficiency_kml !== null) {
-      var kml      = log.efficiency_kml;
-      var priorKml = (prior && prior.efficiency_kml != null) ? prior.efficiency_kml : null;
-      var badgeCls = effBadgeClass(kml, priorKml);
-      var badgeLbl = effBadgeLabel(kml, priorKml);
+    } else {
+      html += '<div class="fld-metrics-row">';
 
-      var effDeltaHtml = '';
-      if (prior && prior.efficiency_kml !== null) {
-        var pct      = ((kml - prior.efficiency_kml) / prior.efficiency_kml) * 100;
-        var sign     = pct >= 0 ? '+' : '';
-        var arrow    = pct > 0 ? '↑' : (pct < 0 ? '↓' : '→');
-        var deltaCls = pct >= 0 ? 'hist-delta--good' : 'hist-delta--bad';
-        effDeltaHtml = '<div class="fld-perf-delta ' + deltaCls + '">' + arrow + ' ' + sign + pct.toFixed(1) + '% vs prior</div>';
+      if (log.efficiency_kml !== null) {
+        html += '<div class="fld-metric-card">' +
+          '<div class="fld-metric-label">Efficiency</div>' +
+          '<div class="fld-metric-value">' + esc(log.efficiency_kml.toFixed(1)) + '<span class="fld-metric-unit"> km/L</span></div>' +
+        '</div>';
       }
 
-      var perfModifier = badgeCls.replace('hist-badge--', 'fld-perf-card--');
-      html += '<div class="fld-perf-card ' + perfModifier + '">' +
-        '<div class="fld-perf-left">' +
-          '<div class="fld-perf-label">Efficiency</div>' +
-          '<div class="fld-perf-value">' + esc(kml.toFixed(1)) + '<span class="fld-perf-unit"> km/L</span></div>' +
-          effDeltaHtml +
-        '</div>' +
-        '<div class="fld-perf-gauge">' +
-          '<div class="fld-gauge-ring">' +
-            '<div class="fld-gauge-badge">' + badgeLbl + '</div>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
+      if (log.cost_per_km !== null) {
+        html += '<div class="fld-metric-card">' +
+          '<div class="fld-metric-label">Cost per km</div>' +
+          '<div class="fld-metric-value">' + fmtPeso(log.cost_per_km) + '<span class="fld-metric-unit">/km</span></div>' +
+        '</div>';
+      }
+
+      html += '</div>';
     }
 
     // Stats: Journey
@@ -134,53 +100,57 @@
     // Stats: Cost
     html += '<div class="fld-stats-section">' +
       '<div class="fld-stats-section-label">Cost</div>' +
-      '<div class="hist-stats-grid hist-stats-grid--3col">' +
+      '<div class="hist-stats-grid hist-stats-grid--2col">' +
       buildStatCard('Total Cost',    fmtPeso(log.fuel_price), '') +
       buildStatCard('Price / Liter', log.cost_per_liter !== null ? fmtPeso(log.cost_per_liter) : '&mdash;', '') +
-      buildStatCard('Cost / km',     log.cost_per_km !== null ? fmtPeso(log.cost_per_km) + '/km' : '&mdash;', '') +
       '</div></div>';
 
-    // Comparison to prior fill-up
-    if (prior && (prior.efficiency_kml !== null || prior.cost_per_km !== null)) {
-      html += '<div class="fld-comparison"><div class="fld-section-title">vs Prior Fill-Up</div><div class="fld-comparison-grid">';
+    // Comparison to prior fill-up (both metrics side-by-side)
+    if (prior) {
+      var hasEffComparison = log.efficiency_kml !== null && prior.efficiency_kml !== null;
+      var hasCostComparison = log.cost_per_km !== null && prior.cost_per_km !== null;
 
-      if (log.efficiency_kml !== null && prior.efficiency_kml !== null) {
-        var effPct   = ((log.efficiency_kml - prior.efficiency_kml) / prior.efficiency_kml) * 100;
-        var effSign  = effPct >= 0 ? '+' : '';
-        var effArrow = effPct > 0 ? '&#8593;' : (effPct < 0 ? '&#8595;' : '&#8594;');
-        var effCls   = effPct >= 0 ? 'hist-delta--good' : 'hist-delta--bad';
-        html += '<div class="fld-comparison-item">' +
-          '<div class="fld-cmp-left">' +
-            '<div class="fld-cmp-label">Efficiency</div>' +
-            '<div class="fld-cmp-flow">' +
-              '<span class="fld-cmp-from">' + esc(prior.efficiency_kml.toFixed(1)) + '</span>' +
-              '<span class="fld-cmp-sep">→</span>' +
-              '<span class="fld-cmp-to">' + esc(log.efficiency_kml.toFixed(1)) + ' km/L</span>' +
+      if (hasEffComparison || hasCostComparison) {
+        html += '<div class="fld-comparison"><div class="fld-section-title">vs Prior Fill-Up</div><div class="fld-comparison-grid">';
+
+        if (hasEffComparison) {
+          var effPct   = ((log.efficiency_kml - prior.efficiency_kml) / prior.efficiency_kml) * 100;
+          var effSign  = effPct >= 0 ? '+' : '';
+          var effArrow = effPct > 0 ? '&#8593;' : (effPct < 0 ? '&#8595;' : '&#8594;');
+          var effCls   = effPct >= 0 ? 'hist-delta--good' : 'hist-delta--bad';
+          html += '<div class="fld-comparison-item">' +
+            '<div class="fld-cmp-left">' +
+              '<div class="fld-cmp-label">Efficiency</div>' +
+              '<div class="fld-cmp-flow">' +
+                '<span class="fld-cmp-from">' + esc(prior.efficiency_kml.toFixed(1)) + '</span>' +
+                '<span class="fld-cmp-sep">→</span>' +
+                '<span class="fld-cmp-to">' + esc(log.efficiency_kml.toFixed(1)) + ' km/L</span>' +
+              '</div>' +
             '</div>' +
-          '</div>' +
-          '<div class="fld-cmp-delta ' + effCls + '">' + effArrow + ' ' + effSign + effPct.toFixed(1) + '%</div>' +
-        '</div>';
-      }
+            '<div class="fld-cmp-delta ' + effCls + '">' + effArrow + ' ' + effSign + effPct.toFixed(1) + '%</div>' +
+          '</div>';
+        }
 
-      if (log.cost_per_km !== null && prior.cost_per_km !== null) {
-        var cstPct   = ((log.cost_per_km - prior.cost_per_km) / prior.cost_per_km) * 100;
-        var cstSign  = cstPct >= 0 ? '+' : '';
-        var cstArrow = cstPct < 0 ? '&#8595;' : (cstPct > 0 ? '&#8593;' : '&#8594;');
-        var cstCls   = cstPct <= 0 ? 'hist-delta--good' : 'hist-delta--bad';
-        html += '<div class="fld-comparison-item">' +
-          '<div class="fld-cmp-left">' +
-            '<div class="fld-cmp-label">Cost / km</div>' +
-            '<div class="fld-cmp-flow">' +
-              '<span class="fld-cmp-from">' + fmtPeso(prior.cost_per_km) + '</span>' +
-              '<span class="fld-cmp-sep">→</span>' +
-              '<span class="fld-cmp-to">' + fmtPeso(log.cost_per_km) + '/km</span>' +
+        if (hasCostComparison) {
+          var cstPct   = ((log.cost_per_km - prior.cost_per_km) / prior.cost_per_km) * 100;
+          var cstSign  = cstPct >= 0 ? '+' : '';
+          var cstArrow = cstPct < 0 ? '&#8595;' : (cstPct > 0 ? '&#8593;' : '&#8594;');
+          var cstCls   = cstPct <= 0 ? 'hist-delta--good' : 'hist-delta--bad';
+          html += '<div class="fld-comparison-item">' +
+            '<div class="fld-cmp-left">' +
+              '<div class="fld-cmp-label">Cost per km</div>' +
+              '<div class="fld-cmp-flow">' +
+                '<span class="fld-cmp-from">' + fmtPeso(prior.cost_per_km) + '</span>' +
+                '<span class="fld-cmp-sep">→</span>' +
+                '<span class="fld-cmp-to">' + fmtPeso(log.cost_per_km) + '/km</span>' +
+              '</div>' +
             '</div>' +
-          '</div>' +
-          '<div class="fld-cmp-delta ' + cstCls + '">' + cstArrow + ' ' + cstSign + cstPct.toFixed(1) + '%</div>' +
-        '</div>';
-      }
+            '<div class="fld-cmp-delta ' + cstCls + '">' + cstArrow + ' ' + cstSign + cstPct.toFixed(1) + '%</div>' +
+          '</div>';
+        }
 
-      html += '</div></div>';
+        html += '</div></div>';
+      }
     }
 
     // Notes

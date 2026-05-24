@@ -156,187 +156,49 @@
   gap: 14px;
 }
 
-/* ── Performance hero card with gauge ────────────────────────────────────────── */
+.fld-metrics-row {
+  display: flex;
+  gap: 12px;
+}
 
-.fld-perf-card {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 32px;
-  border: none;
+.fld-metrics-row .fld-metric-card {
+  flex: 1;
+}
+
+/* ── Metric cards (hero) ─────────────────────────────────────────────────── */
+
+.fld-metric-card {
+  background: #fff;
+  border: 1px solid #E8E8E4;
   border-radius: 16px;
-  padding: 28px 32px;
+  padding: 24px 28px;
   flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
   animation: fld-fade-in 0.5s ease-out;
 }
 
-.fld-perf-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -20%;
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  opacity: 0.08;
-  pointer-events: none;
-}
-
-.fld-perf-card--good    { background: linear-gradient(135deg, #F2FBF5 0%, #E8F7ED 100%); }
-.fld-perf-card--good::before { background: #228A55; }
-.fld-perf-card--neutral { background: linear-gradient(135deg, #FFFBF0 0%, #FFF9ED 100%); }
-.fld-perf-card--neutral::before { background: #D4900A; }
-.fld-perf-card--bad     { background: linear-gradient(135deg, #FEF7F6 0%, #FEF2EF 100%); }
-.fld-perf-card--bad::before { background: #D93520; }
-
-.fld-perf-left {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  position: relative;
-  z-index: 1;
-}
-
-.fld-perf-label {
-  font-size: 0.75rem;
+.fld-metric-label {
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #AAA79E;
+  margin-bottom: 8px;
+  display: block;
 }
 
-.fld-perf-value {
+.fld-metric-value {
   font-family: 'Sora', sans-serif;
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #38362F;
   line-height: 1.1;
 }
 
-.fld-perf-unit  {
-  font-size: 1rem;
+.fld-metric-unit {
+  font-size: 0.875rem;
   font-weight: 500;
   color: #7B756A;
   display: inline;
-}
-
-.fld-perf-delta {
-  font-size: 0.875rem;
-  font-weight: 600;
-  margin-top: 4px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.fld-perf-gauge {
-  position: relative;
-  z-index: 1;
-  flex-shrink: 0;
-}
-
-.fld-gauge-ring {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: radial-gradient(circle at center, #fff 0%, rgba(255,255,255,0.8) 50%, transparent 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.fld-gauge-ring::before {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 8px solid;
-  border-color: #E8E8E4;
-  top: 0;
-  left: 0;
-}
-
-.fld-perf-card--good .fld-gauge-ring::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 8px solid transparent;
-  border-top-color: #228A55;
-  border-right-color: #228A55;
-  border-bottom-color: #228A55;
-  top: 0;
-  left: 0;
-  animation: fld-spin-gauge 1.8s ease-out forwards;
-  opacity: 0;
-}
-
-.fld-perf-card--neutral .fld-gauge-ring::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 8px solid transparent;
-  border-top-color: #D4900A;
-  border-right-color: #D4900A;
-  top: 0;
-  left: 0;
-  animation: fld-spin-gauge-partial 1.8s ease-out forwards;
-  opacity: 0;
-}
-
-.fld-perf-card--bad .fld-gauge-ring::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 8px solid transparent;
-  border-top-color: #D93520;
-  top: 0;
-  left: 0;
-  animation: fld-spin-gauge-small 1.8s ease-out forwards;
-  opacity: 0;
-}
-
-.fld-gauge-badge {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  line-height: 1.1;
-  max-width: 85px;
-  word-break: break-word;
-}
-
-@keyframes fld-spin-gauge {
-  from { transform: rotate(-120deg); opacity: 1; }
-  to { transform: rotate(120deg); opacity: 1; }
-}
-
-@keyframes fld-spin-gauge-partial {
-  from { transform: rotate(-120deg); opacity: 1; }
-  to { transform: rotate(60deg); opacity: 1; }
-}
-
-@keyframes fld-spin-gauge-small {
-  from { transform: rotate(-120deg); opacity: 1; }
-  to { transform: rotate(-30deg); opacity: 1; }
-}
-
-@keyframes fld-fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Stats sections ───────────────────────────────────────────────────────── */
@@ -353,6 +215,12 @@
   color: #AAA79E;
   margin-bottom: 12px;
   display: block;
+}
+
+.hist-stats-grid--2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
 /* ── Section title (comparison, notes) ───────────────────────────────────── */
@@ -525,7 +393,7 @@
 @media (max-width: 768px) {
   .fld-wrap { padding: 0 16px; }
   .fld-title { font-size: 1.25rem; }
-  .fld-perf-value { font-size: 1.5rem; }
+  .fld-metric-value { font-size: 1.5rem; }
 }
 
 @media (max-width: 540px) {

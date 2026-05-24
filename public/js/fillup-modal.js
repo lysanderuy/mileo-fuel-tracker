@@ -394,9 +394,9 @@
       const arrow = pct > 0 ? '↑' : (pct < 0 ? '↓' : '→');
       const cls   = pct >= 0 ? 'hist-delta--good' : 'hist-delta--bad';
 
-      if (pct >= 5)       { badgeClass = 'hist-badge--good';    badgeText = 'Above Average'; }
-      else if (pct >= -5) { badgeClass = 'hist-badge--neutral'; badgeText = 'On Track'; }
-      else                { badgeClass = 'hist-badge--bad';     badgeText = 'Below Average'; }
+      if (pct >= 5)       { badgeClass = 'hist-badge--good';    badgeText = 'Better than avg'; }
+      else if (pct >= -5) { badgeClass = 'hist-badge--neutral'; badgeText = 'About average'; }
+      else                { badgeClass = 'hist-badge--bad';     badgeText = 'Worse than avg'; }
 
       deltaHtml = '<div class="hist-perf-delta ' + cls + '">'
                 + arrow + ' ' + sign + pct.toFixed(1) + '% vs your avg ' + avgKml.toFixed(1) + ' km/L'

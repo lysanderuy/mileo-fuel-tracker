@@ -1,9 +1,6 @@
 (function () {
   'use strict';
 
-  var EFF_THRESHOLD_GOOD = 12.5;
-  var EFF_THRESHOLD_OK   = 10;
-
   var SVG_UP   = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>';
   var SVG_DOWN = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>';
   var SVG_FLAT = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M5 12h14"/></svg>';
@@ -39,17 +36,16 @@
   }
 
   // Returns { cls: 'green'|'yellow'|'red', icon: svgString }
-  // Used to render efficiency badge color and directional icon consistently across pages.
+  // Shows trend vs prior fill-up only. No absolute judgment.
+  // First fill-up (no prior) returns neutral/flat.
   function effBadgeInfo(kml, priorKml) {
-    if (priorKml !== null && priorKml !== undefined) {
-      var pct = ((kml - priorKml) / priorKml) * 100;
-      if (pct > 5)  return { cls: 'green',  icon: SVG_UP };
-      if (pct < -5) return { cls: 'red',    icon: SVG_DOWN };
+    if (priorKml === null || priorKml === undefined) {
       return { cls: 'yellow', icon: SVG_FLAT };
     }
-    if (kml >= EFF_THRESHOLD_GOOD) return { cls: 'green',  icon: SVG_UP };
-    if (kml >= EFF_THRESHOLD_OK)   return { cls: 'yellow', icon: SVG_FLAT };
-    return { cls: 'red', icon: SVG_DOWN };
+    var pct = ((kml - priorKml) / priorKml) * 100;
+    if (pct > 5)  return { cls: 'green',  icon: SVG_UP };
+    if (pct < -5) return { cls: 'red',    icon: SVG_DOWN };
+    return { cls: 'yellow', icon: SVG_FLAT };
   }
 
   window.MileoUtils = { esc: esc, fmtDate: fmtDate, fmtPeso: fmtPeso, showToast: showToast, effBadgeInfo: effBadgeInfo };
