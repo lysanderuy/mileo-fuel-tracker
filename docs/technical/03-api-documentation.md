@@ -350,12 +350,6 @@ Returns aggregate stats, recent fill-ups, active vehicles, and fleet overview fo
     "month_fillups": 5,
     "total_spent": 75000.00,
     "month_spent": 9000.00,
-    "avg_kml": 13.8,
-    "month_avg_kml": 14.1,
-    "avg_cost_km": 5.20,
-    "month_avg_cost_km": 5.10,
-    "avg_cost_per_liter": 71.50,
-    "month_avg_cost_per_liter": 72.00,
     "total_distance": 14490.0,
     "month_total_distance": 1750.0
   },
@@ -367,7 +361,7 @@ Returns aggregate stats, recent fill-ups, active vehicles, and fleet overview fo
   "fillups": [
     {
       "date": "2026-04-25",
-      "station": "Daily",
+      "vehicle_name": "Daily",
       "is_full_tank": true,
       "liters_filled": 25.0,
       "cost_per_liter": 72.00,
@@ -393,4 +387,4 @@ Returns aggregate stats, recent fill-ups, active vehicles, and fleet overview fo
 }
 ```
 
-`fleet` is only populated when the user has more than one active vehicle. `fillups` returns the 5 most recent logs. All numeric efficiency and cost fields may be `null` when there is insufficient data.
+`fleet` is only populated when the user has more than one active vehicle. `fillups` returns the 5 most recent logs. All numeric efficiency and cost fields may be `null` when there is insufficient data. Note: `stats` does not include `avg_kml`, `avg_cost_km`, or `avg_cost_per_liter` fields — only totals and counts.

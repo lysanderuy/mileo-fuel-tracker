@@ -35,7 +35,7 @@ if ($api !== null) {
 
 $page = $_GET['page'] ?? 'landing';
 
-$allowed_pages = ['landing', 'login', 'signup', 'logout', 'dashboard', 'vehicles', 'history', 'fuel-log-detail'];
+$allowed_pages = ['landing', 'login', 'signup', 'dashboard', 'vehicles', 'history', 'fuel-log-detail'];
 
 if (!in_array($page, $allowed_pages)) {
     http_response_code(404);

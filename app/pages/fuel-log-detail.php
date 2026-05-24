@@ -22,6 +22,4 @@ include_once __DIR__ . '/../includes/header.php';
     </div>
   </div>
 </div>
-<script src="js/fillup-modal.js"></script>
-<script src="js/fuel-log-detail.js"></script>
 <?php include_once __DIR__ . '/../includes/footer.php'; ?>

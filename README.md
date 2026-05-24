@@ -69,17 +69,16 @@ mileo/
 │       ├── history.php
 │       ├── landing.php
 │       ├── login.php
-│       ├── logout.php
 │       ├── signup.php
 │       └── vehicles.php
 ├── config/
 │   └── db.php
 ├── database/
-│   ├── migrations/
+│   ├── migrations/           # Historical migrations (already applied to schema.sql)
 │   │   ├── add_is_default_to_vehicles.sql
 │   │   ├── add_tank_capacity_odometer_to_vehicles.sql
 │   │   └── drop_efficiency_l100km_column.sql
-│   └── schema.sql
+│   └── schema.sql            # Current canonical schema
 ├── docs/
 │   ├── design/
 │   │   ├── 01-brand-guidelines.md
@@ -102,6 +101,7 @@ mileo/
 │   │   ├── fuel-log.css
 │   │   ├── history.css
 │   │   ├── landing.css
+│   │   ├── popover.css
 │   │   └── vehicles.css
 │   ├── index.php
 │   └── js/
@@ -111,6 +111,8 @@ mileo/
 │       ├── fuel-log.js
 │       ├── history.js
 │       ├── landing.js
+│       ├── popover.js
+│       ├── utils.js
 │       └── vehicles.js
 └── README.md
 ```

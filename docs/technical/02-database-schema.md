@@ -27,6 +27,10 @@ Indexes:
 - `PRIMARY (id)`
 - `UNIQUE email`
 
+Indexes:
+- `PRIMARY (id)`
+- `UNIQUE email`
+
 ---
 
 ### `vehicles`
@@ -69,12 +73,12 @@ Stores individual fill-ups. `cost_per_liter` and `cost_per_km` are generated (st
 | `vehicle_id` | `INT` | Foreign key to `vehicles.id` (cascade delete) |
 | `log_date` | `DATE` | Fill-up date (`YYYY-MM-DD`) |
 | `odometer` | `INT` | Odometer reading at fill-up (km) |
-| `trip_distance` | `DECIMAL(8,2)` | Distance since last fill-up (km); nullable when log is the first entry |
+| `trip_distance` | `DECIMAL(8,2)` | Distance since last fill-up (km); auto-computed from odometer delta; nullable for first log |
 | `liters_filled` | `DECIMAL(8,2)` | Fuel volume added (L); required |
 | `fuel_price` | `DECIMAL(10,2)` | Total cost of this fill-up; required |
 | `is_full_tank` | `TINYINT(1)` | `1` = full fill-up; default `1` |
 | `cost_per_liter` | `DECIMAL(10,2)` | **Generated:** `fuel_price / liters_filled` |
-| `cost_per_km` | `DECIMAL(10,4)` | **Generated:** `fuel_price / trip_distance` |
+| `cost_per_km` | `DECIMAL(10,4)` | **Generated:** `fuel_price / trip_distance` (NULL when trip_distance is NULL or 0) |
 | `notes` | `TEXT` | Optional; max 200 characters enforced at API layer |
 | `created_at` | `TIMESTAMP` | Defaults to current timestamp |
 | `updated_at` | `TIMESTAMP` | Auto-updates on change |

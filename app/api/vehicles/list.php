@@ -1,28 +1,15 @@
 <?php
 require_once __DIR__ . '/../../../config/db.php';
+require_once __DIR__ . '/../../../app/includes/api_helpers.php';
 
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
-
+api_require_auth();
 header('Content-Type: application/json');
+api_require_method('GET');
 
 $user_id = (int)$_SESSION['user_id'];
 
-$has_is_default = false;
-$check = $conn->query("SHOW COLUMNS FROM vehicles LIKE 'is_default'");
-if ($check && $check->num_rows > 0) {
-    $has_is_default = true;
-}
-
-$orderBy = "is_archived ASC, " . ($has_is_default ? "is_default DESC, " : "") . "name ASC";
-$selectFields = "id, name, make, model, year, fuel_type, color, plate_number, tank_capacity, is_archived" . ($has_is_default ? ", is_default" : "");
-
 $stmt = $conn->prepare("
-    SELECT $selectFields,
+    SELECT id, name, make, model, year, fuel_type, color, plate_number, tank_capacity, is_archived, is_default,
            COALESCE(
              (SELECT odometer FROM fuel_logs
               WHERE user_id = ? AND vehicle_id = v.id
@@ -31,7 +18,7 @@ $stmt = $conn->prepare("
            ) AS current_odometer
     FROM vehicles v
     WHERE user_id = ?
-    ORDER BY $orderBy
+    ORDER BY is_archived ASC, is_default DESC, name ASC
 ");
 $stmt->bind_param('ii', $user_id, $user_id);
 $stmt->execute();
@@ -51,7 +38,7 @@ while ($row = $result->fetch_assoc()) {
         'tank_capacity' => $row['tank_capacity'] !== null ? (float)$row['tank_capacity'] : null,
         'odometer'      => $row['current_odometer'] !== null ? (int)$row['current_odometer'] : null,
         'is_archived'   => (bool)$row['is_archived'],
-        'is_default'    => $has_is_default ? (bool)$row['is_default'] : false,
+        'is_default'    => (bool)$row['is_default'],
     ];
 }
 $stmt->close();

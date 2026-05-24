@@ -1,29 +1,10 @@
 <?php
 require_once __DIR__ . '/../../../config/db.php';
+require_once __DIR__ . '/../../../app/includes/api_helpers.php';
 
-set_exception_handler(function (Throwable $e) {
-    if (!headers_sent()) {
-        http_response_code(500);
-        header('Content-Type: application/json');
-    }
-    echo json_encode(['error' => $e->getMessage()]);
-    exit;
-});
-
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
-
+api_require_auth();
 header('Content-Type: application/json');
-
-if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
-    exit;
-}
+api_require_method('GET');
 
 $user_id = (int)$_SESSION['user_id'];
 $id      = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -110,30 +91,41 @@ $stmt->close();
 
 $prior = null;
 if ($prior_row) {
-    $p_id  = (int)$prior_row['id'];
-    $p_date = $prior_row['log_date'];
+    $p_id       = (int)$prior_row['id'];
+    $p_date     = $prior_row['log_date'];
     $p_odometer = (int)$prior_row['odometer'];
 
-    $prior_l100 = null;
+    // Compute efficiency FOR the prior log (not before it)
+    // This uses the tank before the prior log to get the delta
+    $prior_eff = null;
     if ((bool)$prior_row['is_full_tank']) {
-        $p_eff_row = $conn->query("
-            SELECT SUM(fl2.liters_filled) / NULLIF({$p_odometer} - pf.odometer, 0) * 100 AS efficiency_l100km
-            FROM fuel_logs fl2
-            JOIN (
-                SELECT id, odometer, log_date
+        $prev_before_prior = $conn->query("
+            SELECT odometer
+            FROM fuel_logs
+            WHERE vehicle_id = {$vehicle_id} AND user_id = {$user_id}
+              AND is_full_tank = 1
+              AND (log_date < '{$p_date}' OR (log_date = '{$p_date}' AND id < {$p_id}))
+            ORDER BY log_date DESC, id DESC
+            LIMIT 1
+        ")->fetch_assoc();
+
+        if ($prev_before_prior && $prev_before_prior['odometer'] !== null) {
+            $trip = $p_odometer - (int)$prev_before_prior['odometer'];
+            $liters = $conn->query("
+                SELECT SUM(liters_filled) AS total_liters
                 FROM fuel_logs
                 WHERE vehicle_id = {$vehicle_id} AND user_id = {$user_id}
                   AND is_full_tank = 1
-                  AND (log_date < '{$p_date}' OR (log_date = '{$p_date}' AND id < {$p_id}))
-                ORDER BY log_date DESC, id DESC LIMIT 1
-            ) pf ON (fl2.log_date > pf.log_date OR (fl2.log_date = pf.log_date AND fl2.id > pf.id))
-            WHERE fl2.vehicle_id = {$vehicle_id} AND fl2.user_id = {$user_id}
-              AND (fl2.log_date < '{$p_date}' OR (fl2.log_date = '{$p_date}' AND fl2.id <= {$p_id}))
-        ")->fetch_assoc();
-        $prior_l100 = $p_eff_row['efficiency_l100km'] ?? null;
+                  AND (log_date > '{$prev_before_prior['log_date']}' OR (log_date = '{$prev_before_prior['log_date']}' AND id > {$prev_before_prior['id']}))
+                  AND (log_date < '{$p_date}' OR (log_date = '{$p_date}' AND id <= {$p_id}))
+            ")->fetch_assoc()['total_liters'] ?? null;
+
+            if ($trip > 0 && $liters > 0) {
+                $prior_eff = $trip / (float)$liters;
+            }
+        }
     }
 
-    $prior_eff = ($prior_l100 !== null && $prior_l100 > 0) ? 100.0 / (float)$prior_l100 : null;
     $prior = [
         'id'             => $p_id,
         'log_date'       => $p_date,
