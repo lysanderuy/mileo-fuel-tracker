@@ -169,6 +169,17 @@
       if (item.is_default) opt.selected = true;
       select.appendChild(opt);
     });
+
+    // Initialize custom popover to replace native select
+    if (window.Popover && !select._popoverInitialized) {
+      select._popoverInstance = window.Popover.init(select, {
+        placeholder: 'Select vehicle',
+        onChange: () => applyTripState()
+      });
+      select._popoverInitialized = true;
+    } else if (select._popoverInstance) {
+      select._popoverInstance.refresh();
+    }
   }
 
   // ── Modal Open / Close ─────────────────────────────────────────────────────

@@ -72,11 +72,22 @@
           options += `<option value="${v.id}" ${String(v.id) === currentId ? 'selected' : ''}>${esc(v.name)}</option>`;
         });
         switcherContainer.innerHTML = `<select class="db-switcher" id="db-vehicle-switcher">${options}</select>`;
-        
-        document.getElementById('db-vehicle-switcher').addEventListener('change', (e) => {
-          localStorage.setItem('mileo_active_vehicle_id', e.target.value);
-          loadDashboard();
-        });
+
+        // Initialize custom popover
+        const selectEl = document.getElementById('db-vehicle-switcher');
+        if (selectEl && window.Popover) {
+          window.Popover.init(selectEl, {
+            onChange: (value) => {
+              localStorage.setItem('mileo_active_vehicle_id', value);
+              loadDashboard();
+            }
+          });
+        } else if (selectEl) {
+          selectEl.addEventListener('change', (e) => {
+            localStorage.setItem('mileo_active_vehicle_id', e.target.value);
+            loadDashboard();
+          });
+        }
       } else {
         switcherContainer.innerHTML = '';
       }
@@ -92,10 +103,22 @@
           <option value="this_month" ${currentTimeRange === 'this_month' ? 'selected' : ''}>This Month</option>
         </select>
       `;
-      document.getElementById('db-time-switcher').addEventListener('change', (e) => {
-        localStorage.setItem('mileo_dashboard_time_range', e.target.value);
-        renderDashboard(data);
-      });
+
+      // Initialize custom popover
+      const selectEl = document.getElementById('db-time-switcher');
+      if (selectEl && window.Popover) {
+        window.Popover.init(selectEl, {
+          onChange: (value) => {
+            localStorage.setItem('mileo_dashboard_time_range', value);
+            renderDashboard(data);
+          }
+        });
+      } else if (selectEl) {
+        selectEl.addEventListener('change', (e) => {
+          localStorage.setItem('mileo_dashboard_time_range', e.target.value);
+          renderDashboard(data);
+        });
+      }
     }
 
     // Stats

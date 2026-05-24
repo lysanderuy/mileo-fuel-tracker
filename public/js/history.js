@@ -341,12 +341,23 @@
           });
           // Note: using hist-switcher for styling or reusing db-switcher style
           switcherContainer.innerHTML = `<select class="hist-switcher" id="hist-vehicle-select">${options}</select>`;
-          
-          document.getElementById('hist-vehicle-select').addEventListener('change', (e) => {
-            const newId = e.target.value;
-            localStorage.setItem('mileo_active_vehicle_id', newId);
-            switchVehicle(newId);
-          });
+
+          // Initialize custom popover
+          const selectEl = document.getElementById('hist-vehicle-select');
+          if (selectEl && window.Popover) {
+            window.Popover.init(selectEl, {
+              onChange: (value) => {
+                localStorage.setItem('mileo_active_vehicle_id', value);
+                switchVehicle(value);
+              }
+            });
+          } else if (selectEl) {
+            selectEl.addEventListener('change', (e) => {
+              const newId = e.target.value;
+              localStorage.setItem('mileo_active_vehicle_id', newId);
+              switchVehicle(newId);
+            });
+          }
         } else {
           switcherContainer.innerHTML = '';
         }
