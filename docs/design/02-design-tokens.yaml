@@ -176,8 +176,8 @@ color:
 # TYPOGRAPHY
 # ─────────────────────────────────────────────
 # Font choice rationale:
-#   Display / Headings — "DM Sans" (or fallback: "Sora")
-#     Geometric but human. Confident letterforms that read as
+#   Display / Headings — "Space Grotesk" (or fallback: "Sora")
+#     Geometric, technical feel. Confident letterforms that read as
 #     "coach voice" — not academic, not corporate. Excellent at
 #     large sizes on OLED screens.
 #   Body / UI — "Plus Jakarta Sans"
@@ -189,7 +189,7 @@ color:
 typography:
 
   font_family:
-    display:   "'DM Sans', 'Sora', sans-serif"
+    display:   "'Space Grotesk', 'Sora', sans-serif"
     body:      "'Plus Jakarta Sans', 'DM Sans', sans-serif"
     mono:      "'JetBrains Mono', 'Fira Code', monospace"
 

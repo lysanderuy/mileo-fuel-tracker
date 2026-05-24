@@ -176,7 +176,7 @@
 
 **Acceptance Criteria:**
 - [ ] Tapping **Save Fill-Up** with any required field empty shows an inline error beneath that field (not a modal)
-- [ ] Inline errors also appear for: `volume_filled ≤ 0`, `fuel_price_per_unit ≤ 0`, `trip_distance ≤ 0`, odometer less than previous reading
+- [ ] Inline errors also appear for: `liters_filled ≤ 0`, `fuel_price ≤ 0`, `trip_distance ≤ 0`, odometer less than previous reading
 - [ ] All other field values are preserved when a validation error is shown
 - [ ] Errors clear when the user corrects the relevant field
 

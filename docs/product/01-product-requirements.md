@@ -100,10 +100,9 @@ The person who owns the Mileo account.
 | Field | Type | Notes |
 |---|---|---|
 | `id` | INT | Primary key, auto-increment |
-| `email` | string | Unique, used for auth |
-| `password` | string | Hashed |
-| `first_name` | string | Optional, display only |
-| `last_name` | string | Optional, display only |
+| `name` | VARCHAR(100) | Required display name |
+| `email` | VARCHAR(255) | Unique, used for auth |
+| `password` | VARCHAR(255) | Bcrypt-hashed |
 | `created_at` | timestamp | |
 | `updated_at` | timestamp | |
 
@@ -114,16 +113,18 @@ A car or motorized vehicle owned by the user.
 | Field | Type | Notes |
 |---|---|---|
 | `id` | INT | Primary key, auto-increment |
-| `user_id` | INT | FK → User |
-| `name` | string | User-defined label (e.g., "My Civic", "Work Van") |
-| `make` | string | Optional (e.g., Honda) |
-| `model` | string | Optional (e.g., Civic) |
-| `year` | integer | Optional (e.g., 2019) |
-| `fuel_type` | enum | `gasoline`, `diesel`, `lpg`, `electric` |
-| `color` | string | Optional |
-| `plate_number` | string | Optional |
-| `is_default` | boolean | The vehicle pre-selected when logging a fill-up |
-| `status` | enum | `active`, `archived` |
+| `user_id` | INT | FK → User (cascade delete) |
+| `name` | VARCHAR(100) | User-defined label (e.g., "My Civic", "Work Van") |
+| `make` | VARCHAR(50) | Optional (e.g., Honda) |
+| `model` | VARCHAR(50) | Optional (e.g., Civic) |
+| `year` | INT | Optional (e.g., 2019) |
+| `fuel_type` | VARCHAR(20) | Optional |
+| `color` | VARCHAR(50) | Optional |
+| `plate_number` | VARCHAR(20) | Optional; unique per user |
+| `tank_capacity` | DECIMAL(6,2) | Full tank size in liters; optional |
+| `odometer` | INT | Synced from latest fuel log; optional |
+| `is_archived` | TINYINT(1) | `0` = active, `1` = archived; default `0` |
+| `is_default` | TINYINT(1) | `1` = user's default vehicle; default `0` |
 | `created_at` | timestamp | |
 | `updated_at` | timestamp | |
 
@@ -140,33 +141,33 @@ The record of a single Fill-Up event. This is the central entity of Mileo.
 | Field | Type | Notes |
 |---|---|---|
 | `id` | INT | Primary key, auto-increment |
-| `vehicle_id` | INT | FK → Vehicle |
-| `user_id` | INT | FK → User (denormalized for query performance) |
-| `logged_at` | timestamp | When the fill-up occurred (user-set, defaults to now) |
-| `odometer_reading` | decimal | Cumulative vehicle distance at time of fill-up |
-| `trip_distance` | decimal | Distance since last fill-up (A→B). Auto-computed if prior log exists; editable |
-| `fuel_price_per_unit` | decimal | Price paid per liter at the pump |
-| `volume_filled` | decimal | Amount of fuel added (liters) |
-| `is_full_tank` | boolean | Whether the tank was filled completely |
-| `total_cost` | decimal | Computed: `fuel_price_per_unit × volume_filled` |
-| `cost_per_distance_unit` | decimal | Computed: `total_cost / trip_distance` |
-| `efficiency_km_l` | decimal | Computed: `trip_distance / volume_filled` (km/L) |
-| `notes` | string | Optional free-text field (max 200 chars) |
+| `vehicle_id` | INT | FK → Vehicle (cascade delete) |
+| `user_id` | INT | FK → User (cascade delete) |
+| `log_date` | DATE | Fill-up date (`YYYY-MM-DD`) |
+| `odometer` | INT | Odometer reading at fill-up (km) |
+| `trip_distance` | DECIMAL(8,2) | Distance since last fill-up (km); auto-computed from odometer delta; nullable for first log |
+| `liters_filled` | DECIMAL(8,2) | Fuel volume added (L); required |
+| `fuel_price` | DECIMAL(10,2) | Total cost of this fill-up; required |
+| `is_full_tank` | TINYINT(1) | `1` = full fill-up; default `1` |
+| `cost_per_liter` | DECIMAL(10,2) | **Generated:** `fuel_price / liters_filled` |
+| `cost_per_km` | DECIMAL(10,4) | **Generated:** `fuel_price / trip_distance` (NULL when trip_distance is NULL or 0) |
+| `notes` | TEXT | Optional; max 200 characters enforced at API layer |
 | `created_at` | timestamp | |
 | `updated_at` | timestamp | |
 
 **Computation Rules:**
-- `total_cost` = `fuel_price_per_unit × volume_filled` (always computed, not user-entered)
-- `trip_distance` = `current_odometer - previous_odometer` if a prior log exists for the same vehicle; otherwise user must enter it manually
-- `efficiency_km_l` = `trip_distance / volume_filled` (always computed; partial fills are flagged in the UI but still calculated)
+- `cost_per_liter` = `fuel_price / liters_filled` (generated column, never written directly)
+- `cost_per_km` = `fuel_price / trip_distance` (generated column; NULL when trip_distance is NULL or 0)
+- `trip_distance` = `current_odometer - previous_odometer` if a prior log exists for the same vehicle; otherwise user must enter it manually via `manual_trip_override`
+- Efficiency (`km/L`) is computed at query time using window functions over full fill-ups only; partial fills (`is_full_tank = false`) do not reset the efficiency baseline
 
 **Validation Rules:**
-- `odometer_reading` must be ≥ the previous log's `odometer_reading` for the same Vehicle
-- `volume_filled` must be > 0
-- `fuel_price_per_unit` must be > 0
-- `trip_distance` must be > 0
-- `logged_at` cannot be in the future
-- `logged_at` cannot be before the Vehicle's `created_at`
+- `odometer` must be ≥ the previous log's `odometer` for the same Vehicle
+- `liters_filled` must be > 0
+- `fuel_price` must be > 0
+- `trip_distance` must be > 0 (when provided)
+- `log_date` cannot be in the future
+- `log_date` cannot be before the Vehicle's `created_at`
 
 ---
 

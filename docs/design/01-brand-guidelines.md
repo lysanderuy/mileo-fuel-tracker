@@ -213,7 +213,8 @@ Amber CTAs and the FAB remain `#F59500` in dark mode. The FAB shadow is slightly
 
 | Role | Font | Fallbacks | Why |
 |---|---|---|---|
-| **Display / Headings** | DM Sans | Sora, sans-serif | Geometric but human. Confident at large sizes. Reads as coach voice — not academic, not corporate. |
+| **Display / Headings** | Space Grotesk | Sora, sans-serif | Geometric, technical feel. Confident at large sizes. Reads as coach voice — not academic, not corporate. |
+| **Brand / Logo** | Sora | sans-serif | Used for "mileo" wordmark in navbar. Bold weight, tight tracking. |
 | **Body / UI** | Plus Jakarta Sans | DM Sans, sans-serif | Workhorse with personality. Wide apertures = legible outdoors. Distinguished from overused Inter/Roboto. |
 | **Numbers / Stats** | JetBrains Mono | Fira Code, monospace | Tabular, trustworthy, scannable. Stats feel precise, not decorative. Numbers are Mileo's content. |
 
@@ -221,7 +222,7 @@ Amber CTAs and the FAB remain `#F59500` in dark mode. The FAB shadow is slightly
 <!-- Add to HTML <head> -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 ```
 
 ---
@@ -249,13 +250,13 @@ Amber CTAs and the FAB remain `#F59500` in dark mode. The FAB shadow is slightly
 These are the only defined combinations. Do not freestyle outside these roles.
 
 **`display_hero`** — Onboarding, splash
-- Font: DM Sans | Size: 48px | Weight: 700 | Leading: 1.15 | Tracking: -0.03em
+- Font: Space Grotesk | Size: 48px | Weight: 700 | Leading: 1.15 | Tracking: -0.03em
 
 **`heading_screen`** — Screen titles (e.g., "Fill-Up History")
-- Font: DM Sans | Size: 24px | Weight: 700 | Leading: 1.25 | Tracking: -0.015em
+- Font: Space Grotesk | Size: 24px | Weight: 700 | Leading: 1.25 | Tracking: -0.015em
 
 **`heading_section`** — Section labels (e.g., "This Month")
-- Font: DM Sans | Size: 20px | Weight: 600 | Leading: 1.25 | Tracking: -0.015em
+- Font: Space Grotesk | Size: 20px | Weight: 600 | Leading: 1.25 | Tracking: -0.015em
 
 **`heading_card`** — Card titles (e.g., "My Civic")
 - Font: Plus Jakarta Sans | Size: 18px | Weight: 600 | Leading: 1.25
@@ -296,9 +297,9 @@ These are the only defined combinations. Do not freestyle outside these roles.
 
 1. **Stats always use JetBrains Mono.** Numbers are Mileo's primary content. Monospace keeps them scannable and trustworthy.
 
-2. **Headings always use DM Sans.** Never Plus Jakarta Sans for screen or section headings.
+2. **Headings always use Space Grotesk.** Never Plus Jakarta Sans for screen or section headings.
 
-3. **Body copy always uses Plus Jakarta Sans.** Never use DM Sans or JetBrains Mono for sentences or paragraphs.
+3. **Body copy always uses Plus Jakarta Sans.** Never use Space Grotesk or JetBrains Mono for sentences or paragraphs.
 
 4. **No more than three type sizes per screen.** Hierarchy is about contrast, not abundance. Pick a hero size, a supporting size, and a caption size — and stop there.
 
