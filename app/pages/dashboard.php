@@ -1,4 +1,5 @@
 <?php
+$page = 'dashboard';
 $dashboard_title = 'Dashboard';
 $dashboard_subtitle = 'Your fuel tracking overview';
 
@@ -44,9 +45,4 @@ include_once __DIR__ . '/../includes/header.php';
 
 <!-- Fuel Log Modal -->
 <?php include __DIR__ . '/../includes/components/fillup_modal.php'; ?>
-<script src="js/fillup-modal.js"></script>
-<script src="js/dashboard.js"></script>
-
-<link rel="stylesheet" href="css/popover.css">
-<script src="js/popover.js"></script>
 <?php include_once __DIR__ . '/../includes/footer.php'; ?>

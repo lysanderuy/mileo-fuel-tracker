@@ -47,9 +47,4 @@ include_once __DIR__ . '/../includes/header.php';
   </div>
 </div>
 
-<script src="js/fillup-modal.js"></script>
-<script src="js/history.js"></script>
-
-<link rel="stylesheet" href="css/popover.css">
-<script src="js/popover.js"></script>
 <?php include_once __DIR__ . '/../includes/footer.php'; ?>
