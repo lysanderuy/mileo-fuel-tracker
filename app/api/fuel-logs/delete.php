@@ -79,6 +79,12 @@ if ($next) {
     $stmt->close();
 }
 
+if ($latest_remaining) {
+    $latest_odo = (int)$latest_remaining['odometer'];
+    $stmt = $conn->prepare("UPDATE vehicles SET odometer = ? WHERE id = ? AND user_id = ?");
+    $stmt->bind_param('iii', $latest_odo, $vehicle_id, $user_id);
+} else {
+
 $stmt = $conn->prepare("
     SELECT odometer FROM fuel_logs
     WHERE user_id = ? AND vehicle_id = ?
@@ -91,8 +97,9 @@ $latest_remaining = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 if ($latest_remaining) {
+    $latest_odo = (int)$latest_remaining['odometer'];
     $stmt = $conn->prepare("UPDATE vehicles SET odometer = ? WHERE id = ? AND user_id = ?");
-    $stmt->bind_param('iii', (int)$latest_remaining['odometer'], $vehicle_id, $user_id);
+    $stmt->bind_param('iii', $latest_odo, $vehicle_id, $user_id);
 } else {
     $stmt = $conn->prepare("UPDATE vehicles SET odometer = NULL WHERE id = ? AND user_id = ?");
     $stmt->bind_param('ii', $vehicle_id, $user_id);

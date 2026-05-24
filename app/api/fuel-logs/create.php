@@ -65,7 +65,7 @@ if ($fuel_price <= 0) {
 }
 
 $stmt = $conn->prepare("
-    SELECT id
+    SELECT id, odometer AS vehicle_odometer
     FROM vehicles
     WHERE id = ? AND user_id = ? AND is_archived = 0
     LIMIT 1
@@ -94,7 +94,10 @@ $last_row = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 $last_odometer = $last_row ? (int)$last_row['odometer'] : null;
-if ($last_odometer !== null && $odometer < $last_odometer) {
+$vehicle_odometer = $vehicle_row['vehicle_odometer'] !== null ? (int)$vehicle_row['vehicle_odometer'] : null;
+
+$baseline_odometer = $last_odometer ?? $vehicle_odometer;
+if ($baseline_odometer !== null && $odometer < $baseline_odometer) {
     http_response_code(422);
     echo json_encode(['error' => 'Odometer must be greater than or equal to last logged value.']);
     exit;
@@ -103,7 +106,9 @@ if ($last_odometer !== null && $odometer < $last_odometer) {
 $trip_distance = null;
 if ($last_odometer !== null && !$manual_trip_override) {
     $trip_distance = (float)($odometer - $last_odometer);
-} elseif ($last_odometer !== null) {
+} elseif ($vehicle_odometer !== null && !$manual_trip_override) {
+    $trip_distance = (float)($odometer - $vehicle_odometer);
+} elseif ($manual_trip_override) {
     if ($trip_distance_input === null || $trip_distance_input === '') {
         http_response_code(422);
         echo json_encode(['error' => 'Trip distance is required.']);
@@ -145,28 +150,8 @@ $stmt->execute();
 $stmt->close();
 
 $efficiency_kml = null;
-if ($is_full_tank) {
-    $eff_result = $conn->query("
-        SELECT SUM(fl2.liters_filled) / NULLIF({$odometer} - pf.odometer, 0) * 100 AS efficiency_l100km
-        FROM fuel_logs fl2
-        JOIN (
-            SELECT id, odometer, log_date
-            FROM fuel_logs
-            WHERE vehicle_id = {$vehicle_id} AND user_id = {$user_id}
-              AND is_full_tank = 1
-              AND (log_date < '{$log_date}' OR (log_date = '{$log_date}' AND id < {$new_id}))
-            ORDER BY log_date DESC, id DESC LIMIT 1
-        ) pf ON (fl2.log_date > pf.log_date OR (fl2.log_date = pf.log_date AND fl2.id > pf.id))
-        WHERE fl2.vehicle_id = {$vehicle_id} AND fl2.user_id = {$user_id}
-          AND (fl2.log_date < '{$log_date}' OR (fl2.log_date = '{$log_date}' AND fl2.id <= {$new_id}))
-    ");
-    if ($eff_result) {
-        $eff_row = $eff_result->fetch_assoc();
-        $l100 = $eff_row['efficiency_l100km'] ?? null;
-        if ($l100 !== null && (float)$l100 > 0) {
-            $efficiency_kml = 100.0 / (float)$l100;
-        }
-    }
+if ($is_full_tank && $last_row && $trip_distance !== null && $trip_distance > 0) {
+    $efficiency_kml = $trip_distance / $liters_filled;
 }
 
 http_response_code(201);
