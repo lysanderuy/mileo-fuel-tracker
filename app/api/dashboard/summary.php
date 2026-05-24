@@ -1,47 +1,25 @@
 <?php
 require_once __DIR__ . '/../../../config/db.php';
+require_once __DIR__ . '/../../../app/includes/api_helpers.php';
 
-set_exception_handler(function (Throwable $e) {
-    if (!headers_sent()) {
-        http_response_code(500);
-        header('Content-Type: application/json');
-    }
-    echo json_encode(['error' => $e->getMessage()]);
-    exit;
-});
-
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
-
+api_require_auth();
 header('Content-Type: application/json');
+api_require_method('GET');
 
-$user_id = (int)$_SESSION['user_id'];
+$user_id    = (int)$_SESSION['user_id'];
 $vehicle_id = isset($_GET['vehicle_id']) && $_GET['vehicle_id'] !== '' ? (int)$_GET['vehicle_id'] : null;
+$time_range = isset($_GET['time_range']) && in_array($_GET['time_range'], ['all_time', 'this_month'], true) ? $_GET['time_range'] : 'all_time';
 
-// Get all active vehicles for the switcher
 $vehicles = [];
-$has_is_default = false;
-$check = $conn->query("SHOW COLUMNS FROM vehicles LIKE 'is_default'");
-if ($check && $check->num_rows > 0) {
-    $has_is_default = true;
-}
-
-$orderBy = $has_is_default ? "is_default DESC, name ASC" : "name ASC";
-$selectFields = $has_is_default ? "id, name, is_default" : "id, name";
-
-$stmt = $conn->prepare("SELECT $selectFields FROM vehicles WHERE user_id = ? AND is_archived = 0 ORDER BY $orderBy");
+$stmt = $conn->prepare("SELECT id, name, is_default FROM vehicles WHERE user_id = ? AND is_archived = 0 ORDER BY is_default DESC, name ASC");
 $stmt->bind_param('i', $user_id);
 $stmt->execute();
 $res = $stmt->get_result();
 while ($row = $res->fetch_assoc()) {
     $vehicles[] = [
-        'id' => (int)$row['id'],
-        'name' => $row['name'],
-        'is_default' => $has_is_default ? (bool)$row['is_default'] : false
+        'id'         => (int)$row['id'],
+        'name'       => $row['name'],
+        'is_default' => (bool)$row['is_default'],
     ];
 }
 $stmt->close();
@@ -56,33 +34,17 @@ if ($vehicle_id) {
     }
 }
 
-// Aggregate stats
 $stats_query = "
     SELECT
         COUNT(*)                                                                                AS total_fillups,
         SUM(fuel_price)                                                                         AS total_spent,
-        SUM(trip_distance) / NULLIF(SUM(liters_filled), 0)                                     AS avg_kml,
-        SUM(fuel_price)    / NULLIF(SUM(trip_distance), 0)                                     AS avg_cost_km,
         SUM(CASE WHEN MONTH(log_date) = MONTH(CURDATE())
                   AND  YEAR(log_date) =  YEAR(CURDATE()) THEN 1          ELSE 0 END)           AS month_fillups,
         SUM(CASE WHEN MONTH(log_date) = MONTH(CURDATE())
                   AND  YEAR(log_date) =  YEAR(CURDATE()) THEN fuel_price ELSE 0 END)           AS month_spent,
-        SUM(CASE WHEN MONTH(log_date) = MONTH(CURDATE())
-                  AND  YEAR(log_date) =  YEAR(CURDATE()) THEN trip_distance ELSE NULL END)
-            / NULLIF(SUM(CASE WHEN MONTH(log_date) = MONTH(CURDATE())
-                  AND  YEAR(log_date) =  YEAR(CURDATE()) THEN liters_filled ELSE NULL END), 0) AS month_avg_kml,
-        SUM(CASE WHEN MONTH(log_date) = MONTH(CURDATE())
-                  AND  YEAR(log_date) =  YEAR(CURDATE()) THEN fuel_price   ELSE NULL END)
-            / NULLIF(SUM(CASE WHEN MONTH(log_date) = MONTH(CURDATE())
-                  AND  YEAR(log_date) =  YEAR(CURDATE()) THEN trip_distance ELSE NULL END), 0) AS month_avg_cost_km,
-        SUM(fuel_price) / NULLIF(SUM(liters_filled), 0)                                        AS avg_cost_per_liter,
-        SUM(CASE WHEN MONTH(log_date) = MONTH(CURDATE())
-                  AND  YEAR(log_date) =  YEAR(CURDATE()) THEN fuel_price   ELSE NULL END)
-            / NULLIF(SUM(CASE WHEN MONTH(log_date) = MONTH(CURDATE())
-                  AND  YEAR(log_date) =  YEAR(CURDATE()) THEN liters_filled ELSE NULL END), 0) AS month_avg_cost_per_liter,
         SUM(trip_distance)                                                                       AS total_distance,
         SUM(CASE WHEN MONTH(log_date) = MONTH(CURDATE())
-                  AND  YEAR(log_date) =  YEAR(CURDATE()) THEN trip_distance ELSE 0 END)         AS month_total_distance
+                  AND  YEAR(log_date) =  YEAR(CURDATE()) THEN trip_distance ELSE NULL END)      AS month_total_distance
     FROM fuel_logs
     WHERE user_id = ?
 ";
@@ -102,23 +64,17 @@ $agg = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 $stats = [
-    'total_fillups'     => (int)($agg['total_fillups'] ?? 0),
-    'month_fillups'     => (int)($agg['month_fillups'] ?? 0),
-    'total_spent'       => (float)($agg['total_spent'] ?? 0),
-    'month_spent'       => (float)($agg['month_spent'] ?? 0),
-    'avg_kml'           => ($agg['avg_kml'] !== null) ? (float)$agg['avg_kml'] : null,
-    'month_avg_kml'     => ($agg['month_avg_kml'] !== null) ? (float)$agg['month_avg_kml'] : null,
-    'avg_cost_km'              => ($agg['avg_cost_km'] !== null) ? (float)$agg['avg_cost_km'] : null,
-    'month_avg_cost_km'        => ($agg['month_avg_cost_km'] !== null) ? (float)$agg['month_avg_cost_km'] : null,
-    'avg_cost_per_liter'       => ($agg['avg_cost_per_liter'] !== null) ? (float)$agg['avg_cost_per_liter'] : null,
-    'month_avg_cost_per_liter' => ($agg['month_avg_cost_per_liter'] !== null) ? (float)$agg['month_avg_cost_per_liter'] : null,
-    'total_distance'           => ($agg['total_distance'] !== null) ? (float)$agg['total_distance'] : null,
-    'month_total_distance'     => ($agg['month_total_distance'] !== null) ? (float)$agg['month_total_distance'] : null,
+    'total_fillups'        => (int)($agg['total_fillups'] ?? 0),
+    'month_fillups'        => (int)($agg['month_fillups'] ?? 0),
+    'total_spent'          => (float)($agg['total_spent'] ?? 0),
+    'month_spent'          => (float)($agg['month_spent'] ?? 0),
+    'total_distance'       => ($agg['total_distance'] !== null) ? (float)$agg['total_distance'] : null,
+    'month_total_distance' => ($agg['month_total_distance'] !== null) ? (float)$agg['month_total_distance'] : null,
 ];
 
 $fleet = [];
-if (count($vehicles) > 1) {
-    $fleet_stmt = $conn->prepare("
+if (count($vehicles) > 0) {
+    $fleet_base_query = "
         SELECT
             v.id,
             v.name,
@@ -129,9 +85,13 @@ if (count($vehicles) > 1) {
         FROM fuel_logs fl
         JOIN vehicles v ON v.id = fl.vehicle_id
         WHERE fl.user_id = ? AND v.is_archived = 0
-        GROUP BY v.id, v.name
-        ORDER BY avg_kml DESC
-    ");
+    ";
+    if ($time_range === 'this_month') {
+        $fleet_base_query .= " AND MONTH(fl.log_date) = MONTH(CURDATE()) AND YEAR(fl.log_date) = YEAR(CURDATE())";
+    }
+    $fleet_base_query .= " GROUP BY v.id, v.name ORDER BY avg_kml DESC";
+
+    $fleet_stmt = $conn->prepare($fleet_base_query);
     $fleet_stmt->bind_param('i', $user_id);
     $fleet_stmt->execute();
     $fleet_res = $fleet_stmt->get_result();
@@ -148,9 +108,11 @@ if (count($vehicles) > 1) {
     $fleet_stmt->close();
 }
 
-// Recent fill-ups
 $fillups = [];
 $vehicle_filter = $vehicle_id ? " AND fl.vehicle_id = {$vehicle_id}" : "";
+$time_filter = ($time_range === 'this_month')
+    ? " AND MONTH(fl.log_date) = MONTH(CURDATE()) AND YEAR(fl.log_date) = YEAR(CURDATE())"
+    : "";
 $logs_query = "
     WITH ranked AS (
         SELECT
@@ -200,7 +162,7 @@ $logs_query = "
                   AND (fl2.log_date < fl.log_date OR (fl2.log_date = fl.log_date AND fl2.id <= fl.id))
             ) END AS efficiency_l100km
         FROM fuel_logs fl
-        WHERE fl.user_id = {$user_id}{$vehicle_filter}
+        WHERE fl.user_id = {$user_id}{$vehicle_filter}{$time_filter}
     )
     SELECT
         r.id,
@@ -233,7 +195,7 @@ if ($result === false) {
 while ($row = $result->fetch_assoc()) {
     $fillups[] = [
         'date'           => $row['log_date'],
-        'station'        => $row['vehicle_name'],
+        'vehicle_name'   => $row['vehicle_name'],
         'is_full_tank'   => (bool)$row['is_full_tank'],
         'liters_filled'  => (float)$row['liters_filled'],
         'cost_per_liter' => (float)$row['cost_per_liter'],
@@ -255,4 +217,3 @@ echo json_encode([
     'fillups'             => $fillups,
     'fleet'               => $fleet,
 ]);
-

@@ -1,29 +1,10 @@
 <?php
 require_once __DIR__ . '/../../../config/db.php';
+require_once __DIR__ . '/../../../app/includes/api_helpers.php';
 
-set_exception_handler(function (Throwable $e) {
-    if (!headers_sent()) {
-        http_response_code(500);
-        header('Content-Type: application/json');
-    }
-    echo json_encode(['error' => $e->getMessage()]);
-    exit;
-});
-
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
-
+api_require_auth();
 header('Content-Type: application/json');
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
-    exit;
-}
+api_require_method('POST');
 
 $body = json_decode(file_get_contents('php://input'), true);
 
@@ -58,6 +39,13 @@ if (!$date_valid) {
     exit;
 }
 
+$today = (new DateTime())->format('Y-m-d');
+if ($log_date > $today) {
+    http_response_code(422);
+    echo json_encode(['error' => 'Log date cannot be in the future.']);
+    exit;
+}
+
 if ($odometer < 0) {
     http_response_code(422);
     echo json_encode(['error' => 'Odometer must be zero or greater.']);
@@ -76,7 +64,6 @@ if ($fuel_price <= 0) {
     exit;
 }
 
-// Fetch current log, verify ownership
 $stmt = $conn->prepare("
     SELECT id, vehicle_id, log_date, odometer, trip_distance
     FROM fuel_logs
@@ -97,7 +84,6 @@ if (!$current) {
 $vehicle_id   = (int)$current['vehicle_id'];
 $old_date     = $current['log_date'];
 
-// Validate vehicle is not archived
 $stmt = $conn->prepare("SELECT id FROM vehicles WHERE id = ? AND user_id = ? AND is_archived = 0 LIMIT 1");
 $stmt->bind_param('ii', $vehicle_id, $user_id);
 $stmt->execute();
@@ -110,8 +96,6 @@ if (!$vehicle_row) {
     exit;
 }
 
-// Find old_next (the log immediately after this one in OLD ordering, before we change dates).
-// This is needed for downstream recomputation when the date changes.
 $stmt = $conn->prepare("
     SELECT id, odometer, log_date FROM fuel_logs
     WHERE user_id = ? AND vehicle_id = ? AND id != ?
@@ -124,7 +108,6 @@ $stmt->execute();
 $old_next = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-// Find new_prev: log just before new position (excludes self)
 $stmt = $conn->prepare("
     SELECT odometer FROM fuel_logs
     WHERE user_id = ? AND vehicle_id = ? AND id != ?
@@ -137,7 +120,6 @@ $stmt->execute();
 $new_prev = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-// Find new_next: log just after new position (excludes self)
 $stmt = $conn->prepare("
     SELECT id, odometer FROM fuel_logs
     WHERE user_id = ? AND vehicle_id = ? AND id != ?
@@ -153,7 +135,6 @@ $stmt->close();
 $new_prev_odometer = $new_prev ? (int)$new_prev['odometer'] : null;
 $new_next_odometer = $new_next ? (int)$new_next['odometer'] : null;
 
-// Validate odometer against neighbors in new ordering
 if ($new_prev_odometer !== null && $odometer < $new_prev_odometer) {
     http_response_code(422);
     echo json_encode(['error' => 'Odometer must be ≥ the previous fill-up (' . $new_prev_odometer . ' km).']);
@@ -166,11 +147,10 @@ if ($new_next_odometer !== null && $odometer > $new_next_odometer) {
     exit;
 }
 
-// Compute trip_distance for this log
 $trip_distance = null;
 if ($new_prev_odometer !== null && !$manual_trip_override) {
     $trip_distance = (float)($odometer - $new_prev_odometer);
-} else {
+} elseif ($new_prev_odometer !== null) {
     if ($trip_distance_input === null || $trip_distance_input === '') {
         http_response_code(422);
         echo json_encode(['error' => 'Trip distance is required.']);
@@ -182,10 +162,18 @@ if ($new_prev_odometer !== null && !$manual_trip_override) {
         echo json_encode(['error' => 'Trip distance must be zero or greater.']);
         exit;
     }
+} else {
+    if ($trip_distance_input !== null && $trip_distance_input !== '') {
+        $parsed = (float)$trip_distance_input;
+        if ($parsed > 0) {
+            $trip_distance = $parsed;
+        }
+    }
 }
 
 $is_full_tank_int = $is_full_tank ? 1 : 0;
 
+// Fixed type string: s(log_date) i(odometer) d(trip_distance) d(liters_filled) d(fuel_price) i(is_full_tank_int) s(notes) i(id) i(user_id)
 $stmt = $conn->prepare("
     UPDATE fuel_logs
     SET log_date = ?, odometer = ?, trip_distance = ?,
@@ -194,7 +182,7 @@ $stmt = $conn->prepare("
     WHERE id = ? AND user_id = ?
 ");
 $stmt->bind_param(
-    'siiddiisi',
+    'sidddisii',
     $log_date, $odometer, $trip_distance,
     $liters_filled, $fuel_price, $is_full_tank_int,
     $notes, $id, $user_id
@@ -202,29 +190,24 @@ $stmt->bind_param(
 $stmt->execute();
 $stmt->close();
 
-// Update vehicle's odometer if this is the latest log
 $stmt = $conn->prepare("
-    SELECT COUNT(*) as cnt FROM fuel_logs
+    SELECT odometer FROM fuel_logs
     WHERE user_id = ? AND vehicle_id = ?
-      AND (log_date > ? OR (log_date = ? AND id > ?))
+    ORDER BY log_date DESC, id DESC
+    LIMIT 1
 ");
-$stmt->bind_param('iissi', $user_id, $vehicle_id, $log_date, $log_date, $id);
+$stmt->bind_param('ii', $user_id, $vehicle_id);
 $stmt->execute();
-$is_latest = $stmt->get_result()->fetch_assoc()['cnt'] == 0;
+$latest_row = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-if ($is_latest) {
+if ($latest_row) {
+    $latest_odo = (int)$latest_row['odometer'];
     $stmt = $conn->prepare("UPDATE vehicles SET odometer = ? WHERE id = ? AND user_id = ?");
-    $stmt->bind_param('iii', $odometer, $vehicle_id, $user_id);
+    $stmt->bind_param('iii', $latest_odo, $vehicle_id, $user_id);
     $stmt->execute();
     $stmt->close();
 }
-
-// ── Downstream Recomputation ─────────────────────────────────────────────────
-// After the update, the log is now at its new position.
-// 1. new_next's trip_distance = new_next.odometer - new_odometer
-// 2. If the date changed and old_next != new_next:
-//    old_next now has a different predecessor; recompute its trip_distance.
 
 if ($new_next) {
     $new_next_id       = (int)$new_next['id'];
@@ -240,7 +223,6 @@ if ($date_changed && $old_next && (!$new_next || (int)$old_next['id'] !== (int)$
     $old_next_id   = (int)$old_next['id'];
     $old_next_date = $old_next['log_date'];
 
-    // Find old_next's new predecessor (the log that now comes just before it)
     $stmt = $conn->prepare("
         SELECT odometer FROM fuel_logs
         WHERE user_id = ? AND vehicle_id = ? AND id != ?
@@ -261,7 +243,6 @@ if ($date_changed && $old_next && (!$new_next || (int)$old_next['id'] !== (int)$
         $stmt->close();
     }
 }
-// ─────────────────────────────────────────────────────────────────────────────
 
 http_response_code(200);
 echo json_encode([

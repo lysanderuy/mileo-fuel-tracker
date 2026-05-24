@@ -1,29 +1,10 @@
 <?php
 require_once __DIR__ . '/../../../config/db.php';
+require_once __DIR__ . '/../../../app/includes/api_helpers.php';
 
-set_exception_handler(function (Throwable $e) {
-    if (!headers_sent()) {
-        http_response_code(500);
-        header('Content-Type: application/json');
-    }
-    echo json_encode(['error' => $e->getMessage()]);
-    exit;
-});
-
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
-
+api_require_auth();
 header('Content-Type: application/json');
-
-if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
-    exit;
-}
+api_require_method('GET');
 
 $user_id = (int)$_SESSION['user_id'];
 $id      = isset($_GET['id']) ? (int)$_GET['id'] : 0;

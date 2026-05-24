@@ -1,29 +1,10 @@
 <?php
 require_once __DIR__ . '/../../../config/db.php';
+require_once __DIR__ . '/../../../app/includes/api_helpers.php';
 
-set_exception_handler(function (Throwable $e) {
-    if (!headers_sent()) {
-        http_response_code(500);
-        header('Content-Type: application/json');
-    }
-    echo json_encode(['error' => $e->getMessage()]);
-    exit;
-});
-
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
-
+api_require_auth();
 header('Content-Type: application/json');
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
-    exit;
-}
+api_require_method('POST');
 
 $body = json_decode(file_get_contents('php://input'), true);
 
@@ -55,6 +36,13 @@ $date_valid = $date_obj && $date_obj->format('Y-m-d') === $log_date;
 if (!$date_valid) {
     http_response_code(422);
     echo json_encode(['error' => 'Invalid log date.']);
+    exit;
+}
+
+$today = (new DateTime())->format('Y-m-d');
+if ($log_date > $today) {
+    http_response_code(422);
+    echo json_encode(['error' => 'Log date cannot be in the future.']);
     exit;
 }
 
@@ -115,7 +103,7 @@ if ($last_odometer !== null && $odometer < $last_odometer) {
 $trip_distance = null;
 if ($last_odometer !== null && !$manual_trip_override) {
     $trip_distance = (float)($odometer - $last_odometer);
-} else {
+} elseif ($last_odometer !== null) {
     if ($trip_distance_input === null || $trip_distance_input === '') {
         http_response_code(422);
         echo json_encode(['error' => 'Trip distance is required.']);
@@ -151,11 +139,35 @@ $stmt->execute();
 $new_id = (int)$stmt->insert_id;
 $stmt->close();
 
-// Update vehicle's odometer to latest
 $stmt = $conn->prepare("UPDATE vehicles SET odometer = ? WHERE id = ? AND user_id = ?");
 $stmt->bind_param('iii', $odometer, $vehicle_id, $user_id);
 $stmt->execute();
 $stmt->close();
+
+$efficiency_kml = null;
+if ($is_full_tank) {
+    $eff_result = $conn->query("
+        SELECT SUM(fl2.liters_filled) / NULLIF({$odometer} - pf.odometer, 0) * 100 AS efficiency_l100km
+        FROM fuel_logs fl2
+        JOIN (
+            SELECT id, odometer, log_date
+            FROM fuel_logs
+            WHERE vehicle_id = {$vehicle_id} AND user_id = {$user_id}
+              AND is_full_tank = 1
+              AND (log_date < '{$log_date}' OR (log_date = '{$log_date}' AND id < {$new_id}))
+            ORDER BY log_date DESC, id DESC LIMIT 1
+        ) pf ON (fl2.log_date > pf.log_date OR (fl2.log_date = pf.log_date AND fl2.id > pf.id))
+        WHERE fl2.vehicle_id = {$vehicle_id} AND fl2.user_id = {$user_id}
+          AND (fl2.log_date < '{$log_date}' OR (fl2.log_date = '{$log_date}' AND fl2.id <= {$new_id}))
+    ");
+    if ($eff_result) {
+        $eff_row = $eff_result->fetch_assoc();
+        $l100 = $eff_row['efficiency_l100km'] ?? null;
+        if ($l100 !== null && (float)$l100 > 0) {
+            $efficiency_kml = 100.0 / (float)$l100;
+        }
+    }
+}
 
 http_response_code(201);
 echo json_encode([
@@ -168,6 +180,7 @@ echo json_encode([
         'liters_filled' => $liters_filled,
         'fuel_price' => $fuel_price,
         'is_full_tank' => (bool)$is_full_tank_int,
+        'efficiency_kml' => $efficiency_kml,
         'efficiency_note' => $is_full_tank ? null : 'Partial fill - efficiency estimate may vary.',
         'notes' => $notes === '' ? null : $notes,
     ],

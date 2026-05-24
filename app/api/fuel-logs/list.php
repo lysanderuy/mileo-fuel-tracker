@@ -1,29 +1,10 @@
 <?php
 require_once __DIR__ . '/../../../config/db.php';
+require_once __DIR__ . '/../../../app/includes/api_helpers.php';
 
-set_exception_handler(function (Throwable $e) {
-    if (!headers_sent()) {
-        http_response_code(500);
-        header('Content-Type: application/json');
-    }
-    echo json_encode(['error' => $e->getMessage()]);
-    exit;
-});
-
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
-
+api_require_auth();
 header('Content-Type: application/json');
-
-if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
-    exit;
-}
+api_require_method('GET');
 
 $user_id    = (int)$_SESSION['user_id'];
 $vehicle_id = isset($_GET['vehicle_id']) && $_GET['vehicle_id'] !== '' ? (int)$_GET['vehicle_id'] : 0;
@@ -58,10 +39,8 @@ $logs_query = "
             fl.cost_per_liter,
             fl.liters_filled,
             fl.trip_distance,
-            fl.odometer,
             fl.is_full_tank,
             fl.notes,
-            fl.cost_per_km,
             CASE WHEN fl.is_full_tank = 1 THEN (
                 SELECT SUM(fl2.liters_filled) / NULLIF(
                     fl.odometer - (
@@ -108,15 +87,11 @@ $logs_query = "
         r.cost_per_liter,
         r.liters_filled,
         r.trip_distance,
-        r.odometer,
         r.is_full_tank,
         r.notes,
-        r.cost_per_km,
         CASE WHEN r.efficiency_l100km > 0 THEN 100.0 / r.efficiency_l100km END AS efficiency_kml,
         LAG(CASE WHEN r.efficiency_l100km > 0 THEN 100.0 / r.efficiency_l100km END)
             OVER (PARTITION BY r.vehicle_id ORDER BY r.log_date ASC, r.id ASC)  AS prior_efficiency_kml,
-        LAG(r.cost_per_km)
-            OVER (PARTITION BY r.vehicle_id ORDER BY r.log_date ASC, r.id ASC)  AS prior_cost_per_km,
         v.name AS vehicle_name
     FROM ranked r
     JOIN vehicles v ON v.id = r.vehicle_id
@@ -133,15 +108,12 @@ while ($row = $result->fetch_assoc()) {
         'fuel_price'     => (float)$row['fuel_price'],
         'cost_per_liter' => $row['cost_per_liter'] !== null ? (float)$row['cost_per_liter'] : null,
         'liters_filled'  => (float)$row['liters_filled'],
-        'trip_distance'  => (float)$row['trip_distance'],
-        'odometer'       => (int)$row['odometer'],
-        'is_full_tank'   => (bool)$row['is_full_tank'],
-        'efficiency_kml' => $row['efficiency_kml'] !== null ? (float)$row['efficiency_kml'] : null,
-        'cost_per_km'    => $row['cost_per_km'] !== null ? (float)$row['cost_per_km'] : null,
+        'trip_distance'        => $row['trip_distance'] !== null ? (float)$row['trip_distance'] : null,
+        'is_full_tank'         => (bool)$row['is_full_tank'],
+        'efficiency_kml'       => $row['efficiency_kml'] !== null ? (float)$row['efficiency_kml'] : null,
         'prior_efficiency_kml' => $row['prior_efficiency_kml'] !== null ? (float)$row['prior_efficiency_kml'] : null,
-        'prior_cost_per_km'    => $row['prior_cost_per_km'] !== null ? (float)$row['prior_cost_per_km'] : null,
-        'notes'          => $row['notes'],
-        'vehicle_name'   => $row['vehicle_name']
+        'notes'                => $row['notes'],
+        'vehicle_name'         => $row['vehicle_name']
     ];
 }
 
@@ -152,4 +124,3 @@ echo json_encode([
     'per_page' => $per_page,
     'has_more' => ($offset + count($logs)) < $total,
 ]);
-

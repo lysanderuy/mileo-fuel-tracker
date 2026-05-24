@@ -1,20 +1,10 @@
 <?php
 require_once __DIR__ . '/../../../config/db.php';
+require_once __DIR__ . '/../../../app/includes/api_helpers.php';
 
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
-
+api_require_auth();
 header('Content-Type: application/json');
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
-    exit;
-}
+api_require_method('POST');
 
 $body = json_decode(file_get_contents('php://input'), true);
 
@@ -81,7 +71,6 @@ $stmt->execute();
 $new_id = $stmt->insert_id;
 $stmt->close();
 
-// If this is the user's first vehicle, mark it as the default
 $count_stmt = $conn->prepare("SELECT COUNT(*) FROM vehicles WHERE user_id = ? AND is_archived = 0");
 $count_stmt->bind_param('i', $user_id);
 $count_stmt->execute();
