@@ -25,7 +25,7 @@ Mileo helps drivers track fuel without turning it into a chore. It gives you a f
 
 - **Quick fuel logging.** Capture a fill-up with minimal friction.
 - **Dashboard overview.** See aggregate stats, recent fill-ups, and fleet efficiency at a glance.
-- **Fuel log history.** Browse, search, and filter all fill-ups with computed efficiency metrics.
+- **Fuel log history.** Browse all fill-ups, filter by vehicle, and see computed efficiency metrics.
 - **Fuel log detail.** View per-fill-up breakdown including efficiency compared to the prior fill-up.
 - **Vehicle management.** Add, edit, archive, restore, and delete vehicles.
 - **Archive support.** Keep inactive vehicles out of the way without losing their data.
@@ -34,7 +34,7 @@ Mileo helps drivers track fuel without turning it into a chore. It gives you a f
 ## Project Structure
 
 ```text
-mileo/
+mileo-fuel-tracker/
 ├── app/
 │   ├── api/
 │   │   ├── auth/
@@ -60,7 +60,9 @@ mileo/
 │   ├── includes/
 │   │   ├── components/
 │   │   │   ├── fillup_modal.php
+│   │   │   ├── stat_card.php
 │   │   │   └── vehicles_section.php
+│   │   ├── api_helpers.php
 │   │   ├── footer.php
 │   │   └── header.php
 │   └── pages/
